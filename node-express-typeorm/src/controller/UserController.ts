@@ -24,9 +24,9 @@ export class UserController {
    * @returns JSON response containing the user if found, or 404 error if not found
    */
   async one(request: Request, response: Response) {
-    const id = parseInt(request.params.id);
+    const userName = request.params.userName;
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { userName },
     });
 
     if (!user) {

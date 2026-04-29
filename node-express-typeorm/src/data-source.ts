@@ -5,9 +5,9 @@ import { User } from "./entity/User";
 export const AppDataSource = new DataSource({
   type: "mssql",
   host: "dipto-database.cn2ems8y2mfe.ap-southeast-2.rds.amazonaws.com",
-  username: "diptoStudent",
-  password: "COSC2758-2026@!",
-  database: "diptoStudent",
+  username: "s3731808",
+  password: "Rmit1234#1",
+  database: "s3731804",
       options: {
         encrypt: false, // Use this for Azure SQL Database
         //trustedConnection: false // Use this for Windows Authentication (if applicable)

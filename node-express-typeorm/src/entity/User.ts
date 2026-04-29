@@ -9,15 +9,24 @@ import {
 
 @Entity()
 export class User {
-  userName: string; // Unique identifier for the user
+  @PrimaryColumn({ unique: true })
+  userName: string; //unique identifier for the user
+  @Column()
   firstName: string;
+  @Column()
   lastName: string;
+  @Column()
   email: string;
+  @Column()
   password: string;
-  role: string; // e.g., "hirer", "vendor"
-  phoneNumber?: string; // Optional phone number field
+  @Column()
+  role: string; //e.g., "hirer", "vendor"
+  @Column()
+  phoneNumber?: string; //optional phone number field'
+  @Column()
   eventRankings?: number[]
 }
+/*
 @Entity()
 export class User {
   @PrimaryColumn()
@@ -41,3 +50,4 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+*/
