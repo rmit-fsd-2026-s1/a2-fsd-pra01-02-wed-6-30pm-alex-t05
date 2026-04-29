@@ -18,7 +18,7 @@ export class UserController {
   }
 
   /**
-   * Retrieves a single user by their ID
+   * Retrieves a single user by their userName
    * @param request - Express request object containing the user ID in params
    * @param response - Express response object
    * @returns JSON response containing the user if found, or 404 error if not found
@@ -41,14 +41,17 @@ export class UserController {
    * @returns JSON response containing the created user or error message
    */
   async save(request: Request, response: Response) {
-    const { userName, firstName, lastName, email } = request.body;
+    const { userName, firstName, lastName, email, password, role, phoneNumber } = request.body;
 
-    const user = Object.assign(new User(), {
-      userName,
-      firstName,
-      lastName,
-      email,
-    });
+    const user: User = {
+      userName: userName,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      role: role,
+      phoneNumber: phoneNumber
+    };
 
     try {
       const savedUser = await this.userRepository.save(user);
@@ -61,8 +64,8 @@ export class UserController {
   }
 
   /**
-   * Deletes a user from the database by their ID
-   * @param request - Express request object containing the user ID in params
+   * Deletes a user from the database by their userName
+   * @param request - Express request object containing the user userName in params
    * @param response - Express response object
    * @returns JSON response with success message or 404 error if user not found
    */
@@ -88,7 +91,7 @@ export class UserController {
    */
   async update(request: Request, response: Response) {
     const userName = request.params.userName;
-    const { firstName, lastName, email } = request.body;
+    const { firstName, lastName, email, password, role, phoneNumber } = request.body;
 
     let userToUpdate = await this.userRepository.findOne({
       where: { userName },
@@ -98,15 +101,18 @@ export class UserController {
       return response.status(404).json({ message: "User not found" });
     }
 
-    userToUpdate = Object.assign(userToUpdate, {
-      userName,
-      firstName,
-      lastName,
-      email,
-    });
+    const updatedUser: User = {
+      ...userToUpdate,
+      firstName: firstName,
+      lastName: lastName,
+      email: email,
+      password: password,
+      role: role,
+      phoneNumber: phoneNumber
+    };
 
     try {
-      const updatedUser = await this.userRepository.save(userToUpdate);
+      await this.userRepository.save(updatedUser);
       return response.json(updatedUser);
     } catch (error) {
       return response
