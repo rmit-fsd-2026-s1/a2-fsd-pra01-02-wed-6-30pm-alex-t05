@@ -23,8 +23,10 @@ export class User {
   role: string; //e.g., "hirer", "vendor"
   @Column()
   phoneNumber?: string; //optional phone number field'
+  /*
   @Column()
   eventRankings?: number[]
+  */
 }
 /*
 @Entity()

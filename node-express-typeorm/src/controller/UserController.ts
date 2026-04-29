@@ -34,7 +34,6 @@ export class UserController {
     }
     return response.json(user);
   }
-
   /**
    * Creates a new user in the database
    * @param request - Express request object containing user details in body
@@ -42,13 +41,13 @@ export class UserController {
    * @returns JSON response containing the created user or error message
    */
   async save(request: Request, response: Response) {
-    const { firstName, lastName, email, age } = request.body;
+    const { userName, firstName, lastName, email } = request.body;
 
     const user = Object.assign(new User(), {
+      userName,
       firstName,
       lastName,
       email,
-      age,
     });
 
     try {
@@ -68,9 +67,9 @@ export class UserController {
    * @returns JSON response with success message or 404 error if user not found
    */
   async remove(request: Request, response: Response) {
-    const id = parseInt(request.params.id);
+    const userName = request.params.userName;
     const userToRemove = await this.userRepository.findOne({
-      where: { id },
+      where: { userName },
     });
 
     if (!userToRemove) {
@@ -88,11 +87,11 @@ export class UserController {
    * @returns JSON response containing the updated user or error message
    */
   async update(request: Request, response: Response) {
-    const id = parseInt(request.params.id);
-    const { firstName, lastName, email, age } = request.body;
+    const userName = request.params.userName;
+    const { firstName, lastName, email } = request.body;
 
     let userToUpdate = await this.userRepository.findOne({
-      where: { id },
+      where: { userName },
     });
 
     if (!userToUpdate) {
@@ -100,10 +99,10 @@ export class UserController {
     }
 
     userToUpdate = Object.assign(userToUpdate, {
+      userName,
       firstName,
       lastName,
       email,
-      age,
     });
 
     try {

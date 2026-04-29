@@ -5,7 +5,7 @@ import { User } from "./entity/User";
 export const AppDataSource = new DataSource({
   type: "mssql",
   host: "dipto-database.cn2ems8y2mfe.ap-southeast-2.rds.amazonaws.com",
-  username: "s3731808",
+  username: "s3731804",
   password: "Rmit1234#1",
   database: "s3731804",
       options: {
