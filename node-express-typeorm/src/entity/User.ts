@@ -1,3 +1,4 @@
+import { read } from "fs";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -9,22 +10,22 @@ import {
 
 @Entity()
 export class User {
-  @PrimaryColumn({ unique: true })
+  @PrimaryColumn({ unique: true, update: false })
   userName: string; //unique identifier for the user
   @Column()
   firstName: string;
   @Column()
   lastName: string;
-  @Column()
+  @Column({ update: false, unique: true })
   email: string;
   @Column()
   password: string;
   @Column()
   role: string; //e.g., "hirer", "vendor"
-  @Column()
+  @Column({ nullable: true })
   phoneNumber?: string; //optional phone number field'
   /*
-  @Column()
+  @Column({ array: true, nullable: true })
   eventRankings?: number[]
   */
 }
