@@ -1,4 +1,3 @@
-import { read } from "fs";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -29,28 +28,3 @@ export class User {
   eventRankings?: number[]
   */
 }
-/*
-@Entity()
-export class User {
-  @PrimaryColumn()
-  id: number;
-
-  @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
-
-  @Column({ unique: true })
-  email: string;
-
-  @Column()
-  age: number;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-}
-*/
