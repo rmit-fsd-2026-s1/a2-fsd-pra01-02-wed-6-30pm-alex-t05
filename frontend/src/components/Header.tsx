@@ -1,9 +1,7 @@
-import React from "react";
-import { Image, Icon } from "@chakra-ui/react"
+import { Icon, Avatar } from "@chakra-ui/react"
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { MdEventSeat } from "react-icons/md";
-
 
 const Header = () => {
     const { user } = useAuth();
@@ -16,12 +14,9 @@ const Header = () => {
             </Link>
             <div className="flex space-x-4 items-center ml-auto pr-4">
                 <p className="font-bold pr-2">Hello, {user?.userName || 'Guest'}</p>
-                <Image
-                    //placeholder image 
-                    src="https://mockmind-api.uifaces.co/content/human/80.jpg"
-                    boxSize="50px"
-                    borderRadius="full"
-                    fit="cover"
+                <Avatar
+                    name={user?.userName || 'Guest'}
+                    size="sm"
                 />
             </div>
 

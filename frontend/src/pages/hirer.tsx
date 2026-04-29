@@ -1,20 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { FormControl, FormLabel, Button, Input, Icon } from "@chakra-ui/react";
+import { useState } from 'react';
+import { Button, Input, Icon } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 import { MdSearch } from "react-icons/md";
 import Card from "../components/Card";
 import { useEvent } from '../context/EventContext';
-
-//TODO
-//Enter and update hirer profile (ph num, name) (Somewhat done)
-//display list of prepopulated selectable venues (Done)
-//rank selected venues
-//apply for venue to hire based on prefilled details (can apply, but still needs work i think)
-//is this prefilled in the page or the profile (Somewhat done. phonenumber still doesnt prefilled)
-//view hiring reputation based on history stats
-
-//Not Working
-//Phone Number Showing
 
 export default function Hirer() {
     const { user } = useAuth()

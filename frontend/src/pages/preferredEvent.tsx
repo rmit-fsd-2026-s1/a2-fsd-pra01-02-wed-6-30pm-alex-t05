@@ -1,0 +1,139 @@
+import { Button, Icon, Input } from "@chakra-ui/react";
+import { useAuth } from "@/context/AuthContext";
+import { useEvent } from "@/context/EventContext";
+import { useEffect, useState } from "react";
+import PreferredEventCard from "@/components/preferredEventCard";
+import { MdArrowUpward, MdArrowDownward, MdDelete } from "react-icons/md";
+import { updateUser } from "@/services/userService";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { User } from "@/types/user";
+
+
+export default function PreferredEvent() { 
+    const { user, login } = useAuth();
+    const currentUser = useCurrentUser(); // Get the current full user details from the custom hook
+    
+    const [profileUser, setProfileUser] = useState<User | null>(null); // State to hold the user details
+    useEffect(() => {
+        setProfileUser(currentUser); // Set the profileUser state to the fetched user details
+    }, [currentUser]);
+    
+    const moveUp = (index: number) => {
+        //prevent out of bounds
+        if (index === 0) return;
+        if (profileUser) {
+            const swapEvents = [...profileUser.preferredEvents!];
+            const swap = swapEvents[index];
+            swapEvents[index] = swapEvents[index - 1];
+            swapEvents[index - 1] = swap;
+            const updatedUser = {
+                ...profileUser!,
+                preferredEvents: swapEvents
+            };
+            //update data in local storage and context
+            updateUser(updatedUser);
+            login(updatedUser);
+            setProfileUser(updatedUser); // Trigger local state update to re-render component
+        }
+    };
+
+    const moveDown = (index: number) => {
+        //prevent out of bounds
+        if (index === profileUser!.preferredEvents!.length - 1) return;
+        if (profileUser) {
+            const swapEvents = [...profileUser.preferredEvents!];
+            const swap = swapEvents[index];
+            swapEvents[index] = swapEvents[index + 1];
+            swapEvents[index + 1] = swap;
+            const updatedUser = {
+                ...profileUser,
+                preferredEvents: swapEvents
+            };
+            //update data in local storage and context
+            updateUser(updatedUser);
+            login(updatedUser);
+            setProfileUser(updatedUser); // Trigger local state update to re-render component
+        }
+    };
+
+    const removePreferredEvents = (eventID: number) => {
+        if (profileUser) {
+            profileUser.preferredEvents = profileUser.preferredEvents!.filter((event) => event.eventID !== eventID);
+            const updatedUser = {
+                ...profileUser,
+                preferredEvents: profileUser.preferredEvents
+            };
+            updateUser(updatedUser);
+            login(updatedUser);
+        }
+    };
+
+    return (
+        profileUser && profileUser.role === "hirer" ? ( // This only works if the user is a hirer
+            <div className="min-h-screen items-center justify-center bg-gray-100">
+                <h1 className="!text-2xl flex items-center justify-center">Preferred Events</h1>
+                {profileUser.preferredEvents === null || profileUser.preferredEvents!.length === 0 ? ( // This checks if events are empty or null
+                    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                        <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+                            <h1 className="text-2xl font-bold mb-4">No preferred event found</h1>
+                        </div>
+                    </div>
+                ) : (
+                    /* Search function
+                    include will match the users search and return the event if it matches.
+                    filter will get the found events and put in an array */
+                    <div className="gap-4">
+                        {profileUser.preferredEvents!.map((event) => ( // Map prints the found events
+                            <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventID}>
+                                <PreferredEventCard
+                                    eventID={event.eventID}
+                                    eventName={event.eventName}
+                                    numberOfGuest={event.numberOfGuest}
+                                    date={event.date}
+                                    time={event.time}
+                                    duration={event.duration}
+                                    image={event.image}
+                                    shortDescription={event.shortDescription}
+                                    isBlocked={event.isBlocked}
+                                />
+                                <div className="flex justify-end gap-2 mt-2">
+                                    <Button
+                                        colorScheme='teal'
+                                        type='button'
+                                        className="w-15 items-center"
+                                        onClick={() => removePreferredEvents(event.eventID)}
+                                    >
+                                        <MdDelete />
+                                    </Button>
+                                    <Button
+                                        colorScheme='teal'
+                                        type='button'
+                                        className="w-15 items-center"
+                                        onClick={() => moveUp(profileUser.preferredEvents!.indexOf(event))}
+                                    >
+                                        <MdArrowUpward />
+                                    </Button>
+                                    <Button
+                                        colorScheme='teal'
+                                        type='button'
+                                        className="w-15 items-center"
+                                        onClick={() => moveDown(profileUser.preferredEvents!.indexOf(event))}
+                                    >
+                                        <MdArrowDownward />
+                                    </Button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        ) : ( // If the user is not a hirer, this will show
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
+                    <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
+                    <p className="text-gray-700">You must be signed in as a hirer to view this page.</p>
+                </div>
+            </div>
+        )
+    );
+}

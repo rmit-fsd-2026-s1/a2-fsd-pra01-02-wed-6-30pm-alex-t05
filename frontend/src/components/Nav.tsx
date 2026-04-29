@@ -1,5 +1,4 @@
 import Router from "next/router";
-import React from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@chakra-ui/react";
@@ -16,6 +15,13 @@ const Nav = () => {
                                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard
                             </Link>
                         </li>
+                        {user.role === "hirer" && ( // Only show preferred events link if the user is a hirer
+                            <li>
+                                <Link href="/preferredEvent">
+                                    Preferred Events
+                                </Link>
+                            </li>
+                        )}
                         <li>
                             <Link href="/profile">
                                 Profile

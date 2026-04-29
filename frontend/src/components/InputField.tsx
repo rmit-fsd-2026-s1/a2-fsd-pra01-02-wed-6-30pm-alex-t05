@@ -1,6 +1,6 @@
 import React from "react";
 import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage } from "@chakra-ui/react";
-
+//helper component to streamline form input fields
 type InputFieldProps = {
     label: string;
     name: string;

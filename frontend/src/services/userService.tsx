@@ -46,3 +46,31 @@ export const getUserByUserName = (userName: string): User | null => {
     const user = existingData.find((user: User) => user.userName === userName);
     return user || null;
 }
+
+export function getUserCommentsFromVendor(userName: string, vendorUserName: string) : string {
+    const user = getUserByUserName(userName);
+    for (const comment of user!.vendorComments || []) {
+        //comments are vendorUserName, comment. so match first part to vendorUsername then return comment
+        if (comment[0] === vendorUserName) {
+            return comment[1];
+        }
+    }
+    return "";
+}
+
+export function setUserCommentFromVendor(userName: string, vendorUserName: string, comment: string) : void {
+    const user = getUserByUserName(userName);
+    if (!user) return;
+    for (const existingComment of user!.vendorComments || []) {
+        //if comment from vendor already exists, update it
+        if (existingComment[0] === vendorUserName) {
+            existingComment[1] = comment;
+            updateUser(user!);
+            return;
+        }
+    }
+    //if comment from vendor doesn't exist, add it;
+    user!.vendorComments = user!.vendorComments || [];
+    user!.vendorComments.push([vendorUserName, comment]);
+    updateUser(user!);
+}

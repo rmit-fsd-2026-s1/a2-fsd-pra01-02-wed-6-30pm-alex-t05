@@ -1,22 +1,28 @@
-import { Box } from "@chakra-ui/react";
+import VisualRepresentation from "@/components/vendor/VisualRepresentation";
 import Card from "../components/Card";
 import { useAuth } from "../context/AuthContext";
 import { useEvent } from '../context/EventContext';
+import { Box, Button } from "@chakra-ui/react";
 import { useState } from "react";
-import { getUserByUserName } from "@/services/userService";
-import ApplicantModal from "@/components/vendor/modals/ApplicantModal";
-//TODO
-//view list of hirer applicants
-//view hirers details and compliance docs
-//select applicants and make comments and approve and confirm booking
 
 export default function Vendor() {
     const { user } = useAuth()
     const { events } = useEvent();
+    const[visualisationsVisible, setVisualisationsVisible] = useState(false);
     
     return (
         user && user.role === "vendor" ? (
             <div className="min-h-screen items-center justify-center bg-gray-100">
+                <Box>
+                    <Button colorScheme='teal' type='button'
+                        onClick={() => {
+                            setVisualisationsVisible(!visualisationsVisible);
+                        }}>
+                        {visualisationsVisible ? "Hide Visualisations" : "Show Visualisations"}
+                    </Button>
+                    {visualisationsVisible && 
+                    <VisualRepresentation />}
+                </Box>
                 <h1 className="!text-2xl flex items-center justify-center">Venue List</h1>
                 <div className="grid grid-cols-2 gap-4">
                     {events.map((event) => (event.owner === user.userName) && (

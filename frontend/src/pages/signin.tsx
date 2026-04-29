@@ -1,18 +1,12 @@
-//TODO
-// integrate global state setter
-// combine the email and password state by making an interface (maybe)
-
-
 
 import React, { useState } from 'react';
-import { Box, Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
+import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-import { authenticateUser, getUsers } from '@/services/userService';
-
+import { authenticateUser } from '@/services/userService';
 
 export default function Signin() {
-    const { login } = useAuth(); // Get the login function from the AuthContext
+    const { login } = useAuth(); //get the login function from the AuthContext
     const [email, setEmail] = useState(""); //intial state is empty
     const [password, setPassword] = useState(""); //intial state is empty
     const [error, setError] = useState("") //intial state is empty. also making it false since it has no value in it
@@ -20,10 +14,7 @@ export default function Signin() {
 
     const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         event.preventDefault(); // Page doesn't reload?
-        // Handle form submission logic here
-        //const email = (event.currentTarget.elements[0] as HTMLInputElement).value; // Gets the 'email' value from the form (OLD)
-        //const password = (event.currentTarget.elements[1] as HTMLInputElement).value; //  Gets the 'password' value from the form (OLD)
-
+    
         const user = authenticateUser(email, password);
         if (user) {
                 login({
@@ -79,7 +70,7 @@ export default function Signin() {
                     <h1 className="!text-4xl">An Account</h1>
                 </div>
                 <Button mt={4} colorScheme='teal' type='button' onClick={() => router.push("/signup")}>
-                    Register Now!
+                    Register
                 </Button>
             </div>
         </div>

@@ -1,14 +1,5 @@
-//TODO 
-// Define password requirements and display in helper text
-// Improve password strength indicator (color, progress bar etc)
-// Add field for vendor or hirer and route accordingly on submit (radio)
-// Add global state for profile data and route to profile page on submit
 
-//implement authentication component shared with signin
-
-
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/router";
 import { FormControl, FormLabel, Button, RadioGroup, Radio, Stack, FormErrorMessage } from "@chakra-ui/react";
 import InputField from "@/components/InputField";
@@ -35,7 +26,7 @@ export default function Signup() {
         password: '',
         confirmPassword: '',
         role: ''
-        });
+    });
 
     const [errors, setErrors] = useState<Partial<FormData>>({});
     const router = useRouter();
@@ -47,29 +38,29 @@ export default function Signup() {
         if (password.length > 0) return "weak";
         return "";
     };
-        
+
     //this is just for reactive password strength indicator and error tracking
     const handleInputChange = (
-        
+
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        ) => {
-            const { name, value } = e.target;
-            setProfileData((prevState) => ({
+    ) => {
+        const { name, value } = e.target;
+        setProfileData((prevState) => ({
             ...prevState,
             [name]: value,
-            }));
-            if (!!errors[name as keyof FormData]) {
-                setErrors(prev => ({ ...prev, [name]: undefined }));
-            }
+        }));
+        if (!!errors[name as keyof FormData]) {
+            setErrors(prev => ({ ...prev, [name]: undefined }));
+        }
 
-            if (name === "password") {
-                getPasswordStrength(value)
-            }
-        };
+        if (name === "password") {
+            getPasswordStrength(value)
+        }
+    };
 
 
-    
-    
+
+
 
     //this is is to be run on submit and checks validity of form data and returns an object with error messages for any invalid fields
     const validateDetails = () => {
@@ -98,7 +89,7 @@ export default function Signup() {
             newErrors.role = "Account type is required";
         }
         console.log("Validation errors:", newErrors);
-   
+
         return newErrors;
     };
 
@@ -115,12 +106,12 @@ export default function Signup() {
             return;
         }
         //runs if no errors
-        if(checkDuplicate("userName", profileData.userName) || checkDuplicate("email", profileData.email)) {
+        if (checkDuplicate("userName", profileData.userName) || checkDuplicate("email", profileData.email)) {
             const newErrors: Partial<FormData> = {};
-            if(checkDuplicate("email", profileData.email)) {
+            if (checkDuplicate("email", profileData.email)) {
                 newErrors.email = "Email already exists";
             }
-            if(checkDuplicate("userName", profileData.userName)) {
+            if (checkDuplicate("userName", profileData.userName)) {
                 newErrors.userName = "Username already exists";
             }
             setErrors(newErrors);
@@ -146,9 +137,8 @@ export default function Signup() {
     };
 
     return (
-        <div>
-            <form onSubmit={handleSubmit}>
-
+        <div className="h-200 flex items-center justify-center bg-gray-100">
+            <form onSubmit={handleSubmit} className="w-250">
                 <InputField
                     label="User Name"
                     name="userName"
@@ -170,7 +160,7 @@ export default function Signup() {
                     onChange={handleInputChange}
                     error={errors.lastName}
                 />
-                
+
                 <InputField
                     label="Email"
                     name="email"
@@ -199,8 +189,8 @@ export default function Signup() {
                 />
                 <FormControl isInvalid={!!errors.role}>
                     <FormLabel>Account Type</FormLabel>
-                    <RadioGroup 
-                        onChange={(value) => setProfileData(prev => ({ ...prev, role: value }))} 
+                    <RadioGroup
+                        onChange={(value) => setProfileData(prev => ({ ...prev, role: value }))}
                         value={profileData.role}
                     >
                         <Stack direction='row'>

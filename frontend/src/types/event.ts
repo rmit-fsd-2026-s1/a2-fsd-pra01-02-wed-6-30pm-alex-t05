@@ -10,7 +10,6 @@ export type Event = {
     shortDescription?: string;
     owner: string; // The unique username of the hirer who created the event
     image?: string; // Optional field for event image URL
-    //reputation: [];
     applications: Application[]; // Stores the details of each application, including comments, status, rating, and hire date.
     isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
 };
@@ -25,7 +24,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 4,
         shortDescription: "Celebrate my birthday with friends and family!",
         owner: "minhn",
-        image: "https://images.unsplash.com/photo-1562967005-a3c85514d3e9?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1562967005-a3c85514d3e9",
         applications: [],
         isBlocked: false
     },
@@ -38,7 +37,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 6,
         shortDescription: "A beautiful celebration!",
         owner: "minhn",
-        image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=2698&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3",
         applications: [],
         isBlocked: false
     },
@@ -51,7 +50,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 5,
         shortDescription: "Experience the best rock music live!",
         owner: "minhn",
-        image: "https://images.unsplash.com/photo-1563837168-6eef1595aed9?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1563837168-6eef1595aed9",
         applications: [],
         isBlocked: false
     },
@@ -64,7 +63,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 4,
         shortDescription: "A professional gathering for business networking.",
         owner: "janed",
-        image: "https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1511578314322-379afb476865",
         applications: [
             {
                 id: crypto.randomUUID(),
@@ -114,7 +113,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 5,
         shortDescription: "Help us make a difference!",
         owner: "janed",
-        image: "https://images.unsplash.com/photo-1596727362302-b8d891c42ab8?q=80&w=1570&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1596727362302-b8d891c42ab8",
         applications: [],
         isBlocked: false
     },
@@ -127,7 +126,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 5,
         shortDescription: "Discover the world of contemporary art!",
         owner: "janed",
-        image: "https://images.unsplash.com/photo-1566954979172-eaba308acdf0?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1566954979172-eaba308acdf0",
         applications: [],
         isBlocked: false
     },
@@ -140,7 +139,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 8,
         shortDescription: "Help Us Celebrate Food and Culture!",
         owner: "homers",
-        image: "https://images.unsplash.com/photo-1635702786344-f09eff66e7c4?q=80&w=2062&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1635702786344-f09eff66e7c4",
         applications: [],
         isBlocked: false
     },
@@ -153,7 +152,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 8,
         shortDescription: "Help us, set up an unforgettable rave experience!",
         owner: "homers",
-        image: "https://images.unsplash.com/photo-1506485854521-3e13d857db0b?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1506485854521-3e13d857db0b",
         applications: [],
         isBlocked: false
     },
@@ -166,7 +165,7 @@ export const DEFAULT_EVENT: Event[] = [
         duration: 6,
         shortDescription: "Watch out for people cheating",
         owner: "homers",
-        image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d",
         applications: [],
         isBlocked: false
     }

@@ -3,15 +3,12 @@ import { useEvent } from "../../context/EventContext";
 import { useState } from "react";
 import ApplicantModal from "./modals/ApplicantModal";
 import { Application } from "@/types/application";
-import { autoDeclineOverlappingApplications, getRatingForUser } from "@/services/applicationService";
+import { autoDeclineOverlappingApplications } from "@/services/applicationService";
 import { FaSort } from "react-icons/fa";
-import { useUserRating } from "@/hooks/useUserRating";
 import { ApplicantRow } from "./ApplicantRow";
 
 export default function ApplicantList({ eventID }: { eventID: number }) {
-    //TODO
-    //rework date format to be more user friendly
-
+    
     const { events, updateEvent } = useEvent();
     const event = events.find(e => e.eventID === eventID);
     const applicants = event?.applications || [];
@@ -59,20 +56,17 @@ export default function ApplicantList({ eventID }: { eventID: number }) {
         };
         updateEvent(updatedEvent);
     }
-    console.log("applicants" , applicants);
-    console.log("visible applicants" , visibleApplicants);
-
     return (
         <Box p={4} bg="white" rounded="md" shadow="md">
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-            <Box as="h2">Applicant List for Event ID: {eventID}</Box>
-            <IconButton 
-                aria-label="Sort by rating" 
-                icon={<FaSort />} 
-                onClick={() => setSortedByRating(!sortedByRating)}
-                variant="ghost"
-                
-                />
+            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%" mb={4}>
+                <Box as="h2">Applicant List</Box>
+                <IconButton 
+                    aria-label="Sort by rating" 
+                    icon={<FaSort />} 
+                    onClick={() => setSortedByRating(!sortedByRating)}
+                    variant="ghost"
+                    justifySelf="end"
+                    />
         </Box>
             {visibleApplicants.length === 0 ? (
                 <Box as="p">No applicants found for this event.</Box>
@@ -97,7 +91,6 @@ export default function ApplicantList({ eventID }: { eventID: number }) {
                 onUpdateApplication ={handleUpdateApplication}
                 />
             )}
-
         </Box>
     );
 }

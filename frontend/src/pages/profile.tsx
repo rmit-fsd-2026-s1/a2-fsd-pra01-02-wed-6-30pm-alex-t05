@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FormControl, FormLabel, Button, Input, Box, Flex } from "@chakra-ui/react";
+import { FormControl, FormLabel, Button, Input, Box } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 import { useCurrentUser } from '../hooks/useCurrentUser';
 import { updateUser, getUserByUserName } from '../services/userService';
@@ -8,47 +8,38 @@ import { useRouter } from "next/router";
 import { useUserRating } from '@/hooks/useUserRating';
 import ApplicationHistory from '@/components/ApplicationHistory';
 import useApplicationHistory from '@/hooks/useApplicationHistory';
-
-//1. Given the hirer is logged in, When the hirer opens the profile page, Then the system
-//displays editable fields for name and phone number, and non - editable fields for
-//email and password(as these were already registered during sign - up).
-//2. Given the hirer updates their name or phone number, When the hirer saves the
-//changes, Then the system updates and stores the new profile information and
-//displays a confirmation message.
-//3. Given the hirer enters invalid data(e.g., empty name or invalid phone number
-//format), When the hirer attempts to save, Then the system prevents submission and
-//displays a validation error message.
-//4. Given the profile has been successfully updated, When the hirer returns to the
-//profile page, Then the updated name and phone number are displayed.
-
-//NEED TO FIX
-// Errors are still present in setFirstName(user.firstName || '');, setLastName(user.lastName || '');, setPhoneNumber(user.phoneNumber || '');
+import { fileUploader } from '@/services/FileUploader';
 
 export default function Profile() {
     const router = useRouter();
-    const currentUser = useCurrentUser(); // Get the current full user details from the custom hook
-    const refUserName = router.query.ref as string; // Get the ref query parameter from the URL and cast it to a string
-    const [profileUser, setProfileUser] = useState<User | null>(null); // State to hold the user details
-    const { login } = useAuth(); // Get the login function from the AuthContext 
+    const currentUser = useCurrentUser(); //get the current full user details from the custom hook
+    const refUserName = router.query.ref as string; //get the ref query parameter from the URL and cast it to a string
+    const [profileUser, setProfileUser] = useState<User | null>(null); //state to hold the user details
+    const { login } = useAuth(); //get the login function from the AuthContext 
 
-    const [editing, setEditing] = useState(false); // State to track if the form is in editing mode
+    const [editing, setEditing] = useState(false); //state to track if the form is in editing mode
+    //states for form fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [validation, setValidation] = useState('')
     const [color, setColor] = useState('') 
+    //toggle for application history display
     const [history, setHistory] = useState(false);
     //gets rating from custom hook
     const rating = useUserRating(profileUser?.userName || '');
     //gets application history from custom hook
     const applicationHistory = useApplicationHistory(profileUser?.userName || '');
     // When the component mounts, check if there's a ref query parameter and fetch the corresponding user details, otherwise defaults to current user
+    const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
     useEffect(() => { 
-        async function fetchUser() {
+        function fetchUser() {
+            //fetches user details based on ref query parameter
             if (refUserName) {
-                const user = await getUserByUserName(refUserName); // Fetch the user details using the email from the ref query parameter
+                const user = getUserByUserName(refUserName); 
                 setProfileUser(user); // Set the profileUser state to the fetched user details
             } else {
+                //defaults to current user if no ref
                 setProfileUser(currentUser || null); // If no ref query parameter, set profileUser to the current user from the custom hook
             }
         }
@@ -84,14 +75,32 @@ export default function Profile() {
                 login(updatedUser); // Update user data in AuthContext
                 setColor(`bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded`); // Set color for message
                 setValidation('Profile updated successfully.'); // Set success message
+                setEditing(false); // Exit editing mode
+                setProfileUser(updatedUser); // Update the profileUser state with the updated user details
             }
         }
     }
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        //submits file to uploader service
+        const file = e.target.files?.[0];
+        if (file && profileUser) {
+            const result = await fileUploader(profileUser, file);
+            if (result.success && result.updatedUser) {
+                //runs profile update
+                updateUser(result.updatedUser);
+                login(result.updatedUser);
+                setProfileUser(result.updatedUser);
+            } else {
+                setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`); // Set color for message
+            }
+            setValidation(result.message);
+        }
+    };
 
     return (
+        //page doubles as a public profile page and profile editing page
         profileUser ? (
             <Box p={4} bg="white" rounded="md" shadow="md">
-                
                 {validation ? (
                     <div className={color}>
                         {validation}
@@ -141,6 +150,22 @@ export default function Profile() {
                         <p>Rating</p>
                         <p>{rating ? rating : 'Not rated'}</p>
                     </Box>
+                    <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
+                        <p>Credibility Score</p>
+                        <p>{credibilityScore ? credibilityScore*25 + "%" : 'Not rated'}</p>
+                    </Box>
+                    <Box>
+                        {profileUser.role === "hirer" && editing && (
+                        <Box mt={4} display="flex" gap={3}>
+                            <p>Compliance Document Upload</p>
+                            <Input
+                                type="file"
+                                accept=".pdf, .png, .jpg, .jpeg"
+                                onChange={handleUpload}
+                                />
+                        </Box>
+                    )}
+                    </Box>
                     <Box mt={6} display="flex" gap={3}>
                     {profileUser.userName === currentUser?.userName && ( 
                         // Only show the update button if the profile being viewed is the current user's profile
@@ -154,9 +179,12 @@ export default function Profile() {
                             Save
                         </Button>
                     )}
-                    <Button mt={4} colorScheme='gray' className="w-full" onClick={() => setHistory(!history)}>
-                        {history ? 'Hide Application History' : 'Show Application History'}
-                    </Button>
+                    {profileUser.role === 'hirer' && (
+                        <Button mt={4} colorScheme='gray' className="w-full" onClick={() => setHistory(!history)}>
+                            {history ? 'Hide Application History' : 'Show Application History'}
+                        </Button>
+                    )}
+                    
                     </Box>
                     {history && (
                     <Box mt={6}>
@@ -174,8 +202,6 @@ export default function Profile() {
                     </Box>
                     )}
                 </FormControl>
-                
-            
             </Box>
         ) : (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">

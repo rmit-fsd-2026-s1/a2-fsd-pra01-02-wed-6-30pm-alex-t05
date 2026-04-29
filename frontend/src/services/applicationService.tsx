@@ -14,6 +14,7 @@ export function getApplicationsForUser(userName: string, events: Event[]) : Appl
 }
 
 export function getRatingForUser(userName: string, events: Event[]) : number | null {
+    //filters all applications for user with ratings
     const applicationsWithRatings = 
     getApplicationsForUser(userName, events)
     .filter(application => application.rating !== null);
@@ -21,16 +22,18 @@ export function getRatingForUser(userName: string, events: Event[]) : number | n
     if (applicationsWithRatings.length === 0) {
         return null; //no applications
     }
-
+    //sum
     let sumOfRatings = 0;
     for (const application of applicationsWithRatings) {
         sumOfRatings += application.rating!;
     }
+    //average
     const averageRating = sumOfRatings / applicationsWithRatings.length;    
     
     return averageRating;
 }
 
+//constructor
 export function createApplication(
     eventID: number, 
     applicantUserName: string, 
@@ -42,7 +45,6 @@ export function createApplication(
         id: crypto.randomUUID(), 
         eventID,
         applicantUserName,
-        comment: "",
         status: "pending",
         rating: null,
         startDate: normaliseDate(startDate),
@@ -50,6 +52,7 @@ export function createApplication(
     };
 }
 
+//called on all calender inputs to streamline date handling
 export function normaliseDate(dateStr: string) : string {
     //formats dates as YYYY-MM-DD
     return dateStr.split("T")[0];
@@ -59,10 +62,6 @@ export function normaliseDate(dateStr: string) : string {
 //setters
 export function setApplicationStatus(application: Application, newStatus: "pending" | "approved" | "rejected") : Application {
     return {...application, status: newStatus};
-}
-
-export function setCommentToApplication(application: Application, comment: string) : Application {
-    return {...application, comment};
 }
 
 export function setApplicationRating(application: Application, rating: number) : Application {
@@ -79,6 +78,7 @@ export function getBlockedDatesForEvent(event: Event) : {startDate: string, endD
         }));
 }
 
+//boolean value to check if application overlaps any already booked dates
 export function hasConflict(application: Application, event: Event) : boolean {
     const blockedDates = getBlockedDatesForEvent(event);
     for (const blocked of blockedDates) {
@@ -92,6 +92,7 @@ export function hasConflict(application: Application, event: Event) : boolean {
     return false;
 }
 
+//validator and error constructor for applications
 export function validateApplication(application: Application, event: Event   
 ) : ["startDate" | "endDate", string] | null {
     const today = normaliseDate(new Date().toISOString());

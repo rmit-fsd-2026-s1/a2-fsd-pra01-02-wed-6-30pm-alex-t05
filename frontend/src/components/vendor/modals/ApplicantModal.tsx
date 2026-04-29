@@ -1,18 +1,11 @@
-import { Box, Button, IconButton, Spinner } from "@chakra-ui/react";
+import { Box, Button, IconButton } from "@chakra-ui/react";
 import { MdClose, MdStar } from "react-icons/md";
 import { Application } from "@/types/application";
-import { getUserByUserName } from "@/services/userService";
+import { getUserByUserName, getUserCommentsFromVendor, setUserCommentFromVendor } from "@/services/userService";
 import { getRatingForUser } from "@/services/applicationService";
 import { Event } from "@/types/event";
-import { setApplicationStatus, setApplicationRating, setCommentToApplication } from "@/services/applicationService";
-import { useEffect } from "react";
-
-//TODO 
-//Complaince Docs
-//Link to applicant profile
-//A bit better feedback on actions
-//Rating system is a bit odd styling wise, but functional
-//Kind of hard to follow atm
+import { setApplicationStatus, setApplicationRating } from "@/services/applicationService";
+import { useEffect, useState } from "react";
 
 export default function ApplicantModal({
     application,
@@ -26,9 +19,8 @@ export default function ApplicantModal({
     }) {
     const user = getUserByUserName(application.applicantUserName); // Fetch full user details using the applicant's username
     const rating = getRatingForUser(application.applicantUserName, events);
-    console.log("events in ApplicantModal:", events);
-    console.log("ApplicantModal - user:", user);
-    console.log("ApplicantModal - rating:", rating);
+    const comments = getUserCommentsFromVendor(application.applicantUserName, user?.userName || "");
+    const [commentsForUser, setCommentsForUser] = useState(comments);
     if (!user || !application) {
         return (
             <Box>
@@ -39,8 +31,8 @@ export default function ApplicantModal({
     const isApproved = application.status === "approved";
 
     useEffect(() => {
-        
-    }, [application]);
+        setCommentsForUser(comments);
+    }, [application, comments]);
 
     return (
         <Box
@@ -72,13 +64,11 @@ export default function ApplicantModal({
                     <p><strong>Email:</strong> {user?.email}</p>
                     <p><strong>Phone Number:</strong> {user?.phoneNumber || "Not provided"}</p>
                     <p><strong>Rating:</strong> {rating ? `${rating} / 5` : "No ratings yet"}</p>
-                    <p><strong>Comment:</strong> {application.comment || "No comment provided"}</p>
+                    <p><strong>Comment:</strong> {commentsForUser ? commentsForUser : "No comments yet"}</p>
                     <Button mt={2} colorScheme="blue" onClick={() => {
-                        const newComment = prompt("Enter your comment for this application:", application.comment || "");
-                        if (newComment !== null) {
-                            const updated = setCommentToApplication(application, newComment);
-                            onUpdateApplication(updated);
-                        }
+                        const newComment = prompt("Enter your comment for this application:", commentsForUser || "");
+                        setUserCommentFromVendor(application.applicantUserName, user?.userName || "", newComment || "");
+                        setCommentsForUser(newComment || "");
                     }}>
                         Add/Edit Comment
                     </Button>

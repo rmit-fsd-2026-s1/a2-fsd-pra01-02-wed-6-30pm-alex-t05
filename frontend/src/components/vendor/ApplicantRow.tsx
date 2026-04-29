@@ -2,7 +2,6 @@ import { Box } from "@chakra-ui/react";
 import { useUserRating } from "@/hooks/useUserRating";
 import { Application } from "@/types/application";
 
-
 export function ApplicantRow({applicant, onClick} : {applicant: Application, onClick: () => void}) {
 
     function colourBg() {

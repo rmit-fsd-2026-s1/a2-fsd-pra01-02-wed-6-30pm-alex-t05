@@ -6,7 +6,6 @@ import { validateApplication } from "@/services/applicationService";
 import { Application } from "@/types/application";
 import { Event } from "@/types/event";
 import { useAuth } from "../context/AuthContext";
-import { start } from "repl";
 
 type Props = {
     event: Event;

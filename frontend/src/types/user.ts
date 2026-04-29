@@ -1,3 +1,5 @@
+import { preferredEvent } from "./preferredEvents";
+
 export type User = {
     userName: string; // Unique identifier for the user
     firstName: string;
@@ -7,6 +9,13 @@ export type User = {
     role: string; // e.g., "hirer", "vendor"
     phoneNumber?: string; // Optional phone number field
     eventRankings?: number[]
+    preferredEvents?: preferredEvent[]
+    vendorComments?: [vendorUserName: string, comment: string][]
+    complianceDocuments?: {
+        fileName: string;
+        fileType: string;
+        data: string; //base64 encoded file data
+    }[]
 };
 
 
@@ -19,6 +28,7 @@ export const DEFAULT_USERS: User[] = [
         email: "william.knight@team11.com",
         password: "Rmit1234!",
         role: "hirer",
+        preferredEvents: []
 
     },
     {
@@ -27,7 +37,8 @@ export const DEFAULT_USERS: User[] = [
         lastName: "Doe",
         email: "john.doe@email.com",
         password: "Password123!",
-        role: "hirer"
+        role: "hirer",
+        preferredEvents: []
     },
     {
         userName: "harryp",
@@ -35,7 +46,8 @@ export const DEFAULT_USERS: User[] = [
         lastName: "Potter",
         email: "harry.potter@email.com",
         password: "Magic123!",
-        role: "hirer"
+        role: "hirer",
+        preferredEvents: []
     },
 
     // Vendors
