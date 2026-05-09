@@ -1,49 +1,41 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { Event, DEFAULT_EVENT as DEFAULT_EVENTS } from '../types/event';
+import { eventService } from '@/services/api';
 
 type EventContextType = {
-    event: Event | null;
-    setEvent: (event: Event | null) => void;
+    //event: Event | null;
+    //setEvent: (event: Event | null) => void;
 
     events: Event[];
     setEvents: (events: Event[]) => void;
 
-    selectedEventID?: number | null;
-    setSelectedEventID: (id: number | null) => void;
-    updateEvent: (updatedEvent: Event) => void;
+    //selectedEventID?: number | null;
+    //setSelectedEventID: (id: number | null) => void;
+    //updateEvent: (updatedEvent: Event) => void;
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
 
 export const EventProvider = ({ children }: { children: ReactNode }) => {
-    const [event, setEvent] = useState<Event | null>(null);
     const [events, setEvents] = useState<Event[]>([]);
-    const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
-
-    const updateEvent = (updatedEvent: Event) => {
-        setEvents(prevEvent => {
-            return prevEvent.map(event => event.eventID === updatedEvent.eventID ? updatedEvent : event);
-        });
-    };
+    //const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
 
     //initialises events
     useEffect(() => {
-        const storedEvents = localStorage.getItem('events');
-        if (storedEvents) {
-            setEvents(JSON.parse(storedEvents));
-        } else {
-            localStorage.setItem('events', JSON.stringify(DEFAULT_EVENTS));
-            setEvents(DEFAULT_EVENTS);
-        }
+        fetchEvents();
     }, []);
 
-    //updates localstorage whenever events state changes
-    useEffect(() => {
-        localStorage.setItem('events', JSON.stringify(events));
-    }, [events]);
+    const fetchEvents = async () => {
+        try {
+            const data = await eventService.getAllEvents();
+            setEvents(data);
+        } catch (error) {
+            console.error("Error fetching events:", error);
+        }
+    };
 
     return (
-        <EventContext.Provider value={{ event, setEvent, events, setEvents, selectedEventID, setSelectedEventID, updateEvent }}>
+        <EventContext.Provider value={{ events, setEvents }}>
             {children}
         </EventContext.Provider>
     );

@@ -41,16 +41,15 @@ export class EventController {
    * @returns JSON response containing the created event or error message
    */
   async save(request: Request, response: Response) {
-    const { eventName, numberOfGuest, date, time, duration, shortDescription, owner, image, isBlocked } = request.body;
+    const { eventName, numberOfGuest, date, time, duration, shortDescription, image, isBlocked } = request.body;
 
-    const event= Object.assign(new Event(), {
+    const event = Object.assign(new Event(), {
       eventName,
       numberOfGuest,
       date,
       time,
       duration,
       shortDescription,
-      owner,
       image,
       isBlocked
     });
@@ -63,7 +62,7 @@ export class EventController {
         .status(400)
         .json({ message: "Error creating event", error });
     };
-}
+  }
 
   /**
    * Deletes a user from the database by their userName
@@ -93,7 +92,7 @@ export class EventController {
    */
   async update(request: Request, response: Response) {
     const eventId = parseInt(request.params.id);
-    const { eventName, numberOfGuest, date, time, duration, shortDescription, owner, image, isBlocked } = request.body;
+    const { eventName, numberOfGuest, date, time, duration, shortDescription, image, isBlocked } = request.body;
 
     let eventToUpdate = await this.eventRepository.findOne({
       where: { eventId },
@@ -111,7 +110,6 @@ export class EventController {
       time: time,
       duration: duration,
       shortDescription: shortDescription,
-      owner: owner,
       image: image,
       isBlocked: isBlocked
     };

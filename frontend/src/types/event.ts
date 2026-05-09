@@ -1,16 +1,16 @@
 import { Application } from "./application";
 
 export type Event = {
-    eventID: number;
+    eventId: number;
     eventName: string;
     numberOfGuest: number;
     date: string;
     time: string;
     duration: number;
     shortDescription?: string;
-    owner: string; // The unique username of the hirer who created the event
+    //owner: string; // The unique username of the hirer who created the event
     image?: string; // Optional field for event image URL
-    applications: Application[]; // Stores the details of each application, including comments, status, rating, and hire date.
+    //applications: Application[]; // Stores the details of each application, including comments, status, rating, and hire date.
     isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
 };
 

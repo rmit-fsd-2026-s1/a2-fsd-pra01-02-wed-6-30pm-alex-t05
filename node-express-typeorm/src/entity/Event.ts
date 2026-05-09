@@ -23,8 +23,9 @@ export class Event {
     duration: number;
     @Column({ nullable: true })
     shortDescription?: string;
-    @Column()
-    owner: string; // The unique username of the hirer who created the event
+    // Removed the owner field since it would be used to build a relationship with the user table.
+    //@Column()
+    //owner: string;
     @Column({ nullable: true })
     image?: string; // Optional field for event image URL
     /*
