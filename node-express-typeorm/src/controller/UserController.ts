@@ -41,25 +41,24 @@ export class UserController {
    * @returns JSON response containing the created user or error message
    */
   async save(request: Request, response: Response) {
-    const { userName, firstName, lastName, email, password, role, phoneNumber } = request.body;
+    //const { userName, firstName, lastName, email, password, role, phoneNumber } = request.body;
+    const user = this.userRepository.create(request.body);
 
-    const user: User = {
-      userName: userName,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      role: role,
-      phoneNumber: phoneNumber
-    };
+
+    //const user: User = {
+    //  userName: userName,
+    //  firstName: firstName,
+    //  lastName: lastName,
+    //  email: email,
+    //  password: password,
+    //  role: role,
+    //  phoneNumber: phoneNumber
+    //};
 
     try {
-      const savedUser = await this.userRepository.save(user);
-      return response.status(201).json(savedUser);
+      await this.userRepository.save(user);
     } catch (error) {
-      return response
-        .status(400)
-        .json({ message: "Error creating user", error });
+      return response.status(500).json({ message: "Error saving user", error });
     }
   }
 

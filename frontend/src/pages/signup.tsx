@@ -1,45 +1,63 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { FormControl, FormLabel, Button, RadioGroup, Radio, Stack, FormErrorMessage } from "@chakra-ui/react";
 import InputField from "@/components/InputField";
 import { getUsers, saveUser, checkDuplicate } from "@/services/userService";
 import { useAuth } from "@/context/AuthContext";
+import { userService } from "@/services/api";
+
+// Sign up works but needs to be cleaned heavily
+// Needs to be encryted
 
 export default function Signup() {
-
-    interface FormData {
-        userName: string;
-        firstName: string;
-        lastName: string;
-        email: string;
-        password: string;
-        confirmPassword: string;
-        role: string;
-    };
-
-    const [profileData, setProfileData] = useState<FormData>({
+    const [profileData, setProfileData] = useState({
         userName: '',
         firstName: '',
         lastName: '',
         email: '',
         password: '',
-        confirmPassword: '',
-        role: ''
+        role: '',
     });
-
     const [errors, setErrors] = useState<Partial<FormData>>({});
     const router = useRouter();
     const { login } = useAuth(); // Get the login function from the AuthContext
 
+    // Fetch profiles on component mount
+    useEffect(() => {
+        fetchProfiles();
+    }, []);
+
+    const fetchProfiles = async () => {
+        try {
+            const data = await userService.getAllUsers();
+            setProfileData(data);
+        } catch (error) {
+            console.error("Error fetching profiles:", error);
+        }
+    };
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            await userService.createUser(profileData);
+            setProfileData({ userName: "", firstName: "", lastName: "", email: "", password: "", role: "" });
+            fetchProfiles();
+        } catch (error) {
+            console.error("Error creating profile:", error);
+        }
+    };
+
     //this dynamically displays password strength in helper text
-    const getPasswordStrength = (password: string): "weak" | "strong" | "" => {
+    /*const getPasswordStrength = (password: string): "weak" | "strong" | "" => {
         if (password.length >= 6) return "strong";
         if (password.length > 0) return "weak";
         return "";
     };
 
     //this is just for reactive password strength indicator and error tracking
+    */
     const handleInputChange = (
 
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -53,17 +71,14 @@ export default function Signup() {
             setErrors(prev => ({ ...prev, [name]: undefined }));
         }
 
-        if (name === "password") {
-            getPasswordStrength(value)
-        }
+        //if (name === "password") {
+        //    getPasswordStrength(value)
+        //}
     };
 
 
-
-
-
     //this is is to be run on submit and checks validity of form data and returns an object with error messages for any invalid fields
-    const validateDetails = () => {
+    /*const validateDetails = () => {
         const newErrors: Partial<FormData> = {};
         if (!profileData.userName) {
             newErrors.userName = "Username is required";
@@ -92,49 +107,8 @@ export default function Signup() {
 
         return newErrors;
     };
+    */
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        //validation
-        //reset errors
-        //setErrors({});
-        //validate details and set errors if any
-        const newErrors = validateDetails();
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
-        }
-        //runs if no errors
-        if (checkDuplicate("userName", profileData.userName) || checkDuplicate("email", profileData.email)) {
-            const newErrors: Partial<FormData> = {};
-            if (checkDuplicate("email", profileData.email)) {
-                newErrors.email = "Email already exists";
-            }
-            if (checkDuplicate("userName", profileData.userName)) {
-                newErrors.userName = "Username already exists";
-            }
-            setErrors(newErrors);
-            return;
-        }
-
-        const { confirmPassword, ...profileDataToSave } = profileData; // Exclude confirmPassword from the data to be saved
-        saveUser(profileDataToSave);
-
-        console.log("Profile data stored in localStorage");
-        console.log(getUsers());
-        login(profileData);
-        router.push(`/${profileData.role.toLowerCase()}`);
-        setProfileData({
-            userName: '',
-            firstName: '',
-            lastName: '',
-            email: '',
-            password: '',
-            confirmPassword: '',
-            role: ''
-        });
-    };
 
     return (
         <div className="h-200 flex items-center justify-center bg-gray-100">
@@ -144,21 +118,18 @@ export default function Signup() {
                     name="userName"
                     value={profileData.userName}
                     onChange={handleInputChange}
-                    error={errors.userName}
                 />
                 <InputField
                     label="First Name"
                     name="firstName"
                     value={profileData.firstName}
                     onChange={handleInputChange}
-                    error={errors.firstName}
                 />
                 <InputField
                     label="Last Name"
                     name="lastName"
                     value={profileData.lastName}
                     onChange={handleInputChange}
-                    error={errors.lastName}
                 />
 
                 <InputField
@@ -167,7 +138,6 @@ export default function Signup() {
                     type="email"
                     value={profileData.email}
                     onChange={handleInputChange}
-                    error={errors.email}
                     helperText="We'll never share your email."
                 />
                 <InputField
@@ -176,18 +146,9 @@ export default function Signup() {
                     type="password"
                     value={profileData.password}
                     onChange={handleInputChange}
-                    error={errors.password}
-                    helperText={`Strength: ${getPasswordStrength(profileData.password)}`}
+                //helperText={`Strength: ${getPasswordStrength(profileData.password)}`}
                 />
-                <InputField
-                    label="Confirm Password"
-                    name="confirmPassword"
-                    type="password"
-                    value={profileData.confirmPassword}
-                    onChange={handleInputChange}
-                    error={errors.confirmPassword}
-                />
-                <FormControl isInvalid={!!errors.role}>
+                <FormControl>
                     <FormLabel>Account Type</FormLabel>
                     <RadioGroup
                         onChange={(value) => setProfileData(prev => ({ ...prev, role: value }))}
@@ -198,7 +159,6 @@ export default function Signup() {
                             <Radio value='vendor'>Vendor</Radio>
                         </Stack>
                     </RadioGroup>
-                    <FormErrorMessage>{errors.role}</FormErrorMessage>
                 </FormControl>
                 <Button mt={4} colorScheme='teal' type='submit'>
                     Submit
