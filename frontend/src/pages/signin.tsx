@@ -29,8 +29,6 @@ export default function Signin() {
         }
     };
 
-    console.log("Current users state:", users);
-
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
         const user = users.find((user: User) => user.email === email && user.password === password);
