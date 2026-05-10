@@ -11,3 +11,21 @@ Lab08 code archive:
     UserController.ts
     User.ts
 
+Lectorial Week 8:
+    Backend:
+        Event.ts (Many to One relationship with User.ts)
+        User.ts (One to Many relationship with Event.ts)
+
+Lectorial Week 9:
+    Frontend:
+        api.tsx
+        eventContext.tsx
+        authContext.tsx
+        signup.tsx
+        AuthContext.tsx
+        signin.tsx
+
+    Backend:
+        Event.ts
+        EventController.ts
+    

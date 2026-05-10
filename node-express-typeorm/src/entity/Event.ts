@@ -4,8 +4,10 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
-    PrimaryColumn
+    PrimaryColumn,
+    ManyToOne
 } from "typeorm";
+import { User } from "./User";
 
 @Entity()
 export class Event {
@@ -34,4 +36,9 @@ export class Event {
     */
     @Column({ default: false })
     isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
-};
+
+    @ManyToOne(() => User, (user) => user.events, {
+        lazy: true,
+    })
+    user: User;
+}

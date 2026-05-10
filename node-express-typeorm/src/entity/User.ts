@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  PrimaryColumn
+  PrimaryColumn,
+  OneToMany
 } from "typeorm";
+import { Event } from "./Event";
 
 @Entity()
 export class User {
@@ -27,4 +29,6 @@ export class User {
   @Column({ array: true, nullable: true })
   eventRankings?: number[]
   */
+  @OneToMany(() => Event, (event: Event) => event.user)
+  events: Event[];
 }
