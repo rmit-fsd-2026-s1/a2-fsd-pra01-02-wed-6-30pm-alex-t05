@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { Button, Input, Icon } from "@chakra-ui/react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { MdSearch } from "react-icons/md";
-import Card from "../components/Card";
-import { useEvent } from '../context/EventContext';
+import Card from "../../components/Card";
+import { useEvent } from '../../context/EventContext';
+import { useRouter } from "next/router";
 
 export default function Hirer() {
+    const router = useRouter();
+    const { userName } = router.query;
     const { user } = useAuth()
     const { events } = useEvent();
     const [userSearch, setUserSearch] = useState('')
 
     return (
-        user && user.role === "hirer" ? (
+        user && user.role === "hirer" && user.userName === userName ? (
             <div className="min-h-screen items-center justify-center bg-gray-100">
                 <h1 className="!text-2xl flex items-center justify-center">Venue List</h1>
                 <form className="flex items-center">

@@ -24,3 +24,4 @@ Lectorial Week 9:
         authContext.tsx (Put fetchUsers() in context)
         signup.tsx (NEEDS TO BE FIX. but it can create User from the userService)
         signin.tsx (scans users from context. Context holds the users in database)
+        [id].tsx (changing hirer.tsx and vendor.tsx to this)

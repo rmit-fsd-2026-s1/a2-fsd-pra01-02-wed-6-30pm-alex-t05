@@ -26,7 +26,7 @@ export default function Signin() {
             });
             console.log("Sign in successful");
             //route to either vendor or hirer dashboard
-            router.push(`/${user.role.toLowerCase()}`)
+            router.push(`/${user.role.toLowerCase()}/${user.userName}`);
         } else {
             setError("Invalid username or password");
         }

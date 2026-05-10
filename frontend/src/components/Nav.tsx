@@ -11,7 +11,7 @@ const Nav = () => {
                 {user ? (
                     <>
                         <li>
-                            <Link href={user.role === "hirer" ? "/hirer" : "/vendor"}>
+                            <Link href={user.role === "hirer" ? `/hirer/${user.userName}` : `/vendor/${user.userName}`}>
                                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard
                             </Link>
                         </li>
