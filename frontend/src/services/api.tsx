@@ -17,6 +17,11 @@ export const eventService = {
         return data;
     },
 
+    getEventsByUser: async (userName: string): Promise<Event[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/events`);
+        return data;
+    }
+
     // Will allow vendors to createa an event later
     //createProfile: async (profile: {
     //   first_name: string;

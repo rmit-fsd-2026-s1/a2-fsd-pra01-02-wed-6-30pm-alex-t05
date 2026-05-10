@@ -15,17 +15,12 @@ Lectorial Week 8:
     Backend:
         Event.ts (Many to One relationship with User.ts)
         User.ts (One to Many relationship with Event.ts)
+        eventRoute.tsx & eventController.tsx (Can find events from Username)
 
 Lectorial Week 9:
     Frontend:
-        api.tsx
-        eventContext.tsx
-        authContext.tsx
-        signup.tsx
-        AuthContext.tsx
-        signin.tsx
-
-    Backend:
-        Event.ts
-        EventController.ts
-    
+        api.tsx (holds userService and eventService)
+        eventContext.tsx (Put fetchEvents() in context)
+        authContext.tsx (Put fetchUsers() in context)
+        signup.tsx (NEEDS TO BE FIX. but it can create User from the userService)
+        signin.tsx (scans users from context. Context holds the users in database)

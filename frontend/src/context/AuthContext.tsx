@@ -19,7 +19,6 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-
     const [users, setUsers] = useState<User[]>([]);
     const [user, setUser] = useState<AuthUser | null>(null);
     //retrieves current user to persist login
@@ -30,8 +29,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const fetchUsers = async () => {
         try {
-            const data = await userService.getAllUsers();
-            setUsers(data);
+            const data = await userService.getAllUsers(); // Fetches all users from database
+            const StoredUser = localStorage.getItem('currentUser'); // Checks if there is a logged in user
+            setUsers(data); // Put all users from database in state
+            if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
         } catch (error) {
             console.error("Error fetching users:", error);
         }

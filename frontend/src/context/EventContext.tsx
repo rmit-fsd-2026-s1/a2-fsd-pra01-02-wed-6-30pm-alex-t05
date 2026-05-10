@@ -1,12 +1,15 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { Event, DEFAULT_EVENT as DEFAULT_EVENTS } from '../types/event';
 import { eventService } from '@/services/api';
+import { useAuth } from './AuthContext';
+import { useRouter } from 'next/router';
 
 type EventContextType = {
     //event: Event | null;
     //setEvent: (event: Event | null) => void;
 
     events: Event[];
+    eventsByUser: Event[];
     setEvents: (events: Event[]) => void;
 
     //selectedEventID?: number | null;
@@ -17,13 +20,21 @@ type EventContextType = {
 const EventContext = createContext<EventContextType | undefined>(undefined);
 
 export const EventProvider = ({ children }: { children: ReactNode }) => {
+    const router = useRouter();
     const [events, setEvents] = useState<Event[]>([]);
+    const [eventsByUser, setEventsByUser] = useState<Event[]>([]);
+    const { user } = useAuth();
+    const { userName } = router.query;
+
     //const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
 
     //initialises events
     useEffect(() => {
         fetchEvents();
-    }, []);
+        if (user) {
+            fetchEventsByUser();
+        }
+    }, [user]);
 
     const fetchEvents = async () => {
         try {
@@ -34,12 +45,21 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const fetchEventsByUser = async () => {
+        try {
+            const data = await eventService.getEventsByUser(user?.userName as string);
+            setEventsByUser(data);
+        } catch (error) {
+            console.error("Error fetching events by user:", error);
+        }
+    };
+
     return (
-        <EventContext.Provider value={{ events, setEvents }}>
+        <EventContext.Provider value={{ events, setEvents, eventsByUser }}>
             {children}
         </EventContext.Provider>
     );
-};
+}
 
 export const useEvent = () => {
     const context = useContext(EventContext);
@@ -47,4 +67,4 @@ export const useEvent = () => {
         throw new Error('useEvent must be used within an EventProvider');
     }
     return context;
-}
+};
