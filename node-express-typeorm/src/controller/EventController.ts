@@ -123,4 +123,16 @@ export class EventController {
         .json({ message: "Error updating event", error });
     }
   }
+
+  /**
+ * Retrieves all events for a specific user based on their userName
+ */
+  async findByUser(request: Request, response: Response) {
+    const userName = request.params.userName;
+    const events = await this.eventRepository.find({
+      where: { user: { userName } },
+      relations: ["user"],
+    });
+    return response.json(events);
+  }
 }

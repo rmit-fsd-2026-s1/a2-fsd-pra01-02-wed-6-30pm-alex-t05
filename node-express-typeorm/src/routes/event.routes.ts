@@ -24,4 +24,8 @@ router.delete("/events/:id", async (req, res) => {
   await eventController.remove(req, res);
 });
 
+router.get("/users/:userName/events", async (req, res) => {
+  await eventController.findByUser(req, res);
+});
+
 export default router;
