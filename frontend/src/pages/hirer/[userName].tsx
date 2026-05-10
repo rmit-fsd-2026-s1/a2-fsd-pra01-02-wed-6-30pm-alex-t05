@@ -13,6 +13,12 @@ export default function Hirer() {
     const { events } = useEvent();
     const [userSearch, setUserSearch] = useState('')
 
+    if (!userName) {
+        return <div>Loading...</div>;
+    }
+
+    console.log(userName);
+
     return (
         user && user.role === "hirer" && user.userName === userName ? (
             <div className="min-h-screen items-center justify-center bg-gray-100">

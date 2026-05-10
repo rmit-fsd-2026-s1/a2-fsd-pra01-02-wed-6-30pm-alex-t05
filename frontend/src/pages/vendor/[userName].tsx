@@ -10,12 +10,12 @@ import { useRouter } from "next/router";
 
 export default function Vendor() {
     const { user } = useAuth()
-    const { events, eventByUser } = useEvent();
+    const { events, eventsByUser } = useEvent();
     const [visualisationsVisible, setVisualisationsVisible] = useState(false);
 
     console.log("events state:", events);
     console.log("user state:", user);
-    console.log("eventsByUser state:", eventByUser);
+    console.log("eventsByUser state:", eventsByUser);
 
     return (
         user && user.role === "vendor" ? (
