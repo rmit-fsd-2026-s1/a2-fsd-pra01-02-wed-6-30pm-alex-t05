@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-import { authenticateUser } from '@/services/userService';
-import { userService } from "@/services/api";
 import { User } from '@/types/user';
 
 export default function Signin() {
@@ -12,22 +10,8 @@ export default function Signin() {
     const [password, setPassword] = useState(""); //intial state is empty
     const [error, setError] = useState("") //intial state is empty. also making it false since it has no value in it
     const router = useRouter();
-    const [users, setUsers] = useState<User[]>([]);
-    const { login } = useAuth(); //get the login function from the AuthContext
+    const { login, users } = useAuth();
 
-    // Fetch users on component mount
-    useEffect(() => {
-        fetchUsers();
-    }, []);
-
-    const fetchUsers = async () => {
-        try {
-            const data = await userService.getAllUsers();
-            setUsers(data);
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
-    };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
