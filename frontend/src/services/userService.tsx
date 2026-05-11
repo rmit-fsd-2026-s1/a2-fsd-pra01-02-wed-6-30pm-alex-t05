@@ -1,16 +1,51 @@
 import { DEFAULT_USERS, User } from '../types/user';
-
-export const getUsers = (): User[] => {
-    const checkStoredUsers = localStorage.getItem('users'); // Get existing users from localStorage, if not found return an empty array
-    if (!checkStoredUsers) {
-        localStorage.setItem('users', JSON.stringify(DEFAULT_USERS));
-        return [...DEFAULT_USERS];
+import axios from 'axios';
+const API_BASE_URL = "http://localhost:3001/api";
+//Getters
+export const getUsers = async (): Promise<User[]> => {
+    try {
+        const { data } = await axios.get(`${API_BASE_URL}/users`);
+        return data;
     }
-    const storedUsers = JSON.parse(checkStoredUsers); // Get existing users from localStorage, if not found return an empty array
-        
-    return storedUsers;
+    catch (error) {
+        console.error("Error fetching users:", error);
+        return [];
+    };
 };
+export const getUserByEmail = async (email: string): Promise<User | null> => {
+    try {
+        const users = await getUsers();
+        return users.find((user: User) => user.email === email) || null;
+    }
+    catch (error) {
+        console.error("Error fetching user by email:", error);
+        return null;
+    }
+}
 
+export const getUserByUserName = async (userName: string): Promise<User | null> => {
+    try {
+        const users = await getUsers();
+        return users.find((user: User) => user.userName === userName) || null;
+    }
+    catch (error) {
+        console.error("Error fetching user by username:", error);
+        return null;
+    }    
+}
+
+export function getUserCommentsFromVendor(userName: string, vendorUserName: string) : string {
+    const user = getUserByUserName(userName);
+    for (const comment of user!.vendorComments || []) {
+        //comments are vendorUserName, comment. so match first part to vendorUsername then return comment
+        if (comment[0] === vendorUserName) {
+            return comment[1];
+        }
+    }
+    return "";
+}
+
+//Setters
 export const saveUser = (newUser: User) => {
     const existingData = getUsers();
     localStorage.setItem('users', JSON.stringify([...existingData, newUser]));
@@ -29,33 +64,10 @@ export const checkDuplicate = (field: keyof User, value: string) => {
     return existingData.some((item: User) => item[field] === value);
 };
 
-export const authenticateUser = (email: string, password: string) => {            
-    const existingData = getUsers();
+export const authenticateUser = async (email: string, password: string) => {            
+    const existingData = await getUsers();
     const user = existingData.find((user: User) => user.email === email && user.password === password);
     return user || null;
-}
-
-export const getUserByEmail = (email: string): User | null => {
-    const existingData = getUsers();
-    const user = existingData.find((user: User) => user.email === email);
-    return user || null;
-}
-
-export const getUserByUserName = (userName: string): User | null => {
-    const existingData = getUsers();
-    const user = existingData.find((user: User) => user.userName === userName);
-    return user || null;
-}
-
-export function getUserCommentsFromVendor(userName: string, vendorUserName: string) : string {
-    const user = getUserByUserName(userName);
-    for (const comment of user!.vendorComments || []) {
-        //comments are vendorUserName, comment. so match first part to vendorUsername then return comment
-        if (comment[0] === vendorUserName) {
-            return comment[1];
-        }
-    }
-    return "";
 }
 
 export function setUserCommentFromVendor(userName: string, vendorUserName: string, comment: string) : void {

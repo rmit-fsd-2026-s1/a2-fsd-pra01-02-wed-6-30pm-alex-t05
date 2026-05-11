@@ -4,19 +4,19 @@ import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { User } from '@/types/user';
+import { authenticateUser } from '@/services/userService';
 
 export default function Signin() {
     const [email, setEmail] = useState(""); //intial state is empty
     const [password, setPassword] = useState(""); //intial state is empty
     const [error, setError] = useState("") //intial state is empty. also making it false since it has no value in it
     const router = useRouter();
-    const { login, users } = useAuth();
+    const { login } = useAuth();
 
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
-        const user = users.find((user: User) => user.email === email && user.password === password);
-
+        const user = await authenticateUser(email, password); // Checks if the email and password match a user in the database
         if (user) {
             login({
                 ...user,

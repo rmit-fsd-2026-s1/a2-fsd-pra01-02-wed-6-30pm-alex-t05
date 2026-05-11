@@ -11,7 +11,6 @@ type AuthUser = {
 
 type AuthContextType = {
     user: AuthUser | null;
-    users: User[];
     login: (userData: AuthUser) => void;
     logout: () => void;
 }
@@ -19,26 +18,12 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [users, setUsers] = useState<User[]>([]);
     const [user, setUser] = useState<AuthUser | null>(null);
     //retrieves current user to persist login
-    // Fetch profiles on component mount
     useEffect(() => {
-        fetchUsers();
         const StoredUser = localStorage.getItem('currentUser'); // Checks if there is a logged in user
         if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
     }, []);
-
-    const fetchUsers = async () => {
-        try {
-            const data = await userService.getAllUsers(); // Fetches all users from database
-            const StoredUser = localStorage.getItem('currentUser'); // Checks if there is a logged in user
-            setUsers(data); // Put all users from database in state
-            if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
-        } catch (error) {
-            console.error("Error fetching users:", error);
-        }
-    };
 
     const login = (userData: AuthUser) => {
         //sets authcontext to passed in user data and also stores it in local storage to persist login
@@ -52,7 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, users, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout }}>
             {children}
         </AuthContext.Provider>
     );
