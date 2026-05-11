@@ -6,7 +6,6 @@ import { updateUser, getUserByUserName } from '../services/userService';
 import { User } from "../types/user";
 import { useRouter } from "next/router";
 import { useUserRating } from '@/hooks/useUserRating';
-import ApplicationHistory from '@/components/ApplicationHistory';
 import useApplicationHistory from '@/hooks/useApplicationHistory';
 import { fileUploader } from '@/services/FileUploader';
 
@@ -27,16 +26,18 @@ export default function Profile() {
     //toggle for application history display
     const [history, setHistory] = useState(false);
     //gets rating from custom hook
-    const rating = useUserRating(profileUser?.userName || '');
+    //const rating = useUserRating(profileUser?.userName || '');
     //gets application history from custom hook
-    const applicationHistory = useApplicationHistory(profileUser?.userName || '');
+    //const applicationHistory = useApplicationHistory(profileUser?.userName || '');
     // When the component mounts, check if there's a ref query parameter and fetch the corresponding user details, otherwise defaults to current user
     const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
+    
     useEffect(() => { 
-        function fetchUser() {
+        if (!router.isReady) return; //wait for router
+        async function fetchUser() {
             //fetches user details based on ref query parameter
             if (refUserName) {
-                const user = getUserByUserName(refUserName); 
+                const user = await getUserByUserName(refUserName); 
                 setProfileUser(user); // Set the profileUser state to the fetched user details
             } else {
                 //defaults to current user if no ref
@@ -44,17 +45,16 @@ export default function Profile() {
             }
         }
         fetchUser();
-    }, [refUserName, currentUser, router.isReady]);
+    }, [refUserName, currentUser, router.isReady]); //refetches if ref query parameter or current user changes
 
     useEffect(() => { 
         // When the profileUser state changes, update the form fields with the new user details, also discards unsaved changes when editing
-        if (profileUser) {
-            setFirstName(profileUser.firstName || '');
-            setLastName(profileUser.lastName || '');
-            setPhoneNumber(profileUser.phoneNumber || '');
-        }
-    }, [profileUser, editing]);
-
+        if (!profileUser) return;
+        setFirstName(profileUser.firstName || '');
+        setLastName(profileUser.lastName || '');
+        setPhoneNumber(profileUser.phoneNumber || '');
+    }, [editing]);
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!firstName.trim() || !lastName.trim()) {
@@ -96,10 +96,17 @@ export default function Profile() {
             setValidation(result.message);
         }
     };
+    if (!profileUser) {
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <p>Loading profile...</p>
+        </div>
+    );
+}
 
     return (
+        
         //page doubles as a public profile page and profile editing page
-        profileUser ? (
             <Box p={4} bg="white" rounded="md" shadow="md">
                 {validation ? (
                     <div className={color}>
@@ -148,7 +155,7 @@ export default function Profile() {
                     </Box>
                     <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
                         <p>Rating</p>
-                        <p>{rating ? rating : 'Not rated'}</p>
+                        {/* <p>{rating ? rating : 'Not rated'}</p> */}
                     </Box>
                     <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
                         <p>Credibility Score</p>
@@ -186,7 +193,8 @@ export default function Profile() {
                     )}
                     
                     </Box>
-                    {history && (
+                    {/* PUT THIS BACK IN
+                    history && (
                     <Box mt={6}>
                         <p> Application History:</p>
                         <Box as="ul" mt={2}>
@@ -200,13 +208,9 @@ export default function Profile() {
                             })}
                         </Box>                    
                     </Box>
-                    )}
+                    )*/}
                 </FormControl>
             </Box>
-        ) : (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <p className="text-gray-500">User not found</p>
-            </div>
-        )
+        
     )
 }

@@ -1,0 +1,121 @@
+import { Request, Response } from "express";
+import { AppDataSource } from "../data-source";
+import { User } from "../entity/User";
+import { Application } from "../entity/Application";
+
+export class ApplicationController {
+  private applicationRepository = AppDataSource.getRepository(Application);
+
+  /**
+   * Retrieves all applications from the database
+   * @param request - Express request object
+   * @param response - Express response object
+   * @returns JSON response containing an array of all applications
+   */
+  async all(request: Request, response: Response) {
+    const applications = await this.applicationRepository.find();
+    
+    return response.json(applications);
+  }
+
+  /**
+   * Retrieves a single application by its id
+   * @param request - Express request object containing the application ID in params
+   * @param response - Express response object
+   * @returns JSON response containing the application if found, or 404 error if not found
+   */
+  async one(request: Request, response: Response) {
+    const applicationId = parseInt(request.params.id);
+    const application = await this.applicationRepository.findOne({
+      where: { applicationId },
+    });
+
+    if (!application) {
+      return response.status(404).json({ message: "Application not found" });
+    }
+    return response.json(application);
+  }
+  /**
+   * Creates a new application in the database
+   * @param request - Express request object containing application details in body
+   * @param response - Express response object
+   * @returns JSON response containing the created application or error message
+   */
+  async save(request: Request, response: Response) {
+    const application = this.applicationRepository.create(request.body);
+
+    try {
+      await this.applicationRepository.save(application);
+    } catch (error) {
+      return response.status(500).json({ message: "Error saving application", error });
+    }
+  }
+
+  /**
+   * Deletes an application from the database by its Id
+   * @param request - Express request object containing the application userName in params
+   * @param response - Express response object
+   * @returns JSON response with success message or 404 error if application not found
+   */
+  async remove(request: Request, response: Response) {
+    const applicationId = parseInt(request.params.id);
+    const applicationToRemove = await this.applicationRepository.findOne({
+      where: { applicationId },
+    });
+
+    if (!applicationToRemove) {
+      return response.status(404).json({ message: "Application not found" });
+    }
+
+    await this.applicationRepository.remove(applicationToRemove);
+    return response.json({ message: "Application removed successfully" });
+  }
+
+  /**
+   * Updates an existing application's information
+   * @param request - Express request object containing application ID in params and updated details in body
+   * @param response - Express response object
+   * @returns JSON response containing the updated application or error message
+   */
+  async update(request: Request, response: Response) {
+    const applicationId = parseInt(request.params.id);
+
+    let applicationToUpdate = await this.applicationRepository.findOne({
+      where: { applicationId },
+    });
+
+    if (!applicationToUpdate) {
+      return response.status(404).json({ message: "Application not found" });
+    }
+
+    const updatedApplication: Application  = {
+        ...applicationToUpdate,
+        ...request.body,
+    };
+
+    try {
+      await this.applicationRepository.save(updatedApplication);
+      return response.json(updatedApplication);
+    } catch (error) {
+      return response
+        .status(400)
+        .json({ message: "Error updating application", error });
+    }
+  }
+  async findByUser(request: Request, response: Response) {
+    const applicantUserName = request.params.applicantUserName;
+    const applications = await this.applicationRepository.find({
+      where: { user: { userName: applicantUserName } },
+    });
+
+    return response.json(applications);
+}
+async findByEvent(request: Request, response: Response) {
+    const eventId = parseInt(request.params.eventId);
+    const applications = await this.applicationRepository.find({
+      where: { event: { eventId } },
+    });
+
+    return response.json(applications);
+}  
+}

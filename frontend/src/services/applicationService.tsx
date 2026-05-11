@@ -1,36 +1,45 @@
 import { Event } from "../types/event";
 import { Application } from "@/types/application";
+import axios from "axios";
+
+const API_BASE_URL = "http://localhost:3001/api";
 
 //TODO: this file is getting a bit bloated and hard to follow
 
-export function getApplicationsForUser(userName: string, events: Event[]) : Application[] | [] {
-    const applications: Application[] = [];
-    //loops through events and filters by userName and appends results to applications array
-    for (const event of events) {
-        const userApplications = event.applications.filter(app => app.applicantUserName === userName);
-        applications.push(...userApplications);
+export const getApplicationsForUser = async (userName: string) : Promise<Application[] | []> => {
+    //fetches all applications for a user from the backend
+    try {
+        if (!userName) return [];
+        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/applications`);
+        return data;
+    } catch (error) {
+        console.error("Error fetching applications:", error);
+        return [];
     }
-    return applications;
 }
 
-export function getRatingForUser(userName: string, events: Event[]) : number | null {
+export const getRatingForUser = async (userName: string) : Promise<number> => {
     //filters all applications for user with ratings
-    const applicationsWithRatings = 
-    getApplicationsForUser(userName, events)
-    .filter(application => application.rating !== null);
-    
-    if (applicationsWithRatings.length === 0) {
-        return null; //no applications
+    try {
+        const applications = await getApplicationsForUser(userName);
+        const applicationsWithRatings = applications.filter(app => app.rating !== null);
+        if (applicationsWithRatings.length === 0) {
+            return 0; // No ratings available
+        }
+        //sum
+        let sumOfRatings = 0;
+        for (const application of applications) {
+            if (application.rating) {
+                sumOfRatings += application.rating;
+            }
+        }
+        //average
+        const averageRating = sumOfRatings / applicationsWithRatings.length;  
+        return averageRating; 
+    } catch (error) {
+        console.error("Error fetching applications:", error);
+        return 0;
     }
-    //sum
-    let sumOfRatings = 0;
-    for (const application of applicationsWithRatings) {
-        sumOfRatings += application.rating!;
-    }
-    //average
-    const averageRating = sumOfRatings / applicationsWithRatings.length;    
-    
-    return averageRating;
 }
 
 //constructor
