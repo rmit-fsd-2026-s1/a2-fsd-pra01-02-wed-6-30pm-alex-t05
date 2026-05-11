@@ -25,6 +25,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Fetch profiles on component mount
     useEffect(() => {
         fetchUsers();
+        const StoredUser = localStorage.getItem('currentUser'); // Checks if there is a logged in user
+        if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
     }, []);
 
     const fetchUsers = async () => {

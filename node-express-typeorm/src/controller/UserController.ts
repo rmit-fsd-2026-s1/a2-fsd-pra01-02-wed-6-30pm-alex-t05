@@ -12,8 +12,9 @@ export class UserController {
    * @returns JSON response containing an array of all users
    */
   async all(request: Request, response: Response) {
-    const users = await this.userRepository.find();
-
+    const users = await this.userRepository.find({
+      relations: ["events"],
+    });
     return response.json(users);
   }
 
@@ -27,6 +28,7 @@ export class UserController {
     const userName = request.params.userName;
     const user = await this.userRepository.findOne({
       where: { userName },
+      relations: ["events"],
     });
 
     if (!user) {

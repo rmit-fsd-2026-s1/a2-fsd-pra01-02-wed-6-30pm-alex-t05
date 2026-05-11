@@ -12,15 +12,8 @@ export default function Hirer() {
     const { user } = useAuth()
     const { events } = useEvent();
     const [userSearch, setUserSearch] = useState('')
-
-    if (!userName) {
-        return <div>Loading...</div>;
-    }
-
-    console.log(userName);
-
     return (
-        user && user.role === "hirer" && user.userName === userName ? (
+        user && user.role === "hirer" ? (
             <div className="min-h-screen items-center justify-center bg-gray-100">
                 <h1 className="!text-2xl flex items-center justify-center">Venue List</h1>
                 <form className="flex items-center">

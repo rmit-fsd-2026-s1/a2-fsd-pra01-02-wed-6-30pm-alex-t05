@@ -10,7 +10,7 @@ router.get("/users", async (req, res) => {
 });
 
 // Gets a user by their id
-router.get("/users/:id", async (req, res) => {
+router.get("/users/:userName", async (req, res) => {
   await userController.one(req, res);
 });
 
@@ -20,12 +20,12 @@ router.post("/users", async (req, res) => {
 });
 
 // Updates a user by their id
-router.put("/users/:id", async (req, res) => {
+router.put("/users/:userName", async (req, res) => {
   await userController.update(req, res);
 });
 
 // Deletes a user by their id
-router.delete("/users/:id", async (req, res) => {
+router.delete("/users/:userName", async (req, res) => {
   await userController.remove(req, res);
 });
 

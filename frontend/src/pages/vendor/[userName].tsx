@@ -4,19 +4,11 @@ import { useAuth } from "../../context/AuthContext";
 import { useEvent } from '../../context/EventContext';
 import { Box, Button } from "@chakra-ui/react";
 import { useState } from "react";
-import { Event } from "../../types/event";
-import { eventService } from "@/services/api";
-import { useRouter } from "next/router";
 
 export default function Vendor() {
     const { user } = useAuth()
     const { events, eventsByUser } = useEvent();
     const [visualisationsVisible, setVisualisationsVisible] = useState(false);
-
-    console.log("events state:", events);
-    console.log("user state:", user);
-    console.log("eventsByUser state:", eventsByUser);
-
     return (
         user && user.role === "vendor" ? (
             <div className="min-h-screen items-center justify-center bg-gray-100">
