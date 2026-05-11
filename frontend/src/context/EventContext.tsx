@@ -1,7 +1,6 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { Event, DEFAULT_EVENT as DEFAULT_EVENTS } from '../types/event';
 import { eventService } from '@/services/api';
-import { useAuth } from './AuthContext';
 import { useRouter } from 'next/router';
 
 type EventContextType = {
@@ -23,7 +22,6 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
     const [events, setEvents] = useState<Event[]>([]);
     const [eventsByUser, setEventsByUser] = useState<Event[]>([]);
-    const { user } = useAuth();
     const { userName } = router.query;
 
     //const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
@@ -31,10 +29,10 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     //initialises events
     useEffect(() => {
         fetchEvents();
-        if (user) {
+        if (userName) {
             fetchEventsByUser();
         }
-    }, [user]);
+    }, [userName]);
 
     const fetchEvents = async () => {
         try {
@@ -47,7 +45,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
 
     const fetchEventsByUser = async () => {
         try {
-            const data = await eventService.getEventsByUser(user?.userName as string);
+            const data = await eventService.getEventsByUser(userName as string);
             setEventsByUser(data);
         } catch (error) {
             console.error("Error fetching events by user:", error);
