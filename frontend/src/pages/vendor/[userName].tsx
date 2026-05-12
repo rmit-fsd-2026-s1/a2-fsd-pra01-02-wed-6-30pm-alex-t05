@@ -3,12 +3,27 @@ import Card from "../../components/Card";
 import { useAuth } from "../../context/AuthContext";
 import { useEvent } from '../../context/EventContext';
 import { Box, Button } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Event } from "@/types/event";
+import { eventService } from "@/services/api";
 
 export default function Vendor() {
     const { user } = useAuth()
-    const { events, eventsByUser } = useEvent();
+    const { events } = useEvent();
     const [visualisationsVisible, setVisualisationsVisible] = useState(false);
+    const [ownedEvents, setOwnedEvents] = useState<Event[] | null>(null);
+
+    useEffect (() => {
+        //Fetchest owned events for the vendor
+        const fetchOwnedEvents = async () => {
+            if (user) {
+                const eventsByUser = await eventService.getEventsByUser(user.userName);
+                setOwnedEvents(eventsByUser);
+            }
+        };
+        fetchOwnedEvents();
+    }, [user, events]);
+
     return (
         user && user.role === "vendor" ? (
             <div className="min-h-screen items-center justify-center bg-gray-100">
@@ -24,7 +39,7 @@ export default function Vendor() {
                 </Box>
                 <h1 className="!text-2xl flex items-center justify-center">Venue List</h1>
                 <div className="grid grid-cols-2 gap-4">
-                    {events.map((event) => (event.userUserName === user.userName) && (
+                    {ownedEvents?.map((event) => (
                         <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
                             <Card
                                 eventID={event.eventId}
