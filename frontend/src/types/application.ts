@@ -1,5 +1,5 @@
 export type Application = {
-    id: number;
+    applicationId: number;
     eventId: number,
     applicantUserName: string,
     status: "pending" | "approved" | "rejected"

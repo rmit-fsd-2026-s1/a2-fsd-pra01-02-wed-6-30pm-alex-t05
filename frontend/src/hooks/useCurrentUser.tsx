@@ -6,21 +6,19 @@ import { User } from '../types/user';
 export const useCurrentUser = (): User | null => {
     const { user } = useAuth();
     const [fullUser, setFullUser] = useState<User | null>(null);
-    
+    //updates full user details whenever the user in AuthContext changes, and handles the data being async
     useEffect(() => {
         if (!user) {
-            setFullUser(null); // If there's no user, set fullUser to null
+            setFullUser(null); //if there's no user, set fullUser to null
             return;
         }
-        
-        // If there's no user in the auth context, do nothing
-        const fetchFullUser = async () => {
+            const fetchFullUser = async () => {
             const fetchedUser = await getUserByUserName(user.userName);
             setFullUser(fetchedUser);
         };
         fetchFullUser();
     }, [user]);
 
-    return fullUser; // Get the full user details using the email (which is unique and non-editable)
+    return fullUser; //get the full user details using the username (which is unique and non-editable)
 }
-//This hook is used to pull full user data from AuthContext
+//This hook is used to pull full user data from the username in AuthContext

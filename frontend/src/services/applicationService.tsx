@@ -19,25 +19,13 @@ export const getApplicationsForUser = async (userName: string) : Promise<Applica
 }
 
 export const getRatingForUser = async (userName: string) : Promise<number> => {
-    //filters all applications for user with ratings
+    //filters applications based on username, and averages the ratings
     try {
-        const applications = await getApplicationsForUser(userName);
-        const applicationsWithRatings = applications.filter(app => app.rating !== null);
-        if (applicationsWithRatings.length === 0) {
-            return 0; // No ratings available
-        }
-        //sum
-        let sumOfRatings = 0;
-        for (const application of applications) {
-            if (application.rating) {
-                sumOfRatings += application.rating;
-            }
-        }
-        //average
-        const averageRating = sumOfRatings / applicationsWithRatings.length;  
-        return averageRating; 
+        if (!userName) return 0;
+        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/rating`);
+        return data;
     } catch (error) {
-        console.error("Error fetching applications:", error);
+        console.error("Error fetching user rating:", error);
         return 0;
     }
 }

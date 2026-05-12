@@ -117,5 +117,19 @@ async findByEvent(request: Request, response: Response) {
     });
 
     return response.json(applications);
-}  
+}
+
+async findUserRating(request: Request, response: Response) {
+  //Reference:
+  //https://stackoverflow.com/questions/54684928/how-to-use-parameterized-query-using-typeorm-for-postgres-database-and-nodejs-as
+    const applicantUserName = request.params.applicantUserName;
+    const query = 
+      `SELECT AVG(rating) as averageRating
+      FROM application
+      WHERE "applicantUserName" = $1 
+      AND rating IS NOT NULL`;
+    const averageRating = await this.applicationRepository.query(query, [applicantUserName]);
+    return response.json(averageRating[0].averageRating || 0); 
+    // Return 0 if there are no ratings
+}
 }

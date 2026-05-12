@@ -11,9 +11,10 @@ import { fileUploader } from '@/services/FileUploader';
 import ApplicationHistory from '@/components/ApplicationHistory';
 
 export default function Profile() {
+    //setup
     const router = useRouter();
     const currentUser = useCurrentUser(); //get the current full user details from the custom hook
-    const refUserName = router.query.userName as string; //get the username from url
+    const profileUserName = router.query.userName as string; //get the username from url
     const [profileUser, setProfileUser] = useState<User | null>(null); //state to hold the user details
     const { login } = useAuth(); //get the login function from the AuthContext 
 
@@ -31,24 +32,24 @@ export default function Profile() {
     const applicationHistory = useApplicationHistory(profileUser?.userName || '');
 
     //gets rating from custom hook
-    //const rating = useUserRating(profileUser?.userName || '');
-    // When the component mounts, check if there's a ref query parameter and fetch the corresponding user details, otherwise defaults to current user
+    const rating = useUserRating(profileUser?.userName || '');
     const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
 
+    //fetches user to display
+    //TODO refactor this to just call api
     useEffect(() => {
         if (!router.isReady) return; //wait for router
+        try{
         async function fetchUser() {
-            //fetches user details based on ref query parameter
-            if (refUserName) {
-                const user = await getUserByUserName(refUserName);
-                setProfileUser(user); // Set the profileUser state to the fetched user details
-            } else {
-                //defaults to current user if no ref
-                setProfileUser(currentUser || null); // If no ref query parameter, set profileUser to the current user from the custom hook
-            }
+            //fetches user details based on url
+            const user = await getUserByUserName(profileUserName);
+            setProfileUser(user); //set the profileUser state to the fetched user details
         }
         fetchUser();
-    }, [refUserName, currentUser, router.isReady]); //refetches if ref query parameter or current user changes
+    } catch (error) {
+        console.error("Error fetching user details:", error);
+    }
+    }, [profileUserName, currentUser, router.isReady]); //refetches if profile username query parameter or current user changes
 
     useEffect(() => {
         // When the profileUser state changes, update the form fields with the new user details, also discards unsaved changes when editing
@@ -158,7 +159,7 @@ export default function Profile() {
                 </Box>
                 <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
                     <p>Rating</p>
-                    {/* <p>{rating ? rating : 'Not rated'}</p> */}
+                    {<p>{rating ? rating : 'Not rated'}</p>}
                 </Box>
                 <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
                     <p>Credibility Score</p>
@@ -203,7 +204,7 @@ export default function Profile() {
                             {applicationHistory.map(application => {
                                 return (
                                     <ApplicationHistory
-                                        key={application.id}
+                                        key={application.applicationId}
                                         application={application}
                                     />
                                 );

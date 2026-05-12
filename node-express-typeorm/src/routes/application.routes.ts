@@ -32,4 +32,8 @@ router.get("/events/:eventId/applications", async (req, res) => {
   await applicationController.findByEvent(req, res);
 });
 
+router.get("/users/:userName/rating", async (req, res) => {
+  await applicationController.findUserRating(req, res);
+});
+
 export default router;

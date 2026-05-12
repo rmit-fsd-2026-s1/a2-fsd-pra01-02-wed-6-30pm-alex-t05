@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
 import { Application } from "@/types/application";
 import { useEvent } from "@/context/EventContext";
-import { useEffect, useState } from "react";
+
 export default function ApplicationHistory({application}: {application: Application}) {
     const { events } = useEvent();
     const eventByApplication = events.find(event => event.eventId === application.eventId);
