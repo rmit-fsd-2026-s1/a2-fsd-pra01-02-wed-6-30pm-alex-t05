@@ -23,7 +23,7 @@ const Nav = () => {
                             </li>
                         )}
                         <li>
-                            <Link href="/profile">
+                            <Link href={`/profile/${user.userName}`}>
                                 Profile
                             </Link>
                         </li>

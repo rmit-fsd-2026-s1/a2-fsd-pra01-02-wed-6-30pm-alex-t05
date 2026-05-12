@@ -12,7 +12,7 @@ import { fileUploader } from '@/services/FileUploader';
 export default function Profile() {
     const router = useRouter();
     const currentUser = useCurrentUser(); //get the current full user details from the custom hook
-    const refUserName = router.query.ref as string; //get the ref query parameter from the URL and cast it to a string
+    const refUserName = router.query.userName as string; //get the username from url
     const [profileUser, setProfileUser] = useState<User | null>(null); //state to hold the user details
     const { login } = useAuth(); //get the login function from the AuthContext 
 
