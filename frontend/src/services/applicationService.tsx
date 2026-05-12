@@ -5,7 +5,7 @@ import axios from "axios";
 const API_BASE_URL = "http://localhost:3001/api";
 
 //TODO: this file is getting a bit bloated and hard to follow
-
+//getters
 export const getApplicationsForUser = async (userName: string) : Promise<Application[] | []> => {
     //fetches all applications for a user from the backend
     try {
@@ -29,6 +29,18 @@ export const getRatingForUser = async (userName: string) : Promise<number> => {
         return 0;
     }
 }
+
+export const getApplicationsForEvent = async (eventId: number) : Promise<Application[] | []> => {
+    //fetches all applications for an event from the backend
+    try {
+        const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/applications`);
+        return data;
+    } catch (error) {
+        console.error("Error fetching applications for event:", error);
+        return [];
+    }
+}
+
 
 //constructor
 export function createApplication(
@@ -57,7 +69,16 @@ export function normaliseDate(dateStr: string) : string {
 
 
 //setters
-export function setApplicationStatus(application: Application, newStatus: "pending" | "approved" | "rejected") : Application {
+export const updateApplication = async (updatedApplication: Application) => {
+    //sends put request with updated application
+    try {
+    await axios.put(`${API_BASE_URL}/applications/${updatedApplication.applicationId}`, updatedApplication)
+    return true;
+    } catch (error) {
+        console.error("Error updating application:", error);
+        return false;
+    }
+};export function setApplicationStatus(application: Application, newStatus: "pending" | "approved" | "rejected") : Application {
     return {...application, status: newStatus};
 }
 

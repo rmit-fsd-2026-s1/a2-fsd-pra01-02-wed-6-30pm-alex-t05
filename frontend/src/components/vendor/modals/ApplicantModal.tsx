@@ -6,10 +6,11 @@ import { getRatingForUser } from "@/services/applicationService";
 import { Event } from "@/types/event";
 import { setApplicationStatus, setApplicationRating } from "@/services/applicationService";
 import { useEffect, useState } from "react";
+import { User } from "@/types/user";
+import { useUserRating } from "@/hooks/useUserRating";
 
 export default function ApplicantModal({
     application,
-    events,
     onClose,
     onUpdateApplication }: {
         application: Application, 
@@ -17,8 +18,25 @@ export default function ApplicantModal({
         onClose: () => void
         onUpdateApplication: (updatedApplication: Application) => void
     }) {
-    const user = getUserByUserName(application.applicantUserName); // Fetch full user details using the applicant's username
-    const rating = getRatingForUser(application.applicantUserName, events);
+    const [user, setUser] = useState<User | null>(null);
+    //TODO refactor this to a hook
+    useEffect(() => {
+        try{
+        async function fetchUser() {
+            //fetches user details based on url
+            const applicant = await getUserByUserName(application.applicantUserName);
+            setUser(applicant); //set the profileUser state to the fetched user details
+        }
+        fetchUser();
+    } catch (error) {
+        console.error("Error fetching user details:", error);
+    }
+    }, [application]); //refetches if profile username query parameter or current user changes
+
+    const rating = useUserRating(application.applicantUserName);
+    const isApproved = application.status === "approved";
+
+    /*not implemented yet
     const comments = getUserCommentsFromVendor(application.applicantUserName, user?.userName || "");
     const [commentsForUser, setCommentsForUser] = useState(comments);
     if (!user || !application) {
@@ -28,11 +46,10 @@ export default function ApplicantModal({
             </Box>
         );
     }
-    const isApproved = application.status === "approved";
-
     useEffect(() => {
         setCommentsForUser(comments);
     }, [application, comments]);
+    */
 
     return (
         <Box
@@ -60,10 +77,12 @@ export default function ApplicantModal({
                     />
                 </Box>
                 <Box>
+                    {/*TODO add link to profile here to open in new tab*/}
                     <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
                     <p><strong>Email:</strong> {user?.email}</p>
                     <p><strong>Phone Number:</strong> {user?.phoneNumber || "Not provided"}</p>
                     <p><strong>Rating:</strong> {rating ? `${rating} / 5` : "No ratings yet"}</p>
+                    {/*TODO Commenting to be reimplemented
                     <p><strong>Comment:</strong> {commentsForUser ? commentsForUser : "No comments yet"}</p>
                     <Button mt={2} colorScheme="blue" onClick={() => {
                         const newComment = prompt("Enter your comment for this application:", commentsForUser || "");
@@ -72,6 +91,7 @@ export default function ApplicantModal({
                     }}>
                         Add/Edit Comment
                     </Button>
+                    */}
                     {/* Additional applicant details and compliance docs can be displayed here */} 
                 </Box>
                 {!isApproved ? (

@@ -36,7 +36,7 @@ export default function Profile() {
     const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
 
     //fetches user to display
-    //TODO refactor this to just call api
+    //TODO refactor this to a hook
     useEffect(() => {
         if (!router.isReady) return; //wait for router
         try{

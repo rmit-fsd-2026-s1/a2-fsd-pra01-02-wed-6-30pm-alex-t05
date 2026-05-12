@@ -1,60 +1,72 @@
 import { Box, IconButton } from "@chakra-ui/react";
 import { useEvent } from "../../context/EventContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ApplicantModal from "./modals/ApplicantModal";
 import { Application } from "@/types/application";
-import { autoDeclineOverlappingApplications } from "@/services/applicationService";
+import { autoDeclineOverlappingApplications, getApplicationsForEvent, updateApplication } from "@/services/applicationService";
 import { FaSort } from "react-icons/fa";
 import { ApplicantRow } from "./ApplicantRow";
 
 export default function ApplicantList({ eventID }: { eventID: number }) {
     
-    const { events, updateEvent } = useEvent();
-    const event = events.find(e => e.eventID === eventID);
-    const applicants = event?.applications || [];
-    const [selectedApplicationId, setSelectedApplicationId] = useState<string | null>(null);
+    const { events } = useEvent();
+    
     const [sortedByRating, setSortedByRating] = useState(false);
+    const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
     //visible applicants are those that are pending, or those approved and awaiting a rating
-    const visibleApplicants = applicants
-    .filter(applicant => 
-        applicant.status === "pending" || 
-        (applicant.status === "approved" && applicant.rating === null)
-    )
+    const [applicationsForEvent, setApplicationsForEvent] = useState<Application[]>([]);
+    useEffect(() => {
+        const fetchApplications = async () => {
+            const apps = await getApplicationsForEvent(eventID);
+            setApplicationsForEvent(apps);
+        };
+        fetchApplications();
+        //rerenders the application list when an application is selected, so that the modal can show updated information after an application is approved/declined
+    } , [selectedApplication, applicationsForEvent, events]);
+
     //tack on sort by rating
+    useEffect(() => {
+        if (sortedByRating) {
+            const sortedApplications = [...visibleApplicants].sort((a, b) => {
+                if (a.rating === null) return 1;
+                if (b.rating === null) return -1;
+                return b.rating - a.rating;
+            });
+            setApplicationsForEvent(sortedApplications);
+        } else {
+            //if we're toggling off sorting, we need to reapply the default order (which is by application date, but since we don't have that, we'll just pull from the backend again)
+            const fetchApplications = async () => {
+                const apps = await getApplicationsForEvent(eventID);
+                setApplicationsForEvent(apps);
+            };
+            fetchApplications();
+        }
+    }, [sortedByRating]);
+
+    //TODO consider moving this filtering logic to the backend, so that we can sort by rating without having to pull all applications for the event
+    const visibleApplicants = applicationsForEvent.filter(app => 
+        app.status === "pending" 
+        || (app.status === "approved" 
+        && app.rating === null));
+    
+    
+    /* reimplement this later
     .sort((a, b) => {
         if (!sortedByRating) return 0;
         if (a.rating === null) return 1;
         if (b.rating === null) return -1;
         return b.rating - a.rating;
     });
-    const selectedApplication = applicants.find(app => app.id === selectedApplicationId);
+    */
+    //const selectedApplication = applicants.find(app => app.id === selectedApplicationId);
 
 
 
 
     const handleUpdateApplication = (updatedApplication: Application) => {
-        //select the event that the application belongs to
-        const foundEvent = events.find(e => e.eventID === eventID);
-        if (!foundEvent) return;
+        //call api put query to update application in backend
+        updateApplication(updatedApplication)
 
-        //replace the application in the event with the updated application
-        const updatedApplications = foundEvent.applications.map(app => 
-            app.id === updatedApplication.id
-                ? updatedApplication
-                : app
-        );
-        //update the event's application/s with the new application status
-        const updatedEvent = {
-            ...foundEvent,
-            applications:
-                //if approved, auto decline overlapping applications, otherwise just modify the one app 
-                updatedApplication.status === "approved"
-                    ? autoDeclineOverlappingApplications({
-                        ...foundEvent,
-                        applications: updatedApplications
-                    }) : updatedApplications
-        };
-        updateEvent(updatedEvent);
     }
     return (
         <Box p={4} bg="white" rounded="md" shadow="md">
@@ -72,22 +84,22 @@ export default function ApplicantList({ eventID }: { eventID: number }) {
                 <Box as="p">No applicants found for this event.</Box>
             ) : (
                 <Box as="ul" mt={2}>
-                    {visibleApplicants.map((applicant) => {
+                    {visibleApplicants.map((application) => {
                         return (
                             <ApplicantRow
-                                key={applicant.id}
-                                applicant={applicant}
-                                onClick={() => setSelectedApplicationId(applicant.id)}
+                                key={application.applicationId}
+                                applicant={application}
+                                onClick={() => setSelectedApplication(application)}
                             />
                         );
                     })}
                 </Box>
             )}
-            {selectedApplicationId && (
+            {selectedApplication && (
                 <ApplicantModal 
                 application={selectedApplication!}
                 events={events} 
-                onClose={() => setSelectedApplicationId(null)}
+                onClose={() => setSelectedApplication(null)}
                 onUpdateApplication ={handleUpdateApplication}
                 />
             )}
