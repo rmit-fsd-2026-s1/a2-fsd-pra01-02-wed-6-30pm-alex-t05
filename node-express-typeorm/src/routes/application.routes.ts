@@ -28,4 +28,8 @@ router.get("/users/:userName/applications", async (req, res) => {
   await applicationController.findByUser(req, res);
 });
 
+router.get("/events/:eventId/applications", async (req, res) => {
+  await applicationController.findByEvent(req, res);
+});
+
 export default router;

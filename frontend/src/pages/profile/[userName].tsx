@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { useUserRating } from '@/hooks/useUserRating';
 import useApplicationHistory from '@/hooks/useApplicationHistory';
 import { fileUploader } from '@/services/FileUploader';
+import ApplicationHistory from '@/components/ApplicationHistory';
 
 export default function Profile() {
     const router = useRouter();
@@ -23,12 +24,14 @@ export default function Profile() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [validation, setValidation] = useState('')
     const [color, setColor] = useState('')
+    
     //toggle for application history display
     const [history, setHistory] = useState(false);
+    //gets application history from custom hook
+    const applicationHistory = useApplicationHistory(profileUser?.userName || '');
+
     //gets rating from custom hook
     //const rating = useUserRating(profileUser?.userName || '');
-    //gets application history from custom hook
-    //const applicationHistory = useApplicationHistory(profileUser?.userName || '');
     // When the component mounts, check if there's a ref query parameter and fetch the corresponding user details, otherwise defaults to current user
     const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
 
@@ -193,12 +196,11 @@ export default function Profile() {
                     )}
 
                 </Box>
-                {/* PUT THIS BACK IN
-                    history && (
+                {history && (
                     <Box mt={6}>
                         <p> Application History:</p>
-                        <Box as="ul" mt={2}>
-                            {applicationHistory.map((application) => {
+                        <Box as="li" mt={2}>
+                            {applicationHistory.map(application => {
                                 return (
                                     <ApplicationHistory
                                         key={application.id}
@@ -208,7 +210,7 @@ export default function Profile() {
                             })}
                         </Box>                    
                     </Box>
-                    )*/}
+                    )}
             </FormControl>
         </Box>
 

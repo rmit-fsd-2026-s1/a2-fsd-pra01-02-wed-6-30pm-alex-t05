@@ -8,7 +8,6 @@ export const useCurrentUser = (): User | null => {
     const [fullUser, setFullUser] = useState<User | null>(null);
     
     useEffect(() => {
-        console.log("useCurrentUser effect triggered with user:", user); // Debug log to check when the effect runs and what the user value is
         if (!user) {
             setFullUser(null); // If there's no user, set fullUser to null
             return;

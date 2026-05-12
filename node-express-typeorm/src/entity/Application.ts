@@ -16,6 +16,10 @@ export class Application {
     @PrimaryGeneratedColumn()
     applicationId: number;
     @Column()
+    applicantUserName: string;
+    @Column()
+    eventId: number;
+    @Column()
     status: "pending" | "approved" | "rejected";
     @Column({ type: "float", nullable: true })
     rating: number | null;
