@@ -59,23 +59,30 @@ export default function Profile() {
         setPhoneNumber(profileUser.phoneNumber || '');
     }, [editing]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!firstName.trim() || !lastName.trim()) {
             setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`); // Set color for message
             setValidation('Please fill in all required fields.');
         } else {
-            if (phoneNumber.length < 10 || phoneNumber.length > 10 || !phoneNumber.startsWith('04')) { // Checks if phonenumber is 10 digits if it's not empty
-                setValidation('Invalid phone number. Please enter a 10-digit number and starts with "04".');
+            //valid phone number is either empty or a 10 digit number starting with 04
+            if (phoneNumber && (phoneNumber.length !== 10 || !phoneNumber.startsWith('04'))) { // Checks if phonenumber is 10 digits if it's not empty
+                setValidation('Invalid phone number. Please enter a 10-digit number and starts with "04", or leave blank.');
                 setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`);
             } else {
+                //refactor to use UPDATE query  
                 const updatedUser: User = {
                     ...profileUser!, // Spread the existing user data to retain unchanged fields
                     firstName: firstName.trim(),
                     lastName: lastName.trim(),
                     phoneNumber: phoneNumber.trim() || '' // Ensure phone number is a string, even if empty
                 };
-                updateUser(updatedUser); // Update user data in localStorage
+                const update = await updateUser(updatedUser); // Update user data in database
+                if (!update) {
+                    setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`); // Set color for message
+                    setValidation('Error updating profile. Please try again later.');
+                    return;
+                }
                 login(updatedUser); // Update user data in AuthContext
                 setColor(`bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded`); // Set color for message
                 setValidation('Profile updated successfully.'); // Set success message

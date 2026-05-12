@@ -51,13 +51,16 @@ export const saveUser = (newUser: User) => {
     localStorage.setItem('users', JSON.stringify([...existingData, newUser]));
 };
 
-export const updateUser = (updatedUser: User) => {
-    const existingData = getUsers();
-    const updatedData = existingData.map((user: User) =>
-        user.userName === updatedUser.userName ? updatedUser : user
-    );
-    localStorage.setItem('users', JSON.stringify(updatedData));
-}
+export const updateUser = async (updatedUser: User) => {
+    //sends put request with updated user
+    try {
+    await axios.put(`${API_BASE_URL}/users/${updatedUser.userName}`, updatedUser)
+    return true;
+    } catch (error) {
+        console.error("Error updating user:", error);
+        return false;
+    }
+};
 
 export const checkDuplicate = (field: keyof User, value: string) => {
     const existingData = getUsers();
