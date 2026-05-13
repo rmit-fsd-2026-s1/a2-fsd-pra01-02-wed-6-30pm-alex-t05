@@ -18,11 +18,13 @@ export const getApplicationsForUser = async (userName: string) : Promise<Applica
     }
 }
 
-export const getRatingForUser = async (userName: string) : Promise<number> => {
+export const getRatingForUser = async (applicantUserName: string) : Promise<number | null> => {
     //filters applications based on username, and averages the ratings
     try {
-        if (!userName) return 0;
-        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/rating`);
+        if (!applicantUserName) return 0;
+        console.log("Fetching rating for user:", applicantUserName);
+        const { data } = await axios.get(`${API_BASE_URL}/users/${applicantUserName}/rating`);
+        console.log("Received rating data:", data);
         return data;
     } catch (error) {
         console.error("Error fetching user rating:", error);

@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { useEvent } from "../context/EventContext";
 import { getRatingForUser } from "../services/applicationService";
 
-export const useUserRating = (userName: string): number | null => {
+export const useUserRating = (applicantUserName: string): number | null => {
     const { events } = useEvent();
     const [rating, setRating] = useState<number | null>(null);
 
     useEffect(() => {
         const fetchUserRating = async () => {
             try {
-                const userRating = await getRatingForUser(userName);
+                const userRating = await getRatingForUser(applicantUserName);
                 setRating(userRating);
             } catch (error) {
                 console.error("Error fetching user rating:", error);
@@ -18,8 +18,7 @@ export const useUserRating = (userName: string): number | null => {
         };
 
         fetchUserRating();
-    }, [userName, events]);
-
+    }, [applicantUserName, events]);
     return rating;
 }
 //This hook pulls users rating from username

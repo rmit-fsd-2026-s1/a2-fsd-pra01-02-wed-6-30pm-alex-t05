@@ -122,12 +122,14 @@ export default function ApplicantModal({
                         <Button mt={4} colorScheme="teal" onClick={() => {
                             const updated = setApplicationStatus(application, "approved");
                             onUpdateApplication(updated);
+                            onClose();
                         }}>
                             Approve
                         </Button>
                         <Button mt={4} colorScheme="red" onClick={() => {
                             const updated = setApplicationStatus(application, "rejected");
                             onUpdateApplication(updated);
+                            onClose();
                         }}>
                             Reject
                         </Button>
