@@ -1,6 +1,8 @@
-import { DEFAULT_USERS, User } from '../types/user';
+import { User } from '../types/user';
 import axios from 'axios';
 const API_BASE_URL = "http://localhost:3001/api";
+
+//TODO refactor this to api.tsx
 //Getters
 export const getUsers = async (): Promise<User[]> => {
     try {
@@ -34,23 +36,39 @@ export const getUserByUserName = async (userName: string): Promise<User | null> 
     }    
 }
 
-export function getUserCommentsFromVendor(userName: string, vendorUserName: string) : string {
-    const user = getUserByUserName(userName);
-    for (const comment of user!.vendorComments || []) {
-        //comments are vendorUserName, comment. so match first part to vendorUsername then return comment
-        if (comment[0] === vendorUserName) {
-            return comment[1];
+export async function getUserCommentsFromVendor(vendorUserName: string, hirerUserName: string) : Promise<string> {
+    try {
+        const { data } = await axios.get(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`);
+        console.log("Fetched comments:", data);
+        return data.comment;
+    } catch (error) {
+        //Reference: AI code generation - if no comment is found, we return an empty string and log a warning instead of an error
+        if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
+            console.warn(`No comment found from vendor ${vendorUserName} for user ${hirerUserName}`);
+            return "";
         }
+        console.error("Error fetching user comments from vendor:", error);
+        return "";
     }
-    return "";
+}
+
+export async function setUserCommentFromVendor(vendorUserName: string, hirerUserName: string, comment: string) : Promise<void> {
+    try {
+        await axios.post(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`, { comment });
+    } catch (error) {
+        console.error("Error setting user comment from vendor:", error);
+    }
+}
+
+export async function deleteUserCommentFromVendor(vendorUserName: string, hirerUserName: string) : Promise<void> {
+    try {
+        await axios.delete(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`);
+    } catch (error) {
+        console.error("Error deleting user comment from vendor:", error);
+    }
 }
 
 //Setters
-export const saveUser = (newUser: User) => {
-    const existingData = getUsers();
-    localStorage.setItem('users', JSON.stringify([...existingData, newUser]));
-};
-
 export const updateUser = async (updatedUser: User) => {
     //sends put request with updated user
     try {
@@ -62,30 +80,27 @@ export const updateUser = async (updatedUser: User) => {
     }
 };
 
-export const checkDuplicate = (field: keyof User, value: string) => {
-    const existingData = getUsers();
-    return existingData.some((item: User) => item[field] === value);
-};
-
 export const authenticateUser = async (email: string, password: string) => {            
     const existingData = await getUsers();
     const user = existingData.find((user: User) => user.email === email && user.password === password);
     return user || null;
 }
 
-export function setUserCommentFromVendor(userName: string, vendorUserName: string, comment: string) : void {
-    const user = getUserByUserName(userName);
-    if (!user) return;
-    for (const existingComment of user!.vendorComments || []) {
-        //if comment from vendor already exists, update it
-        if (existingComment[0] === vendorUserName) {
-            existingComment[1] = comment;
-            updateUser(user!);
-            return;
-        }
-    }
-    //if comment from vendor doesn't exist, add it;
-    user!.vendorComments = user!.vendorComments || [];
-    user!.vendorComments.push([vendorUserName, comment]);
-    updateUser(user!);
-}
+
+// Below here should be defunct but check if anything breaks if theyre gone
+
+export const saveUser = (newUser: User) => {
+    const existingData = getUsers();
+    localStorage.setItem('users', JSON.stringify([...existingData, newUser]));
+};
+
+
+
+export const checkDuplicate = (field: keyof User, value: string) => {
+    const existingData = getUsers();
+    return existingData.some((item: User) => item[field] === value);
+};
+
+
+
+

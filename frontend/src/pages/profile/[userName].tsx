@@ -57,7 +57,7 @@ export default function Profile() {
         setFirstName(profileUser.firstName || '');
         setLastName(profileUser.lastName || '');
         setPhoneNumber(profileUser.phoneNumber || '');
-    }, [editing]);
+    }, [editing, profileUser]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

@@ -1,13 +1,14 @@
-import { Box, Button, IconButton } from "@chakra-ui/react";
+import { Box, Button, IconButton, Link } from "@chakra-ui/react";
 import { MdClose, MdStar } from "react-icons/md";
 import { Application } from "@/types/application";
-import { getUserByUserName, getUserCommentsFromVendor, setUserCommentFromVendor } from "@/services/userService";
+import { getUserByUserName, getUserCommentsFromVendor, setUserCommentFromVendor, deleteUserCommentFromVendor } from "@/services/userService";
 import { getRatingForUser } from "@/services/applicationService";
 import { Event } from "@/types/event";
 import { setApplicationStatus, setApplicationRating } from "@/services/applicationService";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useUserRating } from "@/hooks/useUserRating";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ApplicantModal({
     application,
@@ -18,38 +19,47 @@ export default function ApplicantModal({
         onClose: () => void
         onUpdateApplication: (updatedApplication: Application) => void
     }) {
-    const [user, setUser] = useState<User | null>(null);
+    const { user } = useAuth();
+    const [fullApplicant, setApplicant] = useState<User | null>(null);
     //TODO refactor this to a hook
     useEffect(() => {
         try{
         async function fetchUser() {
             //fetches user details based on url
             const applicant = await getUserByUserName(application.applicantUserName);
-            setUser(applicant); //set the profileUser state to the fetched user details
+            setApplicant(applicant); //set the profileUser state to the fetched user details
         }
         fetchUser();
-    } catch (error) {
-        console.error("Error fetching user details:", error);
-    }
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
     }, [application]); //refetches if profile username query parameter or current user changes
+    
+    //TODO move this to a hook if we want it used on the hirer profile
+    //gets comments on a hirer made by a vendor
+    //sets a state to load properly
+    const [userComments, setUserComments] = useState<string | null>(null);
+    useEffect(() => {
+        async function fetchComments() {
+            if (!user || !fullApplicant) {
+                setUserComments(null); //if there's no user or applicant, set comments to null
+                return;
+            }
+            try{
+                const comments = await getUserCommentsFromVendor(user.userName, fullApplicant.userName);
+                setUserComments(comments);
+
+            } catch (error) {
+                console.error("Error fetching user comments from vendor:", error);
+                setUserComments(null);
+            }
+        }
+        fetchComments();
+        //rerenders when both users are fully loaded
+    }, [user, fullApplicant]);
 
     const rating = useUserRating(application.applicantUserName);
     const isApproved = application.status === "approved";
-
-    /*not implemented yet
-    const comments = getUserCommentsFromVendor(application.applicantUserName, user?.userName || "");
-    const [commentsForUser, setCommentsForUser] = useState(comments);
-    if (!user || !application) {
-        return (
-            <Box>
-                <p>User or application not found</p>
-            </Box>
-        );
-    }
-    useEffect(() => {
-        setCommentsForUser(comments);
-    }, [application, comments]);
-    */
 
     return (
         <Box
@@ -77,21 +87,33 @@ export default function ApplicantModal({
                     />
                 </Box>
                 <Box>
-                    {/*TODO add link to profile here to open in new tab*/}
-                    <p><strong>Name:</strong> {user?.firstName} {user?.lastName}</p>
-                    <p><strong>Email:</strong> {user?.email}</p>
-                    <p><strong>Phone Number:</strong> {user?.phoneNumber || "Not provided"}</p>
+                    <Link href={`/profile/${fullApplicant?.userName}`} target="_blank" color="blue.500" fontWeight="bold">
+                        Open Profile
+                    </Link>
+                    <p><strong>Name:</strong> {fullApplicant?.firstName} {fullApplicant?.lastName}</p>
+                    <p><strong>Email:</strong> {fullApplicant?.email}</p>
+                    <p><strong>Phone Number:</strong> {fullApplicant?.phoneNumber || "Not provided"}</p>
                     <p><strong>Rating:</strong> {rating ? `${rating} / 5` : "No ratings yet"}</p>
-                    {/*TODO Commenting to be reimplemented
-                    <p><strong>Comment:</strong> {commentsForUser ? commentsForUser : "No comments yet"}</p>
+                    
+                    <p><strong>Comment:</strong> {userComments || "No existing comments"}</p>
                     <Button mt={2} colorScheme="blue" onClick={() => {
-                        const newComment = prompt("Enter your comment for this application:", commentsForUser || "");
-                        setUserCommentFromVendor(application.applicantUserName, user?.userName || "", newComment || "");
-                        setCommentsForUser(newComment || "");
+                        const newComment = prompt("Enter comment for user, set to blank to delete", userComments || "");
+                        if (newComment !==null) { //if not cancelled update
+                            if (newComment.trim() === "") {
+                                //if blank, delete
+                                if (userComments) { //only call delete if there's an existing comment to delete
+                                    deleteUserCommentFromVendor(user?.userName || "", fullApplicant?.userName || "");
+                                    setUserComments(null); //update local state to reflect deletion
+                                }
+                            } else {
+                                setUserCommentFromVendor(user?.userName || "", fullApplicant?.userName || "", newComment);
+                                setUserComments(newComment); //update local state to reflect the new comment
+                            }
+                        };
                     }}>
                         Add/Edit Comment
                     </Button>
-                    */}
+                    
                     {/* Additional applicant details and compliance docs can be displayed here */} 
                 </Box>
                 {!isApproved ? (

@@ -29,4 +29,19 @@ router.delete("/users/:userName", async (req, res) => {
   await userController.remove(req, res);
 });
 
+//finds comments for a hirer by a vendor by their usernames
+router.get("/users/:vendorUserName/comments/:hirerUserName", async (req, res) => {
+  await userController.findComments(req, res);
+});
+
+//sets a comment for a hirer by a vendor by their usernames
+router.post("/users/:vendorUserName/comments/:hirerUserName", async (req, res) => {
+  await userController.setUserCommentFromVendor(req, res);
+});
+
+//deletes comments
+router.delete("/users/:vendorUserName/comments/:hirerUserName", async (req, res) => {
+  await userController.deleteUserCommentFromVendor(req, res);
+});
+
 export default router;

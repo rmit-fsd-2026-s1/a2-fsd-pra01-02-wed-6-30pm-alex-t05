@@ -4,6 +4,7 @@ import { User } from "../entity/User";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
+  private vendorCommentRepository = AppDataSource.getRepository("VendorComment");
 
   /**
    * Retrieves all users from the database
@@ -120,5 +121,48 @@ export class UserController {
         .status(400)
         .json({ message: "Error updating user", error });
     }
+  }
+
+  async findComments(request: Request, response: Response) {
+    const vendorUserName = request.params.vendorUserName;
+    const hirerUserName = request.params.hirerUserName;
+
+    const comments = await this.vendorCommentRepository.findOne({
+      where: { vendorUserName, hirerUserName },
+    });
+
+    if (!comments) {
+      return response.status(404).json({ message: "Comments not found" });
+    }
+    return response.json(comments);
+  }
+  async setUserCommentFromVendor(request: Request, response: Response) {
+    //Reference: AI suggestion
+    //I wanted to set if no comment or update if comment already exists
+    //it suggested upsert
+    const vendorUserName = request.params.vendorUserName;
+    const hirerUserName = request.params.hirerUserName;
+    const comment = request.body.comment;
+      await AppDataSource.getRepository("VendorComment").upsert(
+        { vendorUserName, hirerUserName, comment },
+        ["vendorUserName", "hirerUserName"]
+      );
+      return response.json({ message: "Comment set successfully" });
+  }
+
+  async deleteUserCommentFromVendor(request: Request, response: Response) {
+    const vendorUserName = request.params.vendorUserName;
+    const hirerUserName = request.params.hirerUserName;
+
+    const commentToDelete = await this.vendorCommentRepository.findOne({
+      where: { vendorUserName, hirerUserName },
+    });
+
+    if (!commentToDelete) {
+      return response.status(404).json({ message: "Comment not found" });
+    }
+
+    await this.vendorCommentRepository.remove(commentToDelete);
+    return response.json({ message: "Comment deleted successfully" });
   }
 }
