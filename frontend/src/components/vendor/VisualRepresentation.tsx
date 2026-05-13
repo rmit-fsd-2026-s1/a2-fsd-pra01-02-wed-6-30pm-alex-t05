@@ -4,6 +4,9 @@ import { useEvent } from "../../context/EventContext";
 export default function VisualRepresentation() {
     const { events } = useEvent();
 
+    //TODO this needs to be refactored to use backend api
+    //will probably be mostly based on sql querries
+
     //displays a bar graph of approvals per user to visually rank them
     const approvedUsers : { userName: string, value: number }[] = [];
     for (const event of events) {

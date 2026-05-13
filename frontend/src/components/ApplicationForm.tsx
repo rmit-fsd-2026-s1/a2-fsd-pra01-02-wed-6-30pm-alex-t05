@@ -7,12 +7,16 @@ import { Application } from "@/types/application";
 import { Event } from "@/types/event";
 import { useAuth } from "../context/AuthContext";
 
-type Props = {
-    event: Event;
-    onSubmit: (eventID: number, application: Application) => void;
-};
 
-export default function ApplicationForm({ event, onSubmit }: Props) {
+export default function ApplicationForm({
+    event, 
+    onSubmit,
+    onClose}:  {
+        event: Event,
+        onSubmit: (eventID: number, application: Application) => void,
+        onClose: () => void,
+    }) {
+    //TODO needs to include more fields for hiring request
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [errors, setErrors] = useState<null | { startDate?: string; endDate?: string }>(null);
@@ -23,7 +27,7 @@ export default function ApplicationForm({ event, onSubmit }: Props) {
             setErrors(null);
             return;
         }     
-        const tempApplication = createApplication(event.eventID, user!.userName, startDate, endDate);
+        const tempApplication = createApplication(event.eventId, user!.userName, startDate, endDate);
         const validation = validateApplication(tempApplication, event);
         validation ? setErrors({ [validation[0]]: validation[1] }) : setErrors(null);
     }, [startDate, endDate]);
@@ -37,8 +41,8 @@ export default function ApplicationForm({ event, onSubmit }: Props) {
         }
     };
 
-    const unvailableDates = getBlockedDatesForEvent(event)
-
+    //const unvailableDates = getBlockedDatesForEvent(event)
+    const unvailableDates: string[] = []
     const handleSubmit = () => {
         //prevent submission if there are validation errors
         if (errors) return;
@@ -47,12 +51,12 @@ export default function ApplicationForm({ event, onSubmit }: Props) {
             return;
         }
         if (user!.role === "hirer") {
-            const application = createApplication(event.eventID, user!.userName, startDate, endDate);
-            onSubmit(event.eventID, application);
+            const application = createApplication(event.eventId, user!.userName, startDate, endDate);
+            onSubmit(event.eventId, application);
         } else if (user!.role === "vendor") {
             //for blocking dates it creates a dummy application
-            const application = setApplicationStatus(createApplication(event.eventID, user!.userName, startDate, endDate), "approved");
-            onSubmit(event.eventID, application);
+            const application = setApplicationStatus(createApplication(event.eventId, user!.userName, startDate, endDate), "approved");
+            onSubmit(event.eventId, application);
         }
     };
 
@@ -63,6 +67,8 @@ export default function ApplicationForm({ event, onSubmit }: Props) {
                 {unvailableDates.length === 0 ? (
                     <p>None</p>
                 ) : (
+
+                    //TODO not yet implemented
                     //displays unavailable dates and sorts by end date
                     unvailableDates
                     .filter(dateRange => dateRange.endDate > normaliseDate(new Date().toISOString())) // Filter out past dates
