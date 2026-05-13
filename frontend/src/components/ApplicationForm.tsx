@@ -13,7 +13,7 @@ export default function ApplicationForm({
     onSubmit,
     onClose}:  {
         event: Event,
-        onSubmit: (eventID: number, application: Application) => void,
+        onSubmit: (application: Application) => void,
         onClose: () => void,
     }) {
     //TODO needs to include more fields for hiring request
@@ -28,8 +28,10 @@ export default function ApplicationForm({
             return;
         }     
         const tempApplication = createApplication(event.eventId, user!.userName, startDate, endDate);
-        const validation = validateApplication(tempApplication, event);
-        validation ? setErrors({ [validation[0]]: validation[1] }) : setErrors(null);
+        
+        //TODO reimplement validation
+        //const validation = validateApplication(tempApplication, event);
+        //validation ? setErrors({ [validation[0]]: validation[1] }) : setErrors(null);
     }, [startDate, endDate]);
     
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,11 +54,11 @@ export default function ApplicationForm({
         }
         if (user!.role === "hirer") {
             const application = createApplication(event.eventId, user!.userName, startDate, endDate);
-            onSubmit(event.eventId, application);
+            onSubmit(application);
         } else if (user!.role === "vendor") {
             //for blocking dates it creates a dummy application
             const application = setApplicationStatus(createApplication(event.eventId, user!.userName, startDate, endDate), "approved");
-            onSubmit(event.eventId, application);
+            onSubmit(application);
         }
     };
 

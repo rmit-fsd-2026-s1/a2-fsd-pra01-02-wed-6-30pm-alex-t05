@@ -44,21 +44,31 @@ export const getApplicationsForEvent = async (eventId: number) : Promise<Applica
 
 //constructor
 export function createApplication(
-    eventID: number, 
+    eventId: number, 
     applicantUserName: string, 
     startDate: string, 
     endDate: string
     ) : Application {
     return {
-        //unique ID for applications
-        id: crypto.randomUUID(), 
-        eventID,
+        applicationId: null!, // Will be set by the backend
+        eventId,
         applicantUserName,
         status: "pending",
         rating: null,
         startDate: normaliseDate(startDate),
         endDate: normaliseDate(endDate)
     };
+}
+
+//post
+export async function submitApplication(application: Application) {
+    try {
+        await axios.post(`${API_BASE_URL}/applications`, application);
+        return true;
+    } catch (error) {
+        console.error("Error submitting application:", error);
+        return false;
+    }
 }
 
 //called on all calender inputs to streamline date handling

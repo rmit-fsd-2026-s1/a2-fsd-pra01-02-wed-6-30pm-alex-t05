@@ -8,6 +8,7 @@ import { Application } from "@/types/application";
 import { updateUser } from "@/services/userService";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Event } from "@/types/event";
+import { submitApplication } from "@/services/applicationService";
 
 interface CardProps {
     eventId: number;
@@ -28,14 +29,10 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
     const [expanded, setExpanded] = useState<"createApplication" | "viewApplications" | "blockDates" | null>(null);
     const [error, setError] = useState<string | null>(null);
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
-    const handleSubmit = (eventId: number, application: Application) => { // Puts in the eventID value
-        const foundEvent = events.find((u) => u.eventId === eventId);
-        if (!foundEvent || !user) return; // Ensure event and user exist before proceeding
+    const handleSubmit = (application: Application) => {
+        if (!selectedEvent || !user) return; // Ensure event and user exist before proceeding
+            submitApplication(application);
 
-        // updateEvent({
-        //     ...foundEvent,
-        //     applications: [...foundEvent.applications, application]
-        // });
         setExpanded(null); // Collapse the application form after submission
         setError(null); // Clear any previous errors
     };
@@ -137,7 +134,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                         </Box>
                         {expanded === "viewApplications" && (
                             <Box mt={4} pl={4}>
-                                <ApplicantList eventID={eventId} />
+                                <ApplicantList event= {selectedEvent} />
                             </Box>
                         )}
                         {expanded === "blockDates" && (

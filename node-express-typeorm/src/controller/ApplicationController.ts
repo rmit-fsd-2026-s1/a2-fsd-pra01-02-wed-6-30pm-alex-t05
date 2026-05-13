@@ -123,6 +123,9 @@ async findUserRating(request: Request, response: Response) {
   //Reference:
   //https://stackoverflow.com/questions/54684928/how-to-use-parameterized-query-using-typeorm-for-postgres-database-and-nodejs-as
     const applicantUserName = request.params.applicantUserName;
+    if (!applicantUserName) {
+        return 0; //This is mostly a guard against state updating
+        }
     const query = 
       `SELECT AVG(rating) as averageRating
       FROM application

@@ -6,8 +6,9 @@ import { Application } from "@/types/application";
 import { autoDeclineOverlappingApplications, getApplicationsForEvent, updateApplication } from "@/services/applicationService";
 import { FaSort } from "react-icons/fa";
 import { ApplicantRow } from "./ApplicantRow";
+import { Event } from "@/types/event";
 
-export default function ApplicantList({ eventID }: { eventID: number }) {
+export default function ApplicantList({ event }: { event: Event }) {
     
     const { events } = useEvent();
     
@@ -17,7 +18,7 @@ export default function ApplicantList({ eventID }: { eventID: number }) {
     const [applicationsForEvent, setApplicationsForEvent] = useState<Application[]>([]);
     useEffect(() => {
         const fetchApplications = async () => {
-            const apps = await getApplicationsForEvent(eventID);
+            const apps = await getApplicationsForEvent(event.eventId);
             setApplicationsForEvent(apps);
         };
         fetchApplications();
@@ -36,7 +37,7 @@ export default function ApplicantList({ eventID }: { eventID: number }) {
         } else {
             //if we're toggling off sorting, we need to reapply the default order (which is by application date, but since we don't have that, we'll just pull from the backend again)
             const fetchApplications = async () => {
-                const apps = await getApplicationsForEvent(eventID);
+                const apps = await getApplicationsForEvent(event.eventId);
                 setApplicationsForEvent(apps);
             };
             fetchApplications();
