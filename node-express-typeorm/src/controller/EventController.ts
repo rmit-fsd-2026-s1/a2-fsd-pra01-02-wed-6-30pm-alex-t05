@@ -135,4 +135,4 @@ export class EventController {
     });
     return response.json(events);
   }
-}
+};

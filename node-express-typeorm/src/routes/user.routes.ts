@@ -44,4 +44,8 @@ router.delete("/users/:vendorUserName/comments/:hirerUserName", async (req, res)
   await userController.deleteUserCommentFromVendor(req, res);
 });
 
+router.get("/users/:userName/preferredEvents", async (req, res) => {
+  await userController.getAllPreferredEvents(req, res);
+});
+
 export default router;

@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
+import { Event } from "../entity/Event";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
   private vendorCommentRepository = AppDataSource.getRepository("VendorComment");
+  private eventRepository = AppDataSource.getRepository(Event);
 
   /**
    * Retrieves all users from the database
@@ -14,7 +16,7 @@ export class UserController {
    */
   async all(request: Request, response: Response) {
     const users = await this.userRepository.find({
-      relations: ["events"],
+      relations: ["events", "preferredUserEvents"],
     });
     return response.json(users);
   }
@@ -143,11 +145,11 @@ export class UserController {
     const vendorUserName = request.params.vendorUserName;
     const hirerUserName = request.params.hirerUserName;
     const comment = request.body.comment;
-      await AppDataSource.getRepository("VendorComment").upsert(
-        { vendorUserName, hirerUserName, comment },
-        ["vendorUserName", "hirerUserName"]
-      );
-      return response.json({ message: "Comment set successfully" });
+    await AppDataSource.getRepository("VendorComment").upsert(
+      { vendorUserName, hirerUserName, comment },
+      ["vendorUserName", "hirerUserName"]
+    );
+    return response.json({ message: "Comment set successfully" });
   }
 
   async deleteUserCommentFromVendor(request: Request, response: Response) {
@@ -165,4 +167,24 @@ export class UserController {
     await this.vendorCommentRepository.remove(commentToDelete);
     return response.json({ message: "Comment deleted successfully" });
   }
-}
+
+  async getAllPreferredEvents(req: Request, res: Response) {
+    /** Retrieve the user from the database */
+    const user = await this.userRepository.findOneBy({
+      userName: req.params.userName,
+    });
+
+    /** Check if the user exists, if not, return a 404 error */
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    /** Retrieve all preferred events associated with the user from the database */
+    const preferredEvents = await this.eventRepository.find({
+      where: { preferredUsers: { userName: user.userName } },
+    });
+
+    /** Return the preferred events */
+    res.json(preferredEvents);
+  }
+};

@@ -5,7 +5,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   PrimaryColumn,
-  OneToMany
+  OneToMany,
+  ManyToMany,
+  JoinTable
 } from "typeorm";
 import { Event } from "./Event";
 
@@ -31,4 +33,8 @@ export class User {
   */
   @OneToMany(() => Event, (event: Event) => event.user)
   events: Event[];
+
+  @ManyToMany(() => Event, (event) => event.preferredUsers, { eager: true })
+  @JoinTable()
+  preferredEvents: Event[]
 }

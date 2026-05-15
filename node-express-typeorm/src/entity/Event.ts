@@ -5,7 +5,8 @@ import {
     CreateDateColumn,
     UpdateDateColumn,
     PrimaryColumn,
-    ManyToOne
+    ManyToOne,
+    ManyToMany
 } from "typeorm";
 import { User } from "./User";
 
@@ -41,4 +42,7 @@ export class Event {
         lazy: true,
     })
     user: User;
+
+    @ManyToMany(() => User, (user) => user.preferredEvents)
+    preferredUsers: User[];
 }
