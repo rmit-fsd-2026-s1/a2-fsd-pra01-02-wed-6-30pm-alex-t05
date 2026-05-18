@@ -16,7 +16,7 @@ export class UserController {
    */
   async all(request: Request, response: Response) {
     const users = await this.userRepository.find({
-      relations: ["events", "preferredUserEvents"],
+      relations: ["events", "preferredEvents"],
     });
     return response.json(users);
   }
@@ -31,7 +31,7 @@ export class UserController {
     const userName = request.params.userName;
     const user = await this.userRepository.findOne({
       where: { userName },
-      relations: ["events"],
+      relations: ["events", "preferredEvents"],
     });
 
     if (!user) {

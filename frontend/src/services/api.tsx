@@ -57,6 +57,11 @@ export const userService = {
         return data;
     },
 
+    getOneUser: async (userName: string): Promise<User> => {
+        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}`);
+        return data;
+    },
+
     getEvent: async (id: string): Promise<Event> => {
         const { data } = await axios.get(`${API_BASE_URL}/users/${id}`);
         return data;
