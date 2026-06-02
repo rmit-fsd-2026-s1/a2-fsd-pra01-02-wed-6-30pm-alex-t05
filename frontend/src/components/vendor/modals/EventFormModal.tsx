@@ -1,5 +1,7 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { Event } from "@/types/event";
+import InputField from "@/components/InputField";
+import { useEffect, useState } from "react";
 export default function EventFormModal({
     mode,
     selectedEvent,
@@ -10,6 +12,59 @@ export default function EventFormModal({
         onClose: () => void,
         onSubmit: (eventData: any) => void
 }) {
+    //set defaults on mount if in edit mode
+    useEffect(() => {
+        if (mode === "editEvent" && selectedEvent) {
+            setFormData({
+                eventName: selectedEvent.eventName,
+                image: selectedEvent.image || "",
+                numberOfGuest: selectedEvent.numberOfGuest.toString(),
+                shortDescription: selectedEvent.shortDescription || "",
+            });
+        }
+    }, []);
+
+    const [formData, setFormData] = useState({
+        eventName: mode === "editEvent" && selectedEvent ? selectedEvent.eventName : "",
+        numberOfGuest: mode === "editEvent" && selectedEvent ? selectedEvent.numberOfGuest.toString() : "",
+        shortDescription: mode === "editEvent" && selectedEvent ? selectedEvent.shortDescription || "" : "",
+        image: mode === "editEvent" && selectedEvent ? selectedEvent.image || "" : "",
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+        // Clear the error for this field when the user starts typing
+        if (errors[e.target.name]) {
+            setErrors({
+                ...errors,
+                [e.target.name]: ""
+            });
+        }
+    };
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const validateForm = () => {
+        const newErrors: { [key: string]: string } = {};
+        if (!formData.eventName.trim()) {
+            newErrors.eventName = "Event name is required.";
+        }
+        if (!formData.numberOfGuest.trim() || isNaN(Number(formData.numberOfGuest)) || Number(formData.numberOfGuest) <= 0) {
+            newErrors.numberOfGuest = "Please enter a valid number of guests.";
+        }
+        if (!formData.shortDescription.trim()) {
+            newErrors.shortDescription = "Description is required.";
+        }
+        if (!formData.image.trim()) {
+            newErrors.image = "Image URL is required.";
+        } else if (!/^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(formData.image.trim())) {
+            newErrors.image = "Please enter a valid image URL.";
+        }
+        //TODO add any other necessary validation
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0 ? null : "Please fix the errors in the form.";
+    }
     return (
         <Box 
             position="fixed"
@@ -30,6 +85,47 @@ export default function EventFormModal({
                         <Box as="h2" mb={4}>Create Event</Box>
                     )}
                     {/*TODO implement form*/}
+                    <FormControl>
+                        <InputField
+                            label="Event Name"
+                            name="eventName"
+                            value={formData.eventName}
+                            onChange={handleInputChange}
+                            error={errors.eventName}
+                        />
+                        <InputField
+                            label="Image URL"
+                            name="image"
+                            value={formData.image}
+                            onChange={handleInputChange}
+                            error={errors.image}
+                        />
+                        <InputField
+                            label="Occupancy"
+                            name="numberOfGuest"
+                            type="number"
+                            value={formData.numberOfGuest}
+                            onChange={handleInputChange}
+                            error={errors.numberOfGuest}
+                        />
+                        <InputField
+                            label="Description"
+                            name="shortDescription"
+                            type="textarea"
+                            value={formData.shortDescription}
+                            onChange={handleInputChange}
+                            error={errors.shortDescription}
+                            helperText="Include keywords here that users may use to search for suitable venues"
+                        />
+                    </FormControl>
+                    <Button mt={4} colorScheme="teal" onClick={() => {
+                        const validationError = validateForm();
+                        if (!validationError) {
+                            onSubmit({ ...formData });
+                        }
+                    }}>
+                        {mode === "editEvent" ? "Save Changes" : "Create Event"}
+                    </Button>
                 </Box>
         </Box>
     )

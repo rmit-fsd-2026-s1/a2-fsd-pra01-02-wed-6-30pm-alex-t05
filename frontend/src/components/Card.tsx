@@ -34,13 +34,19 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
     const [eventForm, setEventForm] = useState<{mode: "editEvent", event: Event} | null>(null);
     const [error, setError] = useState<string | null>(null);
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
-    const handleSubmit = (application: Application) => {
+    const handleApplicationSubmit = (application: Application) => {
         if (!selectedEvent || !user) return; // Ensure event and user exist before proceeding
         submitApplication(application);
 
         setExpanded(null); // Collapse the application form after submission
         setError(null); // Clear any previous errors
     };
+
+    const handleEventSubmit = (updatedEventData: any) => {
+        //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
+        console.log("Updated event data:", updatedEventData);
+        setEventForm(null); // Close the event form modal after submission
+    }
 
     const addPreferredEvents = async (eventID: number) => {
         try {
@@ -59,10 +65,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                 <img src={image} alt={eventName} className="w-full h-24 object-cover mb-4" />
                 <h2 className="!text-2xl font-semibold mb-2">{eventName}</h2>
                 <div className="grid grid-cols-2">
-                    <p className="text-gray-600">Guest: {numberOfGuest}</p>
-                    <p className="text-gray-600">Time: {time}</p>
-                    <p className="text-gray-600">Duration: {duration} hours</p>
-                    <p className="text-gray-600">Date: {date}</p>
+                    <p className="text-gray-600">Occupancy: {numberOfGuest}</p>
                 </div>
                 <p className="text-gray-600 mt-2">Description: {shortDescription}</p>
                 {error && <p className="text-red-500">{error}</p>}
@@ -80,7 +83,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
                                     event={selectedEvent} // Passes the entire event object to the form
-                                    onSubmit={handleSubmit}
+                                    onSubmit={handleApplicationSubmit}
                                     onClose={() => setExpanded(null)}
                                 />
                             </Box>
@@ -169,7 +172,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
                                     event={selectedEvent} // Passes the entire event object to the form
-                                    onSubmit={handleSubmit} // Passes the eventId to the submit handler
+                                    onSubmit={handleApplicationSubmit} // Passes the eventId to the submit handler
                                     onClose={() => setExpanded(null)}
                                 />
                             </Box>
@@ -179,7 +182,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                                 mode={eventForm.mode}
                                 selectedEvent={selectedEvent}
                                 onClose={() => setEventForm(null)}
-                                onSubmit={handleSubmit}
+                                onSubmit={handleEventSubmit}
                             />
                         )}
                     </>
