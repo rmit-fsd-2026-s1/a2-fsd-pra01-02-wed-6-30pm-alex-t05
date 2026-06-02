@@ -45,29 +45,24 @@ export class EventController {
    * @param response - Express response object
    * @returns JSON response containing the created event or error message
    */
-  async save(request: Request, response: Response) {
-    const { eventName, numberOfGuest, date, time, duration, shortDescription, image, isBlocked } = request.body;
-
-    const event = Object.assign(new Event(), {
-      eventName,
-      numberOfGuest,
-      date,
-      time,
-      duration,
-      shortDescription,
-      image,
-      isBlocked
-    });
+  async create(request: Request, response: Response) {
+    const event = this.eventRepository.create(request.body);
 
     try {
-      const savedEvent = await this.eventRepository.save(event);
-      return response.status(201).json(savedEvent);
+      await this.eventRepository.save(event);
     } catch (error) {
-      return response
-        .status(400)
-        .json({ message: "Error creating event", error });
-    };
+      return response.status(500).json({ message: "Error saving event", error });
+    }
+
+    response.status(201).json(event);
   }
+
+  /**
+ * Updates an existing event's information
+ * @param request - Express request object containing event ID in params and updated details in body
+ * @param response - Express response object
+ * @returns JSON response containing the updated event or error message
+ */
 
   /**
    * Deletes a user from the database by their userName
@@ -89,44 +84,57 @@ export class EventController {
     return response.json({ message: "Event removed successfully" });
   }
 
-  /**
-   * Updates an existing event's information
-   * @param request - Express request object containing event ID in params and updated details in body
-   * @param response - Express response object
-   * @returns JSON response containing the updated event or error message
-   */
   async update(request: Request, response: Response) {
-    const eventId = parseInt(request.params.id);
-    const { eventName, numberOfGuest, date, time, duration, shortDescription, image, isBlocked } = request.body;
-
-    let eventToUpdate = await this.eventRepository.findOne({
-      where: { eventId },
+    let event = await this.eventRepository.findOneBy({
+      eventId: parseInt(request.params.id),
     });
 
-    if (!eventToUpdate) {
+    if (!event) {
       return response.status(404).json({ message: "Event not found" });
     }
 
-    const updatedEvent: Event = {
-      ...eventToUpdate,
-      eventName: eventName,
-      numberOfGuest: numberOfGuest,
-      date: date,
-      time: time,
-      duration: duration,
-      shortDescription: shortDescription,
-      image: image,
-      isBlocked: isBlocked
-    };
+    this.eventRepository.merge(event, request.body);
 
     try {
-      await this.eventRepository.save(updatedEvent);
-      return response.json(updatedEvent);
+      await this.eventRepository.save(event);
     } catch (error) {
-      return response
-        .status(400)
-        .json({ message: "Error updating event", error });
+      return response.status(500).json({ message: "Error updating event", error });
     }
+
+    response.json(event);
+
+    /* const eventId = parseInt(request.params.id);
+const { eventName, numberOfGuest, date, time, duration, shortDescription, image, isBlocked } = request.body;
+
+let eventToUpdate = await this.eventRepository.findOne({
+  where: { eventId },
+});
+
+if (!eventToUpdate) {
+  return response.status(404).json({ message: "Event not found" });
+}
+
+const updatedEvent: Event = {
+  ...eventToUpdate,
+  eventName: eventName,
+  numberOfGuest: numberOfGuest,
+  date: date,
+  time: time,
+  duration: duration,
+  shortDescription: shortDescription,
+  image: image,
+  isBlocked: isBlocked
+};
+
+try {
+  await this.eventRepository.save(updatedEvent);
+  return response.json(updatedEvent);
+} catch (error) {
+  return response
+    .status(400)
+    .json({ message: "Error updating event", error });
+}
+*/
   }
 
   /**
@@ -141,7 +149,7 @@ export class EventController {
     return response.json(events);
   }
 
-  async AttachPreferredEvents(request: Request, response: Response) {
+  async addPreferredEvents(request: Request, response: Response) {
     const event = await this.eventRepository.findOne({
       where: { eventId: parseInt(request.params.eventId) },
       relations: ["preferredUsers"],
@@ -161,7 +169,7 @@ export class EventController {
       return response.status(404).json({ message: "User not found" });
     }
 
-    if (!user.role || user.role !== "hirer") {
+    if (user.role !== "hirer") {
       return response.status(403).json({ message: "Only hirers can prefer events" });
     }
 

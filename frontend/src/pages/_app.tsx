@@ -15,6 +15,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Header />
           <Nav />
           <Component {...pageProps} />
+          <Footer />
         </EventProvider>
       </AuthProvider>
     </ChakraProvider>

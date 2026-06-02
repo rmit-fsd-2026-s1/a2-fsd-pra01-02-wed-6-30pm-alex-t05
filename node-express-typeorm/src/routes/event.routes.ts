@@ -13,7 +13,7 @@ router.get("/events/:id", async (req, res) => {
 });
 
 router.post("/events", async (req, res) => {
-  await eventController.save(req, res);
+  await eventController.create(req, res);
 });
 
 router.put("/events/:id", async (req, res) => {
@@ -29,7 +29,7 @@ router.get("/users/:userName/events", async (req, res) => {
 });
 
 router.post("/users/:userName/preferredevents/:eventId", async (req, res) => {
-  await eventController.AttachPreferredEvents(req, res);
+  await eventController.addPreferredEvents(req, res);
 });
 
 export default router;

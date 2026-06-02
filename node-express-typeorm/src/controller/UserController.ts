@@ -45,26 +45,16 @@ export class UserController {
    * @param response - Express response object
    * @returns JSON response containing the created user or error message
    */
-  async save(request: Request, response: Response) {
-    //const { userName, firstName, lastName, email, password, role, phoneNumber } = request.body;
+  async create(request: Request, response: Response) {
     const user = this.userRepository.create(request.body);
-
-
-    //const user: User = {
-    //  userName: userName,
-    //  firstName: firstName,
-    //  lastName: lastName,
-    //  email: email,
-    //  password: password,
-    //  role: role,
-    //  phoneNumber: phoneNumber
-    //};
 
     try {
       await this.userRepository.save(user);
     } catch (error) {
       return response.status(500).json({ message: "Error saving user", error });
     }
+
+    response.status(201).json(user);
   }
 
   /**
@@ -94,37 +84,122 @@ export class UserController {
    * @returns JSON response containing the updated user or error message
    */
   async update(request: Request, response: Response) {
-    const userName = request.params.userName;
-    const { firstName, lastName, email, password, role, phoneNumber } = request.body;
-
-    let userToUpdate = await this.userRepository.findOne({
-      where: { userName },
+    let user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
     });
 
-    if (!userToUpdate) {
+    if (!user) {
       return response.status(404).json({ message: "User not found" });
     }
 
-    const updatedUser: User = {
-      ...userToUpdate,
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      role: role,
-      phoneNumber: phoneNumber
-    };
+    this.userRepository.merge(user, request.body);
 
     try {
-      await this.userRepository.save(updatedUser);
-      return response.json(updatedUser);
+      await this.userRepository.save(user);
     } catch (error) {
-      return response
-        .status(400)
-        .json({ message: "Error updating user", error });
+      return response.status(500).json({ message: "Error updating user", error });
     }
   }
 
+  // Vendor CRUD
+  async getAllEventsForVendor(request: Request, response: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const VendorEvents = await this.eventRepository.find({
+      where: { user: { userName: user.userName } },
+    });
+
+    response.json(VendorEvents);
+  }
+
+  async getOneEventForVendor(request: Request, response: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const event = await this.eventRepository.findOne({
+      where: {
+        eventId: parseInt(request.params.eventId),
+        user: { userName: user.userName }
+      },
+    });
+
+    if (!event) {
+      return response.status(404).json({ message: "Event not found for this vendor" });
+    }
+
+    response.json(event);
+  }
+
+  async createEventforVendor(request: Request, response: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const event = this.eventRepository.create({
+      ...request.body,
+      user: [user],
+    });
+
+    try {
+      await this.eventRepository.save(event);
+    } catch (error) {
+      return response.status(500).json({ message: "Error saving event", error });
+    }
+  }
+
+  //need to do update for vendor
+  async removeEventforVendor(request: Request, response: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+    if (user.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const result = await this.eventRepository.delete({
+      eventId: parseInt(request.params.eventId),
+      user: { userName: user.userName }
+    });
+
+    if (!result.affected) {
+      return response.status(404).json({ message: "Event not found for this vendor" });
+    }
+
+    response.json(204).send();
+  }
+
+  // Set comment
   async findComments(request: Request, response: Response) {
     const vendorUserName = request.params.vendorUserName;
     const hirerUserName = request.params.hirerUserName;
@@ -186,5 +261,8 @@ export class UserController {
 
     /** Return the preferred events */
     res.json(preferredEvents);
+  }
+
+  async removePreferredEvent(req: Request, res: Response) {
   }
 };
