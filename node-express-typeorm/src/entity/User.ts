@@ -27,6 +27,10 @@ export class User {
   role: string; //e.g., "hirer", "vendor"
   @Column({ nullable: true })
   phoneNumber?: string; //optional phone number field'
+  @CreateDateColumn()
+  createdAt: Date;
+  @UpdateDateColumn()
+  updatedAt: Date;
   /*
   @Column({ array: true, nullable: true })
   eventRankings?: number[]

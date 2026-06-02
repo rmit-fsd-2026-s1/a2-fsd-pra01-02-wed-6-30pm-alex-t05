@@ -14,8 +14,9 @@ Lab08 code archive:
 Lectorial Week 8:
     Backend:
         Event.ts (Many to One relationship with User.ts)
-        User.ts (One to Many relationship with Event.ts)
+        User.ts (One to Many relationship with Event.ts) (createAt and updateAt to see when they create/update their profile)
         eventRoute.tsx & eventController.tsx (Can find events from Username)
+
 
 Lectorial Week 9:
     Frontend:
@@ -25,3 +26,4 @@ Lectorial Week 9:
         signup.tsx (NEEDS TO BE FIX. but it can create User from the userService)
         signin.tsx (scans users from context. Context holds the users in database)
         [id].tsx (changing hirer.tsx and vendor.tsx to this)
+        [userName].tsx to allow vendor to hirer profile history
