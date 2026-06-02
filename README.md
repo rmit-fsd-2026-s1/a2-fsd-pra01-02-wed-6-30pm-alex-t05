@@ -31,8 +31,9 @@ Lectorial Week 9:
     Backend:
         validation and dtos where copied to fit our system of (profile/events)
         used attachProfile the same way to attach users(hirers) to events. This way, its like a preferred Event
+        Vendor CRUD was copied from ProfileController.ts
         
-removePreferredEvent in 'EventController.ts'
+removePreferredEvent in 'UserController.ts'
 I used this to get it to work:
     Reference: https://stackoverflow.com/questions/71259876/removing-a-single-row-in-a-manytomany-table-with-typeorm-nestjs
     
