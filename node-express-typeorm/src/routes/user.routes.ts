@@ -42,6 +42,9 @@ router.get("/vendor/:userName/events/:eventId", async (req, res) => {
 });
 
 // event update
+router.put("/vendor/:userName/events/:eventId", async (req, res) => {
+  await userController.updateEventforVendor(req, res);
+});
 
 // Creates an event for a vendor
 router.post("/vendor/:userName/events", async (req, res) => {

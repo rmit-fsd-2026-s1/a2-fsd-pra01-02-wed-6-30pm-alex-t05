@@ -174,7 +174,37 @@ export class UserController {
     }
   }
 
-  //need to do update for vendor
+  async updateEventforVendor(request: Request, response: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    let event = await this.eventRepository.findOneBy({
+      eventId: parseInt(request.params.eventId),
+      user: { userName: user.userName }
+    });
+
+    if (!event) {
+      return response.status(404).json({ message: "Event not found for this vendor" });
+    }
+
+    this.eventRepository.merge(event, request.body);
+
+    try {
+      await this.eventRepository.save(event);
+    } catch (error) {
+      return response.status(500).json({ message: "Error updating event", error });
+    }
+  }
+
   async removeEventforVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
