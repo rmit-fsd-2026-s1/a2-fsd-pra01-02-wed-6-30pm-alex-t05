@@ -20,7 +20,12 @@ export const eventService = {
     getEventsByUser: async (userName: string): Promise<Event[]> => {
         const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/events`);
         return data;
-    }
+    },
+
+    addPreferredEvent: async (eventId: string, userName: string): Promise<void> => {
+        const { data } = await axios.post(`${API_BASE_URL}/users/${userName}/preferredevents/${eventId}`);
+        return data;
+    },
 
     // Will allow vendors to createa an event later
     //createProfile: async (profile: {

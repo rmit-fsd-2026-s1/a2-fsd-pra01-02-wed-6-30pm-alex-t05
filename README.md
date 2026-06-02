@@ -27,7 +27,10 @@ Lectorial Week 9:
         signin.tsx (scans users from context. Context holds the users in database)
         [id].tsx (changing hirer.tsx and vendor.tsx to this)
         [userName].tsx to allow vendor to hirer profile history
+
+    Backend:
         validation and dtos where copied to fit our system of (profile/events)
+        used attachProfile the same way to attach users(hirers) to events. This way, its like a preferred Event
         
 
 NEED TO DO:

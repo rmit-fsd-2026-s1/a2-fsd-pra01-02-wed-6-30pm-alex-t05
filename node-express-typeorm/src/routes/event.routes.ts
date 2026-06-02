@@ -28,4 +28,8 @@ router.get("/users/:userName/events", async (req, res) => {
   await eventController.findByUser(req, res);
 });
 
+router.post("/users/:userName/preferredevents/:eventId", async (req, res) => {
+  await eventController.AttachPreferredEvents(req, res);
+});
+
 export default router;
