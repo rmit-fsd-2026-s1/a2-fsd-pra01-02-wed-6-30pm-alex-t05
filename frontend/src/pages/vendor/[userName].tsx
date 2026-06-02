@@ -7,11 +7,14 @@ import { useEffect, useState } from "react";
 import { Event } from "@/types/event";
 import { eventService } from "@/services/api";
 import { useRouter } from "next/router";
+import EventFormModal from "@/components/vendor/modals/EventFormModal";
 
 export default function Vendor() {
     const { user } = useAuth()
     const { eventsForVendor } = useEvent();
     const [visualisationsVisible, setVisualisationsVisible] = useState(false);
+    const [eventForm, setEventForm] = useState<{mode: "createEvent"} | null>(null);
+
     const router = useRouter();
     const { userName } = router.query;
 
@@ -58,10 +61,21 @@ export default function Vendor() {
                         colorScheme='teal'
                         className="w-50 items-center"
                         type='button'
-                        onClick={() => router.push(`/vendor/createEvent/${userName}`)}>
+                        onClick={() => setEventForm({mode: "createEvent"})}>
                         Create New Event
                     </Button>
+                    
                 </div>
+                {eventForm && (
+                        <EventFormModal
+                            mode = {eventForm.mode}
+                            selectedEvent={null}
+                            onClose={() => setEventForm(null)}
+                            onSubmit={() => {
+                                //TODO implement event creation logic
+                            }}
+                        />
+                    )}
             </div>
         )
     );

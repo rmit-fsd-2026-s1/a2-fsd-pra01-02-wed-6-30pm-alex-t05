@@ -1,4 +1,4 @@
-import { Box, Button } from "@chakra-ui/react";
+import { Box, Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 import { useEvent } from '../context/EventContext';
 import { useEffect, useState } from "react";
@@ -10,7 +10,8 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Event } from "@/types/event";
 import { submitApplication } from "@/services/applicationService";
 import { userService } from "@/services/api";
-import { MdSettings } from 'react-icons/md'
+import { MdArrowDropDown, MdSettings } from 'react-icons/md'
+import EventFormModal from "./vendor/modals/EventFormModal";
 
 interface CardProps {
     eventId: number;
@@ -29,6 +30,8 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
     const { user } = useAuth();
     const loggedinUser = useCurrentUser();
     const [expanded, setExpanded] = useState<"createApplication" | "viewApplications" | "blockDates" | null>(null);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [eventForm, setEventForm] = useState<{mode: "editEvent", event: Event} | null>(null);
     const [error, setError] = useState<string | null>(null);
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
     const handleSubmit = (application: Application) => {
@@ -115,18 +118,47 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                                 }}
                             >View Applications
                             </Button>
-                            <Button
-                                colorScheme='teal'
-                                type='button'
-                                className="float-right w-20 items-center"
-                            ><MdSettings /></Button>
-                            <Button
-                                colorScheme='red'
-                                type='button'
-                                className="float-right w-50 items-center"
-                                onClick={() => setExpanded(expanded !== "blockDates" ? "blockDates" : null)}
-                            >Block
-                            </Button>
+                            <Box position="relative">
+                                <Button
+                                    colorScheme='teal'
+                                    type='button'
+                                    className="float-right w-20 items-center"
+                                    onClick={() => setMenuOpen(!menuOpen)}
+                                ><MdSettings /></Button>
+                                {menuOpen && (
+                                    <Box
+                                        position="absolute"
+                                        top="40px"
+                                        right={0}
+                                        borderWidth="1px"
+                                        borderRadius="md"
+                                        bg="white"
+                                        shadow="md"
+                                    >
+                                    <Button
+                                        variant="ghost"
+                                        colorScheme="blue"
+                                        onClick={() => {setEventForm({mode: "editEvent", event: selectedEvent}); setMenuOpen(false)}
+                                            }
+                                    >
+                                        Edit    
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        colorScheme="yellow"
+                                        onClick={() => setExpanded(expanded !== "blockDates" ? "blockDates" : null)}
+                                    >
+                                        Block Dates
+                                    </Button>
+                                    <Button
+                                        colorScheme="red"
+                                        variant="ghost">
+                                        Delete
+                                    </Button>
+                                    </Box>
+
+                                )}
+                            </Box>
                         </Box>
                         {expanded === "viewApplications" && (
                             <Box mt={4} pl={4}>
@@ -141,6 +173,14 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                                     onClose={() => setExpanded(null)}
                                 />
                             </Box>
+                        )}
+                        {eventForm && (
+                            <EventFormModal
+                                mode={eventForm.mode}
+                                selectedEvent={selectedEvent}
+                                onClose={() => setEventForm(null)}
+                                onSubmit={handleSubmit}
+                            />
                         )}
                     </>
                 ) : null
