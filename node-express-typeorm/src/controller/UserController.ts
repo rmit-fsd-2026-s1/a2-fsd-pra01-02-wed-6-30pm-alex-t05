@@ -263,6 +263,39 @@ export class UserController {
     res.json(preferredEvents);
   }
 
+  // Loads to long (broken)
   async removePreferredEvent(req: Request, res: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: req.params.userName,
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "hirer") {
+      return res.status(403).json({ message: "Only hirers can remove preferred events" });
+    }
+
+    const preferredevent = await this.eventRepository.findOne({
+      where: { eventId: parseInt(req.params.eventId) },
+      relations: ["preferredUsers"],
+    });
+
+    if (!preferredevent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    if (preferredevent.preferredUsers) {
+      preferredevent.preferredUsers = preferredevent.preferredUsers.filter((preferredUser) =>
+        preferredUser.userName !== user.userName
+      );
+    }
+
+    try {
+      await this.eventRepository.save(preferredevent);
+    } catch (error) {
+      return res.status(500).json({ message: "Error removing preferred event", error });
+    }
   }
 };

@@ -32,8 +32,13 @@ Lectorial Week 9:
         validation and dtos where copied to fit our system of (profile/events)
         used attachProfile the same way to attach users(hirers) to events. This way, its like a preferred Event
         
+removePreferredEvent in 'EventController.ts'
+I used this to get it to work:
+    Reference: https://stackoverflow.com/questions/71259876/removing-a-single-row-in-a-manytomany-table-with-typeorm-nestjs
+    
 
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
 apply them to the routes
 Updpate event for vendor (CRUD)
+removepreferredEvents works but every slowly. need to fix to make it quicker somehow

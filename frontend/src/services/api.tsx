@@ -83,6 +83,26 @@ export const userService = {
         await axios.post(`${API_BASE_URL}/users`, user);
     },
 
+    // Vendor CRUD
+    getAllEventsForVendor: async (userName: string): Promise<Event[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/vendor/${userName}/events`);
+        return data;
+    },
+    getOneEventForVendor: async (userName: string, eventId: string): Promise<Event> => {
+        const { data } = await axios.get(`${API_BASE_URL}/vendor/${userName}/events/${eventId}`);
+        return data;
+    },
+    // event update
+    createEventforVendor: async (userName: string, event: {
+        eventName: string,
+        eventDate: string,
+        eventType: string,
+        location: string,
+        description: string,
+    }): Promise<void> => {
+        await axios.post(`${API_BASE_URL}/vendor/${userName}/events`, event);
+    },
+
 
     // Will allow vendors to delete an event later
     //deleteProfile: async (id: string): Promise<void> => {

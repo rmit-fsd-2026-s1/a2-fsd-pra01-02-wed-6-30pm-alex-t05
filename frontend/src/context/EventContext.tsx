@@ -1,14 +1,15 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { Event, DEFAULT_EVENT as DEFAULT_EVENTS } from '../types/event';
-import { eventService } from '@/services/api';
+import { eventService, userService } from '@/services/api';
 import { useRouter } from 'next/router';
+import { useAuth } from './AuthContext';
 
 type EventContextType = {
     //event: Event | null;
     //setEvent: (event: Event | null) => void;
 
     events: Event[];
-    eventsByUser: Event[];
+    eventsForVendor: Event[];
     setEvents: (events: Event[]) => void;
 
     //selectedEventID?: number | null;
@@ -21,18 +22,18 @@ const EventContext = createContext<EventContextType | undefined>(undefined);
 export const EventProvider = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
     const [events, setEvents] = useState<Event[]>([]);
-    const [eventsByUser, setEventsByUser] = useState<Event[]>([]);
-    const { userName } = router.query;
+    const [eventsForVendor, setEventsForVendor] = useState<Event[]>([]);
+    const { user } = useAuth();
 
     //const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
 
     //initialises events
     useEffect(() => {
         fetchEvents();
-        if (userName) {
-            fetchEventsByUser();
+        if (user?.userName) {
+            fetchEventsForVendor();
         }
-    }, [userName]);
+    }, [user?.userName]);
 
     const fetchEvents = async () => {
         try {
@@ -43,17 +44,19 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const fetchEventsByUser = async () => {
-        try {
-            const data = await eventService.getEventsByUser(userName as string);
-            setEventsByUser(data);
-        } catch (error) {
-            console.error("Error fetching events by user:", error);
+    const fetchEventsForVendor = async () => {
+        if (!user?.role || user.role === "vendor") {
+            try {
+                const data = await userService.getAllEventsForVendor(user?.userName as string);
+                setEventsForVendor(data);
+            } catch (error) {
+                console.error("Error fetching events for vendor:", error);
+            }
         }
     };
 
     return (
-        <EventContext.Provider value={{ events, setEvents, eventsByUser }}>
+        <EventContext.Provider value={{ events, setEvents, eventsForVendor }}>
             {children}
         </EventContext.Provider>
     );

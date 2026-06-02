@@ -162,7 +162,6 @@ try {
     // Find the profile
     const user = await this.userRepository.findOne({
       where: { userName: request.params.userName },
-      //relations: ["preferredEvents"],
     });
 
     if (!user) {

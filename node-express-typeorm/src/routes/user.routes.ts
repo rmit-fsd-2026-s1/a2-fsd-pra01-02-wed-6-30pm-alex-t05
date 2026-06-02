@@ -75,4 +75,9 @@ router.get("/users/:userName/preferredEvents", async (req, res) => {
   await userController.getAllPreferredEvents(req, res);
 });
 
+// Removes a preferred event for a user
+router.delete("/users/:userName/preferredEvents/:eventId", async (req, res) => {
+  await userController.removePreferredEvent(req, res);
+});
+
 export default router;
