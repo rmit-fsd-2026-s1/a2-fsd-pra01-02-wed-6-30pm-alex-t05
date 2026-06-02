@@ -53,6 +53,15 @@ export default function Vendor() {
                         </div>
                     ))}
                 </div>
+                <div className="fixed bottom-15 right-15 text-white px-4 py-2 rounded-full shadow-md">
+                    <Button
+                        colorScheme='teal'
+                        className="w-50 items-center"
+                        type='button'
+                        onClick={() => router.push(`/vendor/createEvent/${userName}`)}>
+                        Create New Event
+                    </Button>
+                </div>
             </div>
         )
     );

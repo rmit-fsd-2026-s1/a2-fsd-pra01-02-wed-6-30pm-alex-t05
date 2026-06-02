@@ -10,6 +10,7 @@ import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Event } from "@/types/event";
 import { submitApplication } from "@/services/applicationService";
 import { userService } from "@/services/api";
+import { MdSettings } from 'react-icons/md'
 
 interface CardProps {
     eventId: number;
@@ -114,6 +115,11 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                                 }}
                             >View Applications
                             </Button>
+                            <Button
+                                colorScheme='teal'
+                                type='button'
+                                className="float-right w-20 items-center"
+                            ><MdSettings /></Button>
                             <Button
                                 colorScheme='red'
                                 type='button'
