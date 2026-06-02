@@ -27,3 +27,9 @@ Lectorial Week 9:
         signin.tsx (scans users from context. Context holds the users in database)
         [id].tsx (changing hirer.tsx and vendor.tsx to this)
         [userName].tsx to allow vendor to hirer profile history
+        validation and dtos where copied to fit our system of (profile/events)
+        
+
+NEED TO DO:
+finish of validations to applicaiton and vendorcomments
+apply them to the routes
