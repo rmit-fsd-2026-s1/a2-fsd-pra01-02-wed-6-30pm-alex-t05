@@ -36,3 +36,4 @@ Lectorial Week 9:
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
 apply them to the routes
+Updpate event for vendor (CRUD)

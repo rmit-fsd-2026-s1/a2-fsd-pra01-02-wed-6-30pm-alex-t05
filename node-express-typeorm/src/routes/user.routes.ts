@@ -32,24 +32,24 @@ router.delete("/users/:userName", async (req, res) => {
 
 // ---Vendor CRUD---
 // Gets all events for a vendor
-router.get("/users/:userName/events", async (req, res) => {
+router.get("/vendor/:userName/events", async (req, res) => {
   await userController.getAllEventsForVendor(req, res);
 });
 
 // Gets a single event for a vendor by event id
-router.get("/users/:userName/events/:eventId", async (req, res) => {
+router.get("/vendor/:userName/events/:eventId", async (req, res) => {
   await userController.getOneEventForVendor(req, res);
 });
 
 // event update
 
 // Creates an event for a vendor
-router.post("/users/:userName/events", async (req, res) => {
+router.post("/vendor/:userName/events", async (req, res) => {
   await userController.createEventforVendor(req, res);
 });
 
 // Deletes an event for a vendor by event id
-router.delete("/users/:userName/events/:eventId", async (req, res) => {
+router.delete("/vendor/:userName/events/:eventId", async (req, res) => {
   await userController.removeEventforVendor(req, res);
 });
 
