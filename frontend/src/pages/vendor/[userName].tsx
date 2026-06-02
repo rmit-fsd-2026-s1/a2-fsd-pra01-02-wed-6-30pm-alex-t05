@@ -16,7 +16,7 @@ export default function Vendor() {
     const { userName } = router.query;
 
     return (
-        (!user || user.role !== "vendor" || user.userName !== userName) ? (
+        (!user || user.role === "vendor" && user.userName !== userName) ? (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
                     <h1 className="text-2xl font-bold mb-4">Access Denied</h1>

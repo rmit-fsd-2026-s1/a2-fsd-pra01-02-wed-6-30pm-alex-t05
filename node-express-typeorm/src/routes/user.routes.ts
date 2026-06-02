@@ -80,4 +80,8 @@ router.delete("/users/:userName/preferredEvents/:eventId", async (req, res) => {
   await userController.removePreferredEvent(req, res);
 });
 
+router.post("/users/:userName/preferredevents/:eventId", async (req, res) => {
+  await userController.addPreferredEvents(req, res);
+});
+
 export default router;

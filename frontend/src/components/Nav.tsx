@@ -17,7 +17,7 @@ const Nav = () => {
                         </li>
                         {user.role === "hirer" && ( // Only show preferred events link if the user is a hirer
                             <li>
-                                <Link href="/preferredEvent">
+                                <Link href={`/hirer/preferredEvent/${user.userName}`}>
                                     Preferred Events
                                 </Link>
                             </li>

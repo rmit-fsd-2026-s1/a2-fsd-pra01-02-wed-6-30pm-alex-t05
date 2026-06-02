@@ -9,6 +9,7 @@ import { updateUser } from "@/services/userService";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Event } from "@/types/event";
 import { submitApplication } from "@/services/applicationService";
+import { userService } from "@/services/api";
 
 interface CardProps {
     eventId: number;
@@ -31,29 +32,20 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
     const handleSubmit = (application: Application) => {
         if (!selectedEvent || !user) return; // Ensure event and user exist before proceeding
-            submitApplication(application);
+        submitApplication(application);
 
         setExpanded(null); // Collapse the application form after submission
         setError(null); // Clear any previous errors
     };
 
-    /* TODO this needs to be refactored to use backend api
-    
-    const addPreferredEvents = (eventID: number) => {
-        //adds event to preferred events list, or creates if null
-        const currentPreferredEvents = loggedinUser!.preferredEvents || [];
-        //checks if already there
-        if (currentPreferredEvents.some(event => event.eventId === eventId)) {
-            return;
+    const addPreferredEvents = async (eventID: number) => {
+        try {
+            await userService.addPreferredEvent(eventID, loggedinUser!.userName);
+        } catch (error) {
+            console.error("Error adding preferred event:", error);
+            setError("Failed to add preferred event. Please try again.");
         }
-        updateUser({
-            ...loggedinUser!,
-            preferredEvents: [
-                ...(loggedinUser!.preferredEvents || []), 
-                events.find((e) => e.eventId === eventId)!]
-        });
-    };
-    */
+    }
 
     if (events.length === 0 || !events) {
         return <h1>No events available.</h1>;
@@ -72,21 +64,21 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                 {error && <p className="text-red-500">{error}</p>}
                 {/*Hirer interface*/}
                 {user && (user.role === "hirer" ? (
-                    <Box 
-                    mt={4} 
-                    display="flex"
-                    flexDirection="column" 
-                    justifyContent="space-between" 
-                    h="100%"
+                    <Box
+                        mt={4}
+                        display="flex"
+                        flexDirection="column"
+                        justifyContent="space-between"
+                        h="100%"
                     >
                         {expanded === "createApplication" && (
                             console.log(`Rendering ApplicationForm for event ID: ${selectedEvent.eventId}`),
                             <Box mt={4} pl={4}>
-                            <ApplicationForm
-                                event= {selectedEvent} // Passes the entire event object to the form
-                                onSubmit={handleSubmit}
-                                onClose={() => setExpanded(null)}
-                            />
+                                <ApplicationForm
+                                    event={selectedEvent} // Passes the entire event object to the form
+                                    onSubmit={handleSubmit}
+                                    onClose={() => setExpanded(null)}
+                                />
                             </Box>
                         )}
                         <Box mt={4} display="flex" justifyContent="space-between" alignItems="center">
@@ -103,16 +95,14 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                             <Button
                                 colorScheme='teal'
                                 type='button'
-                                
-                                //TODO reimplement this
-                                //onClick={() => addPreferredEvents(eventId)}
+                                onClick={() => addPreferredEvents(eventId)}
                             >Save Preferrences
                             </Button>
                         </Box>
                     </Box>
                 ) : user.role === "vendor" ? (
                     <>
-                    {/*Vendor interface*/}
+                        {/*Vendor interface*/}
                         <Box mt={4} display="flex" justifyContent="space-between" alignItems="center">
                             <Button
                                 colorScheme='teal'
@@ -134,7 +124,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                         </Box>
                         {expanded === "viewApplications" && (
                             <Box mt={4} pl={4}>
-                                <ApplicantList event= {selectedEvent} />
+                                <ApplicantList event={selectedEvent} />
                             </Box>
                         )}
                         {expanded === "blockDates" && (

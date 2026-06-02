@@ -5,19 +5,33 @@ import { useEffect, useState } from "react";
 import PreferredEventCard from "@/components/preferredEventCard";
 import { MdArrowUpward, MdArrowDownward, MdDelete } from "react-icons/md";
 import { updateUser } from "@/services/userService";
+import { Event } from "@/types/event";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { User } from "@/types/user";
+import { userService } from '@/services/api';
 
 
-export default function PreferredEvent() { 
-    const { user, login } = useAuth();
-    const currentUser = useCurrentUser(); // Get the current full user details from the custom hook
-    
-    const [profileUser, setProfileUser] = useState<User | null>(null); // State to hold the user details
+export default function PreferredEvent() {
+    const { user } = useAuth();
+    const [preferredEvents, setPreferredEvents] = useState<Event[]>([]);
+
+
+    const fetchPreferredEvents = async () => {
+        try {
+            const data = await userService.getAllPreferredEventsForHirer(user?.userName as string);
+            setPreferredEvents(data);
+        } catch (error) {
+            console.error("Error fetching preferred events:", error);
+        }
+    };
+
     useEffect(() => {
-        setProfileUser(currentUser); // Set the profileUser state to the fetched user details
-    }, [currentUser]);
-    
+        if (user?.userName) {
+            fetchPreferredEvents();
+        }
+    }, [user?.userName]);
+
+    /*
     const moveUp = (index: number) => {
         //prevent out of bounds
         if (index === 0) return;
@@ -36,7 +50,7 @@ export default function PreferredEvent() {
             setProfileUser(updatedUser); // Trigger local state update to re-render component
         }
     };
-
+ 
     const moveDown = (index: number) => {
         //prevent out of bounds
         if (index === profileUser!.preferredEvents!.length - 1) return;
@@ -55,24 +69,17 @@ export default function PreferredEvent() {
             setProfileUser(updatedUser); // Trigger local state update to re-render component
         }
     };
+    */
 
-    const removePreferredEvents = (eventID: number) => {
-        if (profileUser) {
-            profileUser.preferredEvents = profileUser.preferredEvents!.filter((event) => event.eventID !== eventID);
-            const updatedUser = {
-                ...profileUser,
-                preferredEvents: profileUser.preferredEvents
-            };
-            updateUser(updatedUser);
-            login(updatedUser);
-        }
-    };
+    if (!user) {
+        return <div>Loading...</div>;
+    }
 
     return (
-        profileUser && profileUser.role === "hirer" ? ( // This only works if the user is a hirer
+        (!user || user.role === "hirer") ? ( // This only works if the user is a hirer
             <div className="min-h-screen items-center justify-center bg-gray-100">
                 <h1 className="!text-2xl flex items-center justify-center">Preferred Events</h1>
-                {profileUser.preferredEvents === null || profileUser.preferredEvents!.length === 0 ? ( // This checks if events are empty or null
+                {preferredEvents === null || preferredEvents.length === 0 ? ( // This checks if events are empty or null
                     <div className="min-h-screen flex items-center justify-center bg-gray-100">
                         <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
                             <h1 className="text-2xl font-bold mb-4">No preferred event found</h1>
@@ -83,7 +90,7 @@ export default function PreferredEvent() {
                     include will match the users search and return the event if it matches.
                     filter will get the found events and put in an array */
                     <div className="gap-4">
-                        {profileUser.preferredEvents!.map((event) => ( // Map prints the found events
+                        {preferredEvents.map((event) => ( // Map prints the found events
                             <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventID}>
                                 <PreferredEventCard
                                     eventID={event.eventID}
@@ -96,6 +103,7 @@ export default function PreferredEvent() {
                                     shortDescription={event.shortDescription}
                                     isBlocked={event.isBlocked}
                                 />
+                                {/*}
                                 <div className="flex justify-end gap-2 mt-2">
                                     <Button
                                         colorScheme='teal'
@@ -122,6 +130,7 @@ export default function PreferredEvent() {
                                         <MdArrowDownward />
                                     </Button>
                                 </div>
+                                */}
                             </div>
                         ))}
                     </div>

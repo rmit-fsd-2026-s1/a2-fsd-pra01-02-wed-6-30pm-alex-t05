@@ -22,11 +22,6 @@ export const eventService = {
         return data;
     },
 
-    addPreferredEvent: async (eventId: string, userName: string): Promise<void> => {
-        const { data } = await axios.post(`${API_BASE_URL}/users/${userName}/preferredevents/${eventId}`);
-        return data;
-    },
-
     // Will allow vendors to createa an event later
     //createProfile: async (profile: {
     //   first_name: string;
@@ -88,10 +83,12 @@ export const userService = {
         const { data } = await axios.get(`${API_BASE_URL}/vendor/${userName}/events`);
         return data;
     },
+
     getOneEventForVendor: async (userName: string, eventId: string): Promise<Event> => {
         const { data } = await axios.get(`${API_BASE_URL}/vendor/${userName}/events/${eventId}`);
         return data;
     },
+
     // event update
     createEventforVendor: async (userName: string, event: {
         eventName: string,
@@ -101,6 +98,16 @@ export const userService = {
         description: string,
     }): Promise<void> => {
         await axios.post(`${API_BASE_URL}/vendor/${userName}/events`, event);
+    },
+
+    getAllPreferredEventsForHirer: async (userName: string): Promise<Event[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/preferredevents`);
+        return data;
+    },
+
+    addPreferredEvent: async (eventId: number, userName: string): Promise<void> => {
+        const { data } = await axios.post(`${API_BASE_URL}/users/${userName}/preferredevents/${eventId}`);
+        return data;
     },
 
 

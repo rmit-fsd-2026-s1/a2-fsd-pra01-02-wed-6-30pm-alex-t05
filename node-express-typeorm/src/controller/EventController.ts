@@ -148,43 +148,4 @@ try {
     });
     return response.json(events);
   }
-
-  async addPreferredEvents(request: Request, response: Response) {
-    const event = await this.eventRepository.findOne({
-      where: { eventId: parseInt(request.params.eventId) },
-      relations: ["preferredUsers"],
-    });
-
-    if (!event) {
-      return response.status(404).json({ message: "Event not found" });
-    }
-
-    // Find the profile
-    const user = await this.userRepository.findOne({
-      where: { userName: request.params.userName },
-    });
-
-    if (!user) {
-      return response.status(404).json({ message: "User not found" });
-    }
-
-    if (user.role !== "hirer") {
-      return response.status(403).json({ message: "Only hirers can prefer events" });
-    }
-
-    if (!event.preferredUsers) {
-      event.preferredUsers = [];
-    }
-
-    event.preferredUsers.push(user);
-
-    try {
-      await this.eventRepository.save(event);
-      response.json({ message: "Event added to preferred events" });
-    } catch (error) {
-      return response
-        .status(500)
-        .json({ message: "Error adding event to preferred events", error });
-    }
-  }
 }
