@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { ApplicationController } from "../controller/ApplicationController";
+import { validateDto } from "../middlewares/validate";
+import { CreateApplicationDTO } from "../dtos/create-application.dto";
 
 const router = Router();
 const applicationController = new ApplicationController();
@@ -12,7 +14,7 @@ router.get("/applications/:id", async (req, res) => {
   await applicationController.one(req, res);
 });
 
-router.post("/applications", async (req, res) => {
+router.post("/applications", validateDto(CreateApplicationDTO), async (req, res) => {
   await applicationController.save(req, res);
 });
 

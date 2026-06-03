@@ -1,5 +1,11 @@
 import { Router } from "express";
 import { UserController } from "../controller/UserController";
+import { validateDto } from "../middlewares/validate";
+import { CreateUserDTO } from "../dtos/create-user.dto";
+import { UpdateUserDTO } from "../dtos/update-user.dto";
+import { CreateEventDTO } from "../dtos/create-event.dto";
+import { UpdateEventDTO } from "../dtos/update-event.dto";
+import { CreateVendorCommentDTO } from "../dtos/create-vendorcomment.dto";
 
 const router = Router();
 const userController = new UserController();
@@ -16,12 +22,12 @@ router.get("/users/:userName", async (req, res) => {
 });
 
 // Creates a new user
-router.post("/users", async (req, res) => {
+router.post("/users", validateDto(CreateUserDTO), async (req, res) => {
   await userController.create(req, res);
 });
 
 // Updates a user by their id
-router.put("/users/:userName", async (req, res) => {
+router.put("/users/:userName", validateDto(UpdateUserDTO), async (req, res) => {
   await userController.update(req, res);
 });
 
@@ -41,14 +47,14 @@ router.get("/vendor/:userName/events/:eventId", async (req, res) => {
   await userController.getOneEventForVendor(req, res);
 });
 
-// event update
-router.put("/vendor/:userName/events/:eventId", async (req, res) => {
-  await userController.updateEventforVendor(req, res);
+// Creates an event for a vendor
+router.post("/vendor/:userName/events", validateDto(CreateEventDTO), async (req, res) => {
+  await userController.createEventforVendor(req, res);
 });
 
-// Creates an event for a vendor
-router.post("/vendor/:userName/events", async (req, res) => {
-  await userController.createEventforVendor(req, res);
+// event update
+router.put("/vendor/:userName/events/:eventId", validateDto(UpdateEventDTO), async (req, res) => {
+  await userController.updateEventforVendor(req, res);
 });
 
 // Deletes an event for a vendor by event id
@@ -63,7 +69,7 @@ router.get("/users/:vendorUserName/comments/:hirerUserName", async (req, res) =>
 });
 
 //sets a comment for a hirer by a vendor by their usernames
-router.post("/users/:vendorUserName/comments/:hirerUserName", async (req, res) => {
+router.post("/users/:vendorUserName/comments/:hirerUserName", validateDto(CreateVendorCommentDTO), async (req, res) => {
   await userController.setUserCommentFromVendor(req, res);
 });
 
