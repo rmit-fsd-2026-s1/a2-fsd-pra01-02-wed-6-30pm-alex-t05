@@ -104,7 +104,7 @@ export class EventController {
     response.json(event);
 
     /* const eventId = parseInt(request.params.id);
-const { eventName, numberOfGuest, date, time, duration, shortDescription, image, isBlocked } = request.body;
+const { eventName, numberOfGuest, address, shortDescription, image, isBlocked } = request.body;
 
 let eventToUpdate = await this.eventRepository.findOne({
   where: { eventId },
@@ -118,9 +118,7 @@ const updatedEvent: Event = {
   ...eventToUpdate,
   eventName: eventName,
   numberOfGuest: numberOfGuest,
-  date: date,
-  time: time,
-  duration: duration,
+  address: address,
   shortDescription: shortDescription,
   image: image,
   isBlocked: isBlocked

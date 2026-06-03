@@ -28,4 +28,5 @@ router.get("/users/:userName/events", async (req, res) => {
   await eventController.findByUser(req, res);
 });
 
+
 export default router;

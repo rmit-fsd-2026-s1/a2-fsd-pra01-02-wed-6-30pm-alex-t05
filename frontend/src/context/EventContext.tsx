@@ -1,5 +1,5 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
-import { Event, DEFAULT_EVENT as DEFAULT_EVENTS } from '../types/event';
+import { Event } from '../types/event';
 import { eventService, userService } from '@/services/api';
 import { useRouter } from 'next/router';
 import { useAuth } from './AuthContext';

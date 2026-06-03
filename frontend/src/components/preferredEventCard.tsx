@@ -7,26 +7,24 @@ import { Application } from "@/types/application";
 import { MdArrowUpward, MdArrowDownward } from "react-icons/md";
 
 interface CardProps {
-    eventID: number;
+    eventId: number;
     eventName: string;
     numberOfGuest: number;
-    date: string;
-    time: string;
-    duration: number;
+    address?: string;
     image?: string; // Optional field for event image URL
     //reputation: [];
     isBlocked: boolean;
     shortDescription?: string;
 }
 
-export default function PreferredEventCard({ eventID, eventName, numberOfGuest, date, time, duration, image, isBlocked, shortDescription }: CardProps) {
+export default function PreferredEventCard({ eventId, eventName, numberOfGuest, address, image, isBlocked, shortDescription }: CardProps) {
     const { events, updateEvent } = useEvent();
     const { user } = useAuth();
     const [expanded, setExpanded] = useState<"viewApplications" | "blockDates" | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    const handleSubmit = (eventID: number, application: Application) => { // Puts in the eventID value
-        const foundEvent = events.find((u) => u.eventID === eventID);
+    const handleSubmit = (eventId: number, application: Application) => { // Puts in the eventID value
+        const foundEvent = events.find((u) => u.eventId === eventId);
         if (!foundEvent || !user) return; // Ensure event and user exist before proceeding
 
         updateEvent({
@@ -47,9 +45,7 @@ export default function PreferredEventCard({ eventID, eventName, numberOfGuest, 
                     <div className="grid grid-span-2">
                         <h2 className="!text-2xl font-semibold mb-2">{eventName}</h2>
                         <p className="text-gray-600">Guest: {numberOfGuest}</p>
-                        <p className="text-gray-600">Time: {time}</p>
-                        <p className="text-gray-600">Duration: {duration} hours</p>
-                        <p className="text-gray-600">Date: {date}</p>
+                        <p className="text-gray-600">Address: {address}</p>
                         <p className="text-gray-600 mt-2">Description: {shortDescription}</p>
                     </div>
                 </div>
@@ -67,8 +63,8 @@ export default function PreferredEventCard({ eventID, eventName, numberOfGuest, 
                         {expanded && (
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
-                                    event={events.find((u) => u.eventID === eventID)!} // Passes the entire event object to the form
-                                    onSubmit={handleSubmit} // Passes the eventID to the submit handler
+                                    event={events.find((u) => u.eventId === eventId)!} // Passes the entire event object to the form
+                                    onSubmit={handleSubmit} // Passes the eventId to the submit handler
                                 />
                             </Box>
                         )}

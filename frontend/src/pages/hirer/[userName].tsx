@@ -40,9 +40,7 @@ export default function Hirer() {
                         {events.filter(e =>
                             e.eventName.toLowerCase().includes(userSearch.toLowerCase()) ||
                             e.numberOfGuest.toString().includes(userSearch.toLowerCase()) ||
-                            e.date.toLowerCase().includes(userSearch.toLowerCase()) ||
-                            e.time.toLowerCase().includes(userSearch.toLowerCase()) ||
-                            e.duration.toString().includes(userSearch.toLowerCase()) ||
+                            e.address?.toLowerCase().includes(userSearch.toLowerCase()) ||
                             e.shortDescription?.toLowerCase().includes(userSearch.toLowerCase()
                             )).map((event) => (
                                 <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
@@ -50,9 +48,7 @@ export default function Hirer() {
                                         eventId={event.eventId}
                                         eventName={event.eventName}
                                         numberOfGuest={event.numberOfGuest}
-                                        date={event.date}
-                                        time={event.time}
-                                        duration={event.duration}
+                                        address={event.address || "No address provided"}
                                         image={event.image}
                                         shortDescription={event.shortDescription}
                                         isBlocked={event.isBlocked}

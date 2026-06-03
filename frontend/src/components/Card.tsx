@@ -12,20 +12,21 @@ import { submitApplication } from "@/services/applicationService";
 import { userService } from "@/services/api";
 import { MdArrowDropDown, MdSettings } from 'react-icons/md'
 import EventFormModal from "./vendor/modals/EventFormModal";
+import { useRouter } from "next/router";
+import { eventService } from "@/services/api";
+
 
 interface CardProps {
     eventId: number;
     eventName: string;
     numberOfGuest: number;
-    date: string;
-    time: string;
-    duration: number;
+    address?: string;
     image?: string; // Optional field for event image URL
     isBlocked: boolean;
     shortDescription?: string;
 }
 
-export default function Card({ eventId, eventName, numberOfGuest, date, time, duration, image, isBlocked, shortDescription }: CardProps) {
+export default function Card({ eventId, eventName, numberOfGuest, address, image, isBlocked, shortDescription }: CardProps) {
     const { events } = useEvent();
     const { user } = useAuth();
     const loggedinUser = useCurrentUser();
@@ -34,13 +35,22 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
     const [eventForm, setEventForm] = useState<{mode: "editEvent", event: Event} | null>(null);
     const [error, setError] = useState<string | null>(null);
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
-    const handleSubmit = (application: Application) => {
+    const router = useRouter();
+    const handleApplicationSubmit = (application: Application) => {
         if (!selectedEvent || !user) return; // Ensure event and user exist before proceeding
         submitApplication(application);
 
         setExpanded(null); // Collapse the application form after submission
         setError(null); // Clear any previous errors
     };
+
+    const handleEventSubmit = async (updatedEventData: any) => {
+        //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
+        console.log("Updated event data:", updatedEventData);
+        await eventService.updateEvent(selectedEvent.eventId, updatedEventData);
+        setEventForm(null); // Close the event form modal after submission
+        router.reload(); // Refresh the page to show updated event details, ideally this should be replaced with a more efficient state update
+    }
 
     const addPreferredEvents = async (eventID: number) => {
         try {
@@ -59,10 +69,8 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                 <img src={image} alt={eventName} className="w-full h-24 object-cover mb-4" />
                 <h2 className="!text-2xl font-semibold mb-2">{eventName}</h2>
                 <div className="grid grid-cols-2">
-                    <p className="text-gray-600">Guest: {numberOfGuest}</p>
-                    <p className="text-gray-600">Time: {time}</p>
-                    <p className="text-gray-600">Duration: {duration} hours</p>
-                    <p className="text-gray-600">Date: {date}</p>
+                    <p className="text-gray-600">Occupancy: {numberOfGuest}</p>
+                    <p className="text-gray-600">Address: {address || "No address provided"}</p>
                 </div>
                 <p className="text-gray-600 mt-2">Description: {shortDescription}</p>
                 {error && <p className="text-red-500">{error}</p>}
@@ -80,7 +88,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
                                     event={selectedEvent} // Passes the entire event object to the form
-                                    onSubmit={handleSubmit}
+                                    onSubmit={handleApplicationSubmit}
                                     onClose={() => setExpanded(null)}
                                 />
                             </Box>
@@ -152,7 +160,14 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                                     </Button>
                                     <Button
                                         colorScheme="red"
-                                        variant="ghost">
+                                        variant="ghost"
+                                        onClick={ async () => {
+                                            if (confirm("Are you sure you want to delete this event?")) {
+                                                await eventService.deleteEvent(selectedEvent);
+                                                router.reload();
+                                            }
+                                        }}
+                                    >
                                         Delete
                                     </Button>
                                     </Box>
@@ -169,7 +184,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
                                     event={selectedEvent} // Passes the entire event object to the form
-                                    onSubmit={handleSubmit} // Passes the eventId to the submit handler
+                                    onSubmit={handleApplicationSubmit} // Passes the eventId to the submit handler
                                     onClose={() => setExpanded(null)}
                                 />
                             </Box>
@@ -179,7 +194,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                                 mode={eventForm.mode}
                                 selectedEvent={selectedEvent}
                                 onClose={() => setEventForm(null)}
-                                onSubmit={handleSubmit}
+                                onSubmit={handleEventSubmit}
                             />
                         )}
                     </>

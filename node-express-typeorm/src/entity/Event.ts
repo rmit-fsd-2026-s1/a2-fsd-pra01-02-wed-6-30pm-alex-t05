@@ -15,12 +15,8 @@ export class Event {
     eventName: string;
     @Column()
     numberOfGuest: number;
-    @Column()
-    date: string;
-    @Column()
-    time: string;
-    @Column()
-    duration: number;
+    @Column({ nullable: true })
+    address: string;
     @Column({ nullable: true })
     shortDescription?: string;
     // Removed the owner field since it would be used to build a relationship with the user table.
