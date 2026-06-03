@@ -1,6 +1,5 @@
 import {
   Entity,
-  PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
@@ -38,7 +37,8 @@ export class User {
   @OneToMany(() => Event, (event: Event) => event.user)
   events: Event[];
 
-  @ManyToMany(() => Event, (event) => event.preferredUsers, { eager: true })
+  @ManyToMany(() => Event, event => event.preferredUsers, { eager: true })
   @JoinTable()
-  preferredEvents: Event[]
+  preferredEvents: Event[];
+
 }

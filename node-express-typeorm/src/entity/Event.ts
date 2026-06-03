@@ -2,11 +2,8 @@ import {
     Entity,
     PrimaryGeneratedColumn,
     Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    PrimaryColumn,
     ManyToOne,
-    ManyToMany
+    ManyToMany,
 } from "typeorm";
 import { User } from "./User";
 
@@ -43,6 +40,7 @@ export class Event {
     })
     user: User;
 
-    @ManyToMany(() => User, (user) => user.preferredEvents)
+    @ManyToMany(() => User, user => user.preferredEvents)
     preferredUsers: User[];
+
 }
