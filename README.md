@@ -36,6 +36,12 @@ Lectorial Week 9:
 removePreferredEvent in 'UserController.ts'
 I used this to get it to work:
     Reference: https://stackoverflow.com/questions/71259876/removing-a-single-row-in-a-manytomany-table-with-typeorm-nestjs
+
+'siginup.tsx' with the validation:
+    Reference:
+    https://www.c-sharpcorner.com/blogs/various-types-of-password-validation-in-javascript1
+    https://iamkartikeya.medium.com/form-validation-in-javascript-ddc776f76920
+    https://www.the-art-of-web.com/javascript/validate-password/
     
 
 NEED TO DO:

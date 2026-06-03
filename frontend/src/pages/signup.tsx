@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { FormControl, FormLabel, Button, RadioGroup, Radio, Stack, FormErrorMessage } from "@chakra-ui/react";
+import { FormControl, FormLabel, Button, RadioGroup, Radio, Stack, FormErrorMessage, Input, Box } from "@chakra-ui/react";
 import InputField from "@/components/InputField";
 import { getUsers, saveUser, checkDuplicate } from "@/services/userService";
 import { useAuth } from "@/context/AuthContext";
@@ -11,7 +11,7 @@ import { userService } from "@/services/api";
 // Needs to be encryted
 
 export default function Signup() {
-    const [profileData, setProfileData] = useState({
+    const [userData, setUserData] = useState({
         userName: '',
         firstName: '',
         lastName: '',
@@ -19,35 +19,65 @@ export default function Signup() {
         password: '',
         role: '',
     });
-    const [errors, setErrors] = useState<Partial<FormData>>({});
+    const [confirmPassword, setConfirmPassword] = useState("");
+    //const [errors, setErrors] = useState<Partial<FormData>>({});
+    const [errors, setErrors] = useState("");
     const router = useRouter();
-    const { login } = useAuth(); // Get the login function from the AuthContext
+    const { user } = useAuth();
 
     // Fetch profiles on component mount
-    useEffect(() => {
-        fetchProfiles();
-    }, []);
-
-    const fetchProfiles = async () => {
-        try {
-            const data = await userService.getAllUsers();
-            setProfileData(data);
-        } catch (error) {
-            console.error("Error fetching profiles:", error);
-        }
-    };
-
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!userData.userName) {
+            setErrors("Username is required");
+            return;
+        }
+        if (!userData.firstName.trim()) {
+            setErrors("First name is required");
+            return;
+        }
+        if (!userData.lastName.trim()) {
+            setErrors("Last name is required");
+            return;
+        }
+        if (!userData.email) {
+            setErrors("Email is required");
+            return;
+        }
+        if (!userData.email.includes("@")) {
+            setErrors("Email must be valid e.g. example@email.com");
+            return;
+        }
+        if (user?.email === userData.email && !userData.email) {
+            setErrors("Email already exists");
+            return;
+        }
+        if (userData.password.length < 6) {
+            setErrors("Password must be at least 6 characters");
+            return;
+        }
+        if (!/[A-Z]/.test(userData.password) || !/[a-z]/.test(userData.password) || !/[!@#$%^&*]/.test(userData.password)) {
+            setErrors("Password must contain at least one uppercase letter, one lowercase letter, and one special character (!@#$%^&*)");
+            return;
+        }
+        if (confirmPassword !== userData.password) {
+            setErrors("Passwords do not match");
+            return;
+        }
+        if (!userData.role.trim()) {
+            setErrors("Select hirer or vendor");
+            return;
+        }
         try {
-            await userService.createUser(profileData);
-            setProfileData({ userName: "", firstName: "", lastName: "", email: "", password: "", role: "" });
-            fetchProfiles();
+            await userService.createUser(userData);
+            setUserData({ userName: "", firstName: "", lastName: "", email: "", password: "", role: "" });
+            setErrors("");
+            router.push("/signin");
         } catch (error) {
-            console.error("Error creating profile:", error);
+            console.error("Error creating user:", error);
         }
     };
+
 
     //this dynamically displays password strength in helper text
     /*const getPasswordStrength = (password: string): "weak" | "strong" | "" => {
@@ -55,115 +85,90 @@ export default function Signup() {
         if (password.length > 0) return "weak";
         return "";
     };
-
+    
     //this is just for reactive password strength indicator and error tracking
     */
     const handleInputChange = (
-
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
     ) => {
         const { name, value } = e.target;
-        setProfileData((prevState) => ({
+        setUserData((prevState) => ({
             ...prevState,
             [name]: value,
         }));
-        if (!!errors[name as keyof FormData]) {
-            setErrors(prev => ({ ...prev, [name]: undefined }));
-        }
-
         //if (name === "password") {
         //    getPasswordStrength(value)
         //}
     };
 
-
-    //this is is to be run on submit and checks validity of form data and returns an object with error messages for any invalid fields
-    /*const validateDetails = () => {
-        const newErrors: Partial<FormData> = {};
-        if (!profileData.userName) {
-            newErrors.userName = "Username is required";
-        }
-        if (!profileData.firstName) {
-            newErrors.firstName = "First name is required";
-        }
-        if (!profileData.lastName) {
-            newErrors.lastName = "Last name is required";
-        }
-        if (!profileData.email) {
-            newErrors.email = "Email is required";
-        } else if (!/\S+@\S+\.\S+/.test(profileData.email)) {
-            newErrors.email = "Email is invalid";
-        }
-        if (profileData.password.length < 6 || !profileData.password) {
-            newErrors.password = "Password must be at least 6 characters";
-        }
-        if (profileData.confirmPassword !== profileData.password) {
-            newErrors.confirmPassword = "Passwords do not match";
-        }
-        if (!profileData.role) {
-            newErrors.role = "Account type is required";
-        }
-        console.log("Validation errors:", newErrors);
-
-        return newErrors;
-    };
-    */
-
-
     return (
-        <div className="h-200 flex items-center justify-center bg-gray-100">
-            <form onSubmit={handleSubmit} className="w-250">
-                <InputField
-                    label="User Name"
-                    name="userName"
-                    value={profileData.userName}
-                    onChange={handleInputChange}
-                />
-                <InputField
-                    label="First Name"
-                    name="firstName"
-                    value={profileData.firstName}
-                    onChange={handleInputChange}
-                />
-                <InputField
-                    label="Last Name"
-                    name="lastName"
-                    value={profileData.lastName}
-                    onChange={handleInputChange}
-                />
+        <main>
+            {errors && (
+                <Box mb={4} p={3} bg="red.100" borderRadius="md" color="red.700">
+                    {errors}
+                </Box>
+            )}
+            <div className="h-200 flex items-center justify-center bg-gray-100">
+                <form onSubmit={handleSubmit} className="w-250">
 
-                <InputField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    value={profileData.email}
-                    onChange={handleInputChange}
-                    helperText="We'll never share your email."
-                />
-                <InputField
-                    label="Password"
-                    name="password"
-                    type="password"
-                    value={profileData.password}
-                    onChange={handleInputChange}
-                //helperText={`Strength: ${getPasswordStrength(profileData.password)}`}
-                />
-                <FormControl>
-                    <FormLabel>Account Type</FormLabel>
-                    <RadioGroup
-                        onChange={(value) => setProfileData(prev => ({ ...prev, role: value }))}
-                        value={profileData.role}
-                    >
-                        <Stack direction='row'>
-                            <Radio value='hirer'>Hirer</Radio>
-                            <Radio value='vendor'>Vendor</Radio>
-                        </Stack>
-                    </RadioGroup>
-                </FormControl>
-                <Button mt={4} colorScheme='teal' type='submit'>
-                    Submit
-                </Button>
-            </form>
-        </div>
+                    <FormControl isRequired>
+                        <FormLabel>Username</FormLabel>
+                        <Input type='userName'
+                            value={userData.userName}
+                            onChange={(e) => setUserData({ ...userData, userName: e.target.value })} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>First Name</FormLabel>
+                        <Input type='firstName'
+                            value={userData.firstName}
+                            onChange={(e) => setUserData({ ...userData, firstName: e.target.value })} />
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel>Last Name</FormLabel>
+                        <Input
+                            value={userData.lastName}
+                            onChange={(e) => setUserData({ ...userData, lastName: e.target.value })} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Email</FormLabel>
+                        <Input
+                            type="email"
+                            value={userData.email}
+                            onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
+                    </FormControl>
+
+                    <FormControl isRequired>
+                        <FormLabel>Password</FormLabel>
+                        <Input
+                            type="password"
+                            value={userData.password}
+                            onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
+                    </FormControl>
+                    <FormControl isRequired>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <Input
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)} />
+                    </FormControl>
+                    <FormControl>
+                        <FormLabel>Account Type</FormLabel>
+                        <RadioGroup
+                            onChange={(value) => setUserData(prev => ({ ...prev, role: value }))}
+                            value={userData.role}>
+                            <Stack direction='row'>
+                                <Radio value='hirer'>Hirer</Radio>
+                                <Radio value='vendor'>Vendor</Radio>
+                            </Stack>
+                        </RadioGroup>
+                    </FormControl>
+                    <Button mt={4} colorScheme='teal' type='submit'>
+                        Sign Up
+                    </Button>
+                </form>
+            </div>
+        </main>
     );
 }
