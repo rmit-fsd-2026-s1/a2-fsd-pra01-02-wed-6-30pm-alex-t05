@@ -231,8 +231,29 @@ export class UserController {
 
   // Set comment
   async findComments(request: Request, response: Response) {
-    const vendorUserName = request.params.vendorUserName;
-    const hirerUserName = request.params.hirerUserName;
+    const vendorUserName = await this.userRepository.findOneBy({
+      userName: request.params.UserName,
+    });
+
+    if (!vendorUserName) {
+      return response.status(404).json({ message: "Vendor user not found" });
+    }
+
+    if (vendorUserName.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const hirerUserName = await this.userRepository.findOneBy({
+      userName: request.params.UserName,
+    });
+
+    if (!hirerUserName) {
+      return response.status(404).json({ message: "Hirer user not found" });
+    }
+
+    if (hirerUserName.role !== "hirer") {
+      return response.status(403).json({ message: "User is not a hirer" });
+    }
 
     const comments = await this.vendorCommentRepository.findOne({
       where: { vendorUserName, hirerUserName },
@@ -243,12 +264,35 @@ export class UserController {
     }
     return response.json(comments);
   }
+
   async setUserCommentFromVendor(request: Request, response: Response) {
     //Reference: AI suggestion
     //I wanted to set if no comment or update if comment already exists
     //it suggested upsert
-    const vendorUserName = request.params.vendorUserName;
-    const hirerUserName = request.params.hirerUserName;
+    const vendorUserName = await this.userRepository.findOneBy({
+      userName: request.params.UserName,
+    });
+
+    if (!vendorUserName) {
+      return response.status(404).json({ message: "Vendor user not found" });
+    }
+
+    if (vendorUserName.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const hirerUserName = await this.userRepository.findOneBy({
+      userName: request.params.UserName,
+    });
+
+    if (!hirerUserName) {
+      return response.status(404).json({ message: "Hirer user not found" });
+    }
+
+    if (hirerUserName.role !== "hirer") {
+      return response.status(403).json({ message: "User is not a hirer" });
+    }
+
     const comment = request.body.comment;
     await AppDataSource.getRepository("VendorComment").upsert(
       { vendorUserName, hirerUserName, comment },
@@ -258,8 +302,29 @@ export class UserController {
   }
 
   async deleteUserCommentFromVendor(request: Request, response: Response) {
-    const vendorUserName = request.params.vendorUserName;
-    const hirerUserName = request.params.hirerUserName;
+    const vendorUserName = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!vendorUserName) {
+      return response.status(404).json({ message: "Vendor user not found" });
+    }
+
+    if (vendorUserName.role !== "vendor") {
+      return response.status(403).json({ message: "User is not a vendor" });
+    }
+
+    const hirerUserName = await this.userRepository.findOneBy({
+      userName: request.params.UserName,
+    });
+
+    if (!hirerUserName) {
+      return response.status(404).json({ message: "Hirer user not found" });
+    }
+
+    if (hirerUserName.role !== "hirer") {
+      return response.status(403).json({ message: "User is not a hirer" });
+    }
 
     const commentToDelete = await this.vendorCommentRepository.findOne({
       where: { vendorUserName, hirerUserName },
@@ -274,22 +339,18 @@ export class UserController {
   }
 
   async getAllPreferredEvents(req: Request, res: Response) {
-    /** Retrieve the user from the database */
     const user = await this.userRepository.findOneBy({
       userName: req.params.userName,
     });
 
-    /** Check if the user exists, if not, return a 404 error */
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    /** Retrieve all preferred events associated with the user from the database */
     const preferredEvents = await this.eventRepository.find({
       where: { preferredUsers: { userName: user.userName } },
     });
 
-    /** Return the preferred events */
     res.json(preferredEvents);
   }
 
