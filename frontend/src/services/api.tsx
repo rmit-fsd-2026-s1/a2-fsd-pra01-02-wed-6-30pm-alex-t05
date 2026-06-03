@@ -26,8 +26,8 @@ export const eventService = {
         await axios.post(`${API_BASE_URL}/events`, event);
     },
 
-    updateEvent: async (id: string, event: Event): Promise<Event> => {
-        const { data } = await axios.put(`${API_BASE_URL}/events/${id}`, event);
+    updateEvent: async (eventId: number, event: Event): Promise<Event> => {
+        const { data } = await axios.put(`${API_BASE_URL}/events/${eventId}`, event);
         return data;
     },
 

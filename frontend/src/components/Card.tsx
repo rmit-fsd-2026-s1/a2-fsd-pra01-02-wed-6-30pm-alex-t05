@@ -44,10 +44,12 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
         setError(null); // Clear any previous errors
     };
 
-    const handleEventSubmit = (updatedEventData: any) => {
+    const handleEventSubmit = async (updatedEventData: any) => {
         //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
         console.log("Updated event data:", updatedEventData);
+        await eventService.updateEvent(selectedEvent.eventId, updatedEventData);
         setEventForm(null); // Close the event form modal after submission
+        router.reload(); // Refresh the page to show updated event details, ideally this should be replaced with a more efficient state update
     }
 
     const addPreferredEvents = async (eventID: number) => {
