@@ -2,6 +2,7 @@ import { Box, Button, FormControl, FormLabel, Input } from "@chakra-ui/react";
 import { Event } from "@/types/event";
 import InputField from "@/components/InputField";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 export default function EventFormModal({
     mode,
     selectedEvent,
@@ -12,6 +13,8 @@ export default function EventFormModal({
         onClose: () => void,
         onSubmit: (eventData: any) => void
 }) {
+    const owner = useAuth().user?.userName || "";
+
     //set defaults on mount if in edit mode
     useEffect(() => {
         if (mode === "editEvent" && selectedEvent) {
@@ -21,9 +24,11 @@ export default function EventFormModal({
                 numberOfGuest: selectedEvent.numberOfGuest.toString(),
                 shortDescription: selectedEvent.shortDescription || "",
                 address: selectedEvent.address || "",
+                user: selectedEvent.user,
             });
         }
-    }, []);
+    }, [owner]);
+    console.log("Selected event for editing:", selectedEvent, "Owner:", owner);
 
     const [formData, setFormData] = useState({
         eventName: mode === "editEvent" && selectedEvent ? selectedEvent.eventName : "",
@@ -31,6 +36,7 @@ export default function EventFormModal({
         shortDescription: mode === "editEvent" && selectedEvent ? selectedEvent.shortDescription || "" : "",
         image: mode === "editEvent" && selectedEvent ? selectedEvent.image || "" : "",
         address: mode === "editEvent" && selectedEvent ? selectedEvent.address || "" : "",
+        user: owner,
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

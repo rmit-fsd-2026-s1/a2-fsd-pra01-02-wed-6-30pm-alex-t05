@@ -12,6 +12,9 @@ import { submitApplication } from "@/services/applicationService";
 import { userService } from "@/services/api";
 import { MdArrowDropDown, MdSettings } from 'react-icons/md'
 import EventFormModal from "./vendor/modals/EventFormModal";
+import { useRouter } from "next/router";
+import { eventService } from "@/services/api";
+
 
 interface CardProps {
     eventId: number;
@@ -32,6 +35,7 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
     const [eventForm, setEventForm] = useState<{mode: "editEvent", event: Event} | null>(null);
     const [error, setError] = useState<string | null>(null);
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
+    const router = useRouter();
     const handleApplicationSubmit = (application: Application) => {
         if (!selectedEvent || !user) return; // Ensure event and user exist before proceeding
         submitApplication(application);
@@ -154,7 +158,14 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                     </Button>
                                     <Button
                                         colorScheme="red"
-                                        variant="ghost">
+                                        variant="ghost"
+                                        onClick={ async () => {
+                                            if (confirm("Are you sure you want to delete this event?")) {
+                                                await eventService.deleteEvent(selectedEvent);
+                                                router.reload();
+                                            }
+                                        }}
+                                    >
                                         Delete
                                     </Button>
                                     </Box>

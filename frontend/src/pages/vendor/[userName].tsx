@@ -17,6 +17,12 @@ export default function Vendor() {
 
     const router = useRouter();
     const { userName } = router.query;
+    const handleEventFormSubmit = async (event: Event) => {
+        await eventService.createEvent(event);
+        //this is kinda bad and is a workaround to not having to update event context properly, but it works for now
+        router.reload();
+    };
+    
 
     return (
         (!user || user.role === "vendor" && user.userName !== userName) ? (
@@ -69,9 +75,7 @@ export default function Vendor() {
                             mode = {eventForm.mode}
                             selectedEvent={null}
                             onClose={() => setEventForm(null)}
-                            onSubmit={() => {
-                                //TODO implement event creation logic
-                            }}
+                            onSubmit={(event) => {handleEventFormSubmit(event); setEventForm(null);}}
                         />
                     )}
             </div>

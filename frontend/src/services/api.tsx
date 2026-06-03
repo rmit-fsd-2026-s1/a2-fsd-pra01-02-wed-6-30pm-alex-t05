@@ -22,6 +22,19 @@ export const eventService = {
         return data;
     },
 
+    createEvent: async (event: Event): Promise<void> => {
+        await axios.post(`${API_BASE_URL}/events`, event);
+    },
+
+    updateEvent: async (id: string, event: Event): Promise<Event> => {
+        const { data } = await axios.put(`${API_BASE_URL}/events/${id}`, event);
+        return data;
+    },
+
+    deleteEvent: async (event: Event): Promise<void> => {
+        await axios.delete(`${API_BASE_URL}/events/${event.eventId}`);
+    },
+
     // Will allow vendors to createa an event later
     //createProfile: async (profile: {
     //   first_name: string;
@@ -92,9 +105,8 @@ export const userService = {
     // event update
     createEventforVendor: async (userName: string, event: {
         eventName: string,
-        eventDate: string,
         eventType: string,
-        location: string,
+        address: string,
         description: string,
     }): Promise<void> => {
         await axios.post(`${API_BASE_URL}/vendor/${userName}/events`, event);

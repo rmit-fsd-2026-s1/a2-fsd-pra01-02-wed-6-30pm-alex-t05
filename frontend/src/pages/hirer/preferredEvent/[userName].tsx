@@ -91,14 +91,12 @@ export default function PreferredEvent() {
                     filter will get the found events and put in an array */
                     <div className="gap-4">
                         {preferredEvents.map((event) => ( // Map prints the found events
-                            <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventID}>
+                            <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
                                 <PreferredEventCard
-                                    eventID={event.eventID}
+                                    eventId={event.eventId}
                                     eventName={event.eventName}
                                     numberOfGuest={event.numberOfGuest}
-                                    date={event.date}
-                                    time={event.time}
-                                    duration={event.duration}
+                                    address={event.address || "No address provided"}
                                     image={event.image}
                                     shortDescription={event.shortDescription}
                                     isBlocked={event.isBlocked}
@@ -109,7 +107,7 @@ export default function PreferredEvent() {
                                         colorScheme='teal'
                                         type='button'
                                         className="w-15 items-center"
-                                        onClick={() => removePreferredEvents(event.eventID)}
+                                        onClick={() => removePreferredEvents(event.eventId)}
                                     >
                                         <MdDelete />
                                     </Button>

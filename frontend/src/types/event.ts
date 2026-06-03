@@ -5,7 +5,7 @@ export type Event = {
     eventName: string;
     numberOfGuest: number;
     shortDescription?: string;
-    //owner: string; // The unique username of the hirer who created the event
+    user: string; // The unique username of the hirer who created the event
     image?: string; // Optional field for event image URL
     address?: string; // Optional field for event address
     //applications: Application[]; // Stores the details of each application, including comments, status, rating, and hire date.
