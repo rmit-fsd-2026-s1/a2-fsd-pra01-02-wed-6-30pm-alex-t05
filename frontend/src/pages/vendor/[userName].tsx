@@ -46,9 +46,7 @@ export default function Vendor() {
                                 eventId={vendorEvent.eventId}
                                 eventName={vendorEvent.eventName}
                                 numberOfGuest={vendorEvent.numberOfGuest}
-                                date={vendorEvent.date}
-                                time={vendorEvent.time}
-                                duration={vendorEvent.duration}
+                                address={vendorEvent.address || "No address provided"}
                                 shortDescription={vendorEvent.shortDescription}
                                 image={vendorEvent.image}
                                 isBlocked={vendorEvent.isBlocked}

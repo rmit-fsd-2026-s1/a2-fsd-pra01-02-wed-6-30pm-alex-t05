@@ -20,6 +20,7 @@ export default function EventFormModal({
                 image: selectedEvent.image || "",
                 numberOfGuest: selectedEvent.numberOfGuest.toString(),
                 shortDescription: selectedEvent.shortDescription || "",
+                address: selectedEvent.address || "",
             });
         }
     }, []);
@@ -29,6 +30,7 @@ export default function EventFormModal({
         numberOfGuest: mode === "editEvent" && selectedEvent ? selectedEvent.numberOfGuest.toString() : "",
         shortDescription: mode === "editEvent" && selectedEvent ? selectedEvent.shortDescription || "" : "",
         image: mode === "editEvent" && selectedEvent ? selectedEvent.image || "" : "",
+        address: mode === "editEvent" && selectedEvent ? selectedEvent.address || "" : "",
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -58,7 +60,7 @@ export default function EventFormModal({
         }
         if (!formData.image.trim()) {
             newErrors.image = "Image URL is required.";
-        } else if (!/^https?:\/\/.+\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(formData.image.trim())) {
+        } else if (!/^https?:\/\/[^\s]+\.[^\s]+$/.test(formData.image.trim())) {
             newErrors.image = "Please enter a valid image URL.";
         }
         //TODO add any other necessary validation
@@ -99,6 +101,13 @@ export default function EventFormModal({
                             value={formData.image}
                             onChange={handleInputChange}
                             error={errors.image}
+                        />
+                        <InputField
+                            label="Address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleInputChange}
+                            error={errors.address}
                         />
                         <InputField
                             label="Occupancy"

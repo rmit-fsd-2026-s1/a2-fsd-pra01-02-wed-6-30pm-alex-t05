@@ -17,15 +17,13 @@ interface CardProps {
     eventId: number;
     eventName: string;
     numberOfGuest: number;
-    date: string;
-    time: string;
-    duration: number;
+    address?: string;
     image?: string; // Optional field for event image URL
     isBlocked: boolean;
     shortDescription?: string;
 }
 
-export default function Card({ eventId, eventName, numberOfGuest, date, time, duration, image, isBlocked, shortDescription }: CardProps) {
+export default function Card({ eventId, eventName, numberOfGuest, address, image, isBlocked, shortDescription }: CardProps) {
     const { events } = useEvent();
     const { user } = useAuth();
     const loggedinUser = useCurrentUser();
@@ -66,6 +64,7 @@ export default function Card({ eventId, eventName, numberOfGuest, date, time, du
                 <h2 className="!text-2xl font-semibold mb-2">{eventName}</h2>
                 <div className="grid grid-cols-2">
                     <p className="text-gray-600">Occupancy: {numberOfGuest}</p>
+                    <p className="text-gray-600">Address: {address || "No address provided"}</p>
                 </div>
                 <p className="text-gray-600 mt-2">Description: {shortDescription}</p>
                 {error && <p className="text-red-500">{error}</p>}
