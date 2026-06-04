@@ -118,16 +118,11 @@ export class UserController {
 
     // if users provided the wrong email
     if (!user) {
-      return response.status(404).json({ message: "User not found" });
+      return response.status(401).json({ message: "User not found" });
     }
 
     // Gets users password
     const password = request.body.password;
-    console.log("User found for email:", email); // Debug log to confirm user retrieval
-    console.log("Provided password:", password);
-    console.log("The hash of this passowrd is:", await argon2.hash(password)); // Debug log to check password hashing
-    console.log("Stored hashed password:", user.password);
-    console.log("was this successful: ", await argon2.verify(user.password, password)); // Debug log to check password comparison result
     // Compares the password and the password from database with argon2
     const isPasswordValid = await argon2.verify(user.password, password);
 

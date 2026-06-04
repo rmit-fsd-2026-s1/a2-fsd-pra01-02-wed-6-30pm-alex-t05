@@ -9,7 +9,6 @@ const API_BASE_URL = "http://localhost:3001/api";
 export const authService = {
     loginUser: async (email: string, password: string): Promise<User> => {
         const { data } = await axios.post(`${API_BASE_URL}/users/login`, { email, password });
-        console.log("Login response data:", data); // Debug log to check response data
         return data;
     }
 }

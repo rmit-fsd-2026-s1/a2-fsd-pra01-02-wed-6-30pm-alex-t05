@@ -4,6 +4,7 @@ import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/services/api";
+import axios from 'axios';
 
 
 export default function Signin() {
@@ -16,11 +17,18 @@ export default function Signin() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
+        setError(""); //clear previous error message on new submit attempt
         try {
             await login(email, password);
             router.push("/"); // Redirect to home page after successful login
         } catch (error) {
-            setError("Invalid email or password"); // Set error message if login fails
+            if (axios.isAxiosError(error) && error.response) {
+                if (error.response.status === 401) { // Check if the error status is 401 (Unauthorized) or 400 (Bad Request)
+                    setError("Invalid email or password"); // Set error message if login fails due to invalid credentials
+                } 
+            } else {
+                setError("An error occurred during login. Please try again."); // Set generic error message for other errors
+            }
         }
     };
 

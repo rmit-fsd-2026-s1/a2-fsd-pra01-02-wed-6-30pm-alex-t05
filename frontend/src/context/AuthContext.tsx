@@ -17,7 +17,7 @@ type login = {
 
 type AuthContextType = {
     user: AuthUser | null;
-    login: (userName: string, password: string) => void;
+    login: (userName: string, password: string) => Promise<void>;
     logout: () => void;
 }
 
@@ -32,20 +32,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (email: string, password: string) => {
-        try {
-            const data = await authService.loginUser(email, password);
-            console.log("Login successful, user data:", data); // Debug log to check login response
-            const userData: AuthUser = {
-                userName: data.userName,
-                email: data.email,
-                role: data.role
-            }
-            console.log("User data after login:", userData); // Debug log to check user data
-            setUser(userData);
-            localStorage.setItem('currentUser', JSON.stringify(userData));
-        } catch (error) {
-            console.error("Login failed:", error);
+        const data = await authService.loginUser(email, password);
+        console.log("Login successful, user data:", data); // Debug log to check login response
+        const userData: AuthUser = {
+            userName: data.userName,
+            email: data.email,
+            role: data.role
         }
+        console.log("User data after login:", userData); // Debug log to check user data
+        setUser(userData);
+        localStorage.setItem('currentUser', JSON.stringify(userData));
     };
 
     const logout = () => {

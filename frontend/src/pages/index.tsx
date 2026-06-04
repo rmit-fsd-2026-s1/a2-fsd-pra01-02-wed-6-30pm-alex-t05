@@ -27,12 +27,9 @@ export default function Home() {
       <h2 className="!text-3xl flex items-center justify-center pt-5">Here is one of our example Venues</h2>
       {events.length > 0 && ( // Checks if there any avaliable events. if there is, display the first on the array list.
         <IndexCard
-          eventID={events[0].eventID}
+          eventID={events[0].eventId}
           eventName={events[0].eventName}
           numberOfGuest={events[0].numberOfGuest}
-          date={events[0].date}
-          time={events[0].time}
-          duration={events[0].duration}
           image={events[0].image}
           shortDescription={events[0].shortDescription}
           isBlocked={events[0].isBlocked}
