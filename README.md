@@ -42,6 +42,13 @@ I used this to get it to work:
     https://www.c-sharpcorner.com/blogs/various-types-of-password-validation-in-javascript1
     https://iamkartikeya.medium.com/form-validation-in-javascript-ddc776f76920
     https://www.the-art-of-web.com/javascript/validate-password/
+
+in 'create' for user and 'login' in UserController.ts:
+    Reference:
+    https://medium.com/@gaganparmar110/build-a-login-and-registration-system-using-nestjs-and-typeorm-with-postgresql-a-step-by-step-d913e344eff8
+    https://medium.com/@ggluopeihai/unlocking-system-security-master-authentication-and-access-control-with-nestjs-jwt-and-redis-b2c60c4383b4
+    https://peaklab.fr/en/glossaire/argon2
+    https://www.npmjs.com/package/argon2
     
 
 NEED TO DO:
@@ -49,3 +56,33 @@ finish of validations to applicaiton and vendorcomments
 apply them to the routes
 Updpate event for vendor (CRUD)
 removepreferredEvents works but every slowly. need to fix to make it quicker somehow
+
+User Logins (plaintext):
+userName: harryp
+email: harry.potter@email.com
+password: Magic123!
+
+User Logins (plaintext):
+userName: homers
+email: homer.simpson@email.com
+password: Donut123!
+
+User Logins (plaintext):
+userName: janed
+email: jane.doe@email.com
+password: Password123@
+
+User Logins (plaintext):
+userName: johnd
+email: john.doe@email.com
+password: Password123!
+
+User Logins (plaintext):
+userName: minhn
+email: minh.nguyen@team5.com
+password: Rmit1234!
+
+User Logins (plaintext):
+userName: willk
+email: willknights@rmit.com
+password: Rmit123

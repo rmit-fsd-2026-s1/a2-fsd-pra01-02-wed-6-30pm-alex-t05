@@ -1,6 +1,7 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { userService } from "@/services/api";
 import { User } from '@/types/user';
+import { authService } from '@/services/loginapi';
 
 //bespoke type to restrict user data displayed in context
 type AuthUser = {
@@ -9,9 +10,14 @@ type AuthUser = {
     role: string;
 }
 
+type login = {
+    userName: string;
+    password: string;
+}
+
 type AuthContextType = {
     user: AuthUser | null;
-    login: (userData: AuthUser) => void;
+    login: (userName: string, password: string) => void;
     logout: () => void;
 }
 
@@ -25,10 +31,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
     }, []);
 
-    const login = (userData: AuthUser) => {
-        //sets authcontext to passed in user data and also stores it in local storage to persist login
-        setUser(userData);
-        localStorage.setItem('currentUser', JSON.stringify(userData));
+    const login = async (userName: string, password: string) => {
+        try {
+            const data = await authService.loginUser(userName, password);
+            setUser(data);
+            localStorage.setItem('currentUser', JSON.stringify(data));
+        } catch (error) {
+            console.error("Login failed:", error);
+        }
     };
 
     const logout = () => {

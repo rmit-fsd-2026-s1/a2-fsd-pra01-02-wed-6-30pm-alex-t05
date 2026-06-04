@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-import {userService} from "@/services/api";
+import { userService } from "@/services/api";
 
 
 export default function Signin() {
@@ -16,19 +16,11 @@ export default function Signin() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
-        const user = await userService.authenticateUser(email, password); // Checks if the email and password match a user in the database
-        if (user) {
-            login({
-                ...user,
-                userName: user.userName,
-                email: user.email,
-                role: user.role
-            });
-            console.log("Sign in successful");
-            //route to either vendor or hirer dashboard
-            router.push(`/${user.role.toLowerCase()}/${user.userName}`);
-        } else {
-            setError("Invalid username or password");
+        try {
+            await login(email, password);
+            router.push("/"); // Redirect to home page after successful login
+        } catch (error) {
+            setError("Invalid email or password"); // Set error message if login fails
         }
     };
 

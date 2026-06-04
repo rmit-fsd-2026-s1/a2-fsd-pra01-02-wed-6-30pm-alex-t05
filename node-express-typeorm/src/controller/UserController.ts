@@ -108,11 +108,11 @@ export class UserController {
   }
 
   async login(request: Request, response: Response) {
-    // Gets users userName
-    const userName = request.body.userName;
+    // Gets users email
+    const email = request.body.userName;
     // finds the user from database based on the userName
     const user = await this.userRepository.findOne({
-      where: { userName },
+      where: { email },
     });
 
     // if users provided the wrong username
