@@ -36,6 +36,11 @@ router.delete("/users/:userName", async (req, res) => {
   await userController.remove(req, res);
 });
 
+// User login
+router.post("/users/login", async (req, res) => {
+  await userController.login(req, res);
+});
+
 // ---Vendor CRUD---
 // Gets all events for a vendor
 router.get("/vendor/:userName/events", async (req, res) => {

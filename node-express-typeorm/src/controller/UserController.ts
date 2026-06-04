@@ -107,6 +107,33 @@ export class UserController {
     }
   }
 
+  async login(request: Request, response: Response) {
+    // Gets users userName
+    const userName = request.body.userName;
+    // finds the user from database based on the userName
+    const user = await this.userRepository.findOne({
+      where: { userName },
+    });
+
+    // if users provided the wrong username
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    // Gets users password
+    const password = request.body.password;
+
+    // Compares the password and the password from database with argon2
+    const isPasswordValid = await argon2.verify(user.password, password);
+
+    // if users password is wrong
+    if (!isPasswordValid) {
+      return response.status(401).json({ message: "Invalid password" });
+    }
+
+    return response.json({ user });
+  }
+
   // Vendor CRUD
   async getAllEventsForVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
@@ -236,7 +263,7 @@ export class UserController {
   }
 
   // Set comment
-  async validateUserRoles(vendorUserName: string, hirerUserName: string) : Promise<{ success: boolean; message: string; status: number }> {
+  async validateUserRoles(vendorUserName: string, hirerUserName: string): Promise<{ success: boolean; message: string; status: number }> {
     const vendor = await this.userRepository.findOneBy({
       userName: vendorUserName,
     });
