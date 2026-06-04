@@ -31,14 +31,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
     }, []);
 
-    const login = async (userName: string, password: string) => {
+    useEffect(() => {
+        setUser(user); // Update the user state whenever it changes
+    }, [user]);
+
+    const login = async (email: string, password: string) => {
         try {
-            const data = await authService.loginUser(userName, password);
+            const data = await authService.loginUser(email, password);
+            console.log("Login successful, user data:", data); // Debug log to check login response
             const userData: AuthUser = {
                 userName: data.userName,
                 email: data.email,
                 role: data.role
             }
+            console.log("User data after login:", userData); // Debug log to check user data
             setUser(userData);
             localStorage.setItem('currentUser', JSON.stringify(userData));
         } catch (error) {

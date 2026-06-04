@@ -108,21 +108,26 @@ export class UserController {
   }
 
   async login(request: Request, response: Response) {
+    console.log("Login request received with body:", request.body); // Debug log to check incoming request body
     // Gets users email
     const email = request.body.email;
-    // finds the user from database based on the userName
+    // finds the user from database based on the email
     const user = await this.userRepository.findOne({
       where: { email },
     });
 
-    // if users provided the wrong username
+    // if users provided the wrong email
     if (!user) {
       return response.status(404).json({ message: "User not found" });
     }
 
     // Gets users password
     const password = request.body.password;
-
+    console.log("User found for email:", email); // Debug log to confirm user retrieval
+    console.log("Provided password:", password);
+    console.log("The hash of this passowrd is:", await argon2.hash(password)); // Debug log to check password hashing
+    console.log("Stored hashed password:", user.password);
+    console.log("was this successful: ", await argon2.verify(user.password, password)); // Debug log to check password comparison result
     // Compares the password and the password from database with argon2
     const isPasswordValid = await argon2.verify(user.password, password);
 
@@ -131,7 +136,7 @@ export class UserController {
       return response.status(401).json({ message: "Invalid password" });
     }
 
-    return response.json({ user });
+    return response.json(user);
   }
 
   // Vendor CRUD

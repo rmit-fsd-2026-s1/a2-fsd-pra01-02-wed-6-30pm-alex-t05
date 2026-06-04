@@ -2,9 +2,11 @@ import Router from "next/router";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 const Nav = () => {
     const { user, logout } = useAuth();
+
     return (
         <nav>
             <ul className="flex space-x-4">
