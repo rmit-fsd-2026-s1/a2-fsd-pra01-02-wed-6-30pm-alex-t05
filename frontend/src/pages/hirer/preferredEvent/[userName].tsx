@@ -1,13 +1,7 @@
-import { Button, Icon, Input } from "@chakra-ui/react";
 import { useAuth } from "@/context/AuthContext";
-import { useEvent } from "@/context/EventContext";
 import { useEffect, useState } from "react";
 import PreferredEventCard from "@/components/preferredEventCard";
-import { MdArrowUpward, MdArrowDownward, MdDelete } from "react-icons/md";
-import { updateUser } from "@/services/userService";
 import { Event } from "@/types/event";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { User } from "@/types/user";
 import { userService } from '@/services/api';
 
 

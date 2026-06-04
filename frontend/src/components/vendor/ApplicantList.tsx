@@ -3,11 +3,10 @@ import { useEvent } from "../../context/EventContext";
 import { useEffect, useState } from "react";
 import ApplicantModal from "./modals/ApplicantModal";
 import { Application } from "@/types/application";
-import { autoDeclineOverlappingApplications, getApplicationsForEvent, updateApplication } from "@/services/applicationService";
 import { FaSort } from "react-icons/fa";
 import { ApplicantRow } from "./ApplicantRow";
 import { Event } from "@/types/event";
-
+import { applicationService} from "@/services/api";
 export default function ApplicantList({ event }: { event: Event }) {
     
     const { events } = useEvent();
@@ -18,7 +17,7 @@ export default function ApplicantList({ event }: { event: Event }) {
     const [applicationsForEvent, setApplicationsForEvent] = useState<Application[]>([]);
     useEffect(() => {
         const fetchApplications = async () => {
-            const apps = await getApplicationsForEvent(event.eventId);
+            const apps = await applicationService.getApplicationsForEvent(event.eventId);
             setApplicationsForEvent(apps);
         };
         fetchApplications();
@@ -37,7 +36,7 @@ export default function ApplicantList({ event }: { event: Event }) {
         } else {
             //if we're toggling off sorting, we need to reapply the default order (which is by application date, but since we don't have that, we'll just pull from the backend again)
             const fetchApplications = async () => {
-                const apps = await getApplicationsForEvent(event.eventId);
+                const apps = await applicationService.getApplicationsForEvent(event.eventId);
                 setApplicationsForEvent(apps);
             };
             fetchApplications();
@@ -49,25 +48,10 @@ export default function ApplicantList({ event }: { event: Event }) {
         app.status === "pending" 
         || (app.status === "approved" 
         && app.rating === null));
-    
-    
-    /* reimplement this later
-    .sort((a, b) => {
-        if (!sortedByRating) return 0;
-        if (a.rating === null) return 1;
-        if (b.rating === null) return -1;
-        return b.rating - a.rating;
-    });
-    */
-    //const selectedApplication = applicants.find(app => app.id === selectedApplicationId);
-
-
-
 
     const handleUpdateApplication = (updatedApplication: Application) => {
         //call api put query to update application in backend
-        updateApplication(updatedApplication)
-
+        applicationService.updateApplication(updatedApplication)
     }
     return (
         <Box p={4} bg="white" rounded="md" shadow="md">

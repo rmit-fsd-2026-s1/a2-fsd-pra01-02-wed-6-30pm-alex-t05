@@ -1,8 +1,7 @@
 import { Button, Box } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import InputField from "./InputField";
-import { createApplication, getBlockedDatesForEvent, normaliseDate, setApplicationStatus } from "@/services/applicationService";
-import { validateApplication } from "@/services/applicationService";
+import { createApplication, normaliseDate } from "@/services/applicationService";
 import { Application } from "@/types/application";
 import { Event } from "@/types/event";
 import { useAuth } from "../context/AuthContext";

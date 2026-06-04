@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-import { User } from '@/types/user';
-import { authenticateUser } from '@/services/userService';
+import {userService} from "@/services/api";
+
 
 export default function Signin() {
     const [email, setEmail] = useState(""); //intial state is empty
@@ -16,7 +16,7 @@ export default function Signin() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
-        const user = await authenticateUser(email, password); // Checks if the email and password match a user in the database
+        const user = await userService.authenticateUser(email, password); // Checks if the email and password match a user in the database
         if (user) {
             login({
                 ...user,

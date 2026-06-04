@@ -2,8 +2,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { FormControl, FormLabel, Button, RadioGroup, Radio, Stack, FormErrorMessage, Input, Box } from "@chakra-ui/react";
-import InputField from "@/components/InputField";
-import { getUsers, saveUser, checkDuplicate } from "@/services/userService";
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/services/api";
 
