@@ -31,10 +31,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
     }, []);
 
-    useEffect(() => {
-        setUser(user); // Update the user state whenever it changes
-    }, [user]);
-
     const login = async (email: string, password: string) => {
         try {
             const data = await authService.loginUser(email, password);
