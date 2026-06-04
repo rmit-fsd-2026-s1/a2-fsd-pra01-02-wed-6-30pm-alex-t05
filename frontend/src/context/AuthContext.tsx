@@ -34,8 +34,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const login = async (userName: string, password: string) => {
         try {
             const data = await authService.loginUser(userName, password);
-            setUser(data);
-            localStorage.setItem('currentUser', JSON.stringify(data));
+            const userData: AuthUser = {
+                userName: data.userName,
+                email: data.email,
+                role: data.role
+            }
+            setUser(userData);
+            localStorage.setItem('currentUser', JSON.stringify(userData));
         } catch (error) {
             console.error("Login failed:", error);
         }
