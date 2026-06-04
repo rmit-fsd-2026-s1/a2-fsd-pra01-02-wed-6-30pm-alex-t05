@@ -6,4 +6,5 @@ export type Application = {
     rating: number | null;
     startDate: string;
     endDate: string;
+    guests: number;
 };

@@ -26,6 +26,7 @@ export default function ApplicationForm({
         startDate: "",
         endDate: "",
         status: "",
+        guests: "",
     });
     useEffect(() => {
         //ensure formdata is populated correctly as props are loaded
@@ -82,6 +83,23 @@ export default function ApplicationForm({
                 newErrors.endDate = "Selected dates overlap with unavailable dates.";
             }
         }
+        if (!formData.guests) {
+            newErrors.guests = "Number of guests is required.";
+        } else {
+            const guestsNumber = parseInt(formData.guests);
+            if (isNaN(guestsNumber)) {
+                newErrors.guests = "Number of guests must be a valid number.";
+            }
+            if (guestsNumber % 1 !== 0) {
+                newErrors.guests = "Number of guests must be a whole number.";
+            }
+            if (guestsNumber <= 0) {
+                newErrors.guests = "Number of guests must be greater than zero.";
+            }
+            if (guestsNumber > event.numberOfGuest) {
+                newErrors.guests = `Number of guests cannot exceed event capacity of ${event.numberOfGuest}.`;
+            }
+        }
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -112,6 +130,7 @@ export default function ApplicationForm({
             formData.startDate,
             formData.endDate,
             formData.status as "pending" | "approved",
+            parseInt(formData.guests)
         );
         onSubmit(newApplication);
         onClose();
@@ -152,6 +171,14 @@ export default function ApplicationForm({
             value={formData.endDate}
             onChange={handleInputChange}
             error={errors?.endDate}
+        />
+        <InputField
+            label = "Number of Guests"
+            type = "number"
+            name = "guests"
+            value={formData.guests}
+            onChange={handleInputChange}
+            error={errors?.guests}
         />
         <Button mt={4} colorScheme="teal" onClick={handleSubmit}>
             {user!.role === "hirer" ? "Submit Application" : "Block Dates"}

@@ -51,6 +51,7 @@ export function createApplication(
     startDate: string, 
     endDate: string,
     status: "pending" | "approved",
+    guests: number
     ) : Application {
     return {
         applicationId: null!, // Will be set by the backend
@@ -59,7 +60,8 @@ export function createApplication(
         status,
         rating: null,
         startDate: normaliseDate(startDate),
-        endDate: normaliseDate(endDate)
+        endDate: normaliseDate(endDate),
+        guests,
     };
 }
 
