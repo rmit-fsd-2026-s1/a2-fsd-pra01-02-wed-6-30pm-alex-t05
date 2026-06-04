@@ -109,7 +109,7 @@ export class UserController {
 
   async login(request: Request, response: Response) {
     // Gets users email
-    const email = request.body.userName;
+    const email = request.body.email;
     // finds the user from database based on the userName
     const user = await this.userRepository.findOne({
       where: { email },
