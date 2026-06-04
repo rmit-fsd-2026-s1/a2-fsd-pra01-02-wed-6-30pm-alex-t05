@@ -38,4 +38,9 @@ router.get("/users/:userName/rating", async (req, res) => {
   await applicationController.findUserRating(req, res);
 });
 
+router.get("/events/:eventId/unavailable-dates", async (req, res) => {
+  await applicationController.findUnavailableDatesForEvent(req, res);
+});
+
+
 export default router;

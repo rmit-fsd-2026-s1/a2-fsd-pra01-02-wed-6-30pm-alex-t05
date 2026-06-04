@@ -37,12 +37,10 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
     const router = useRouter();
     const handleApplicationSubmit = (application: Application) => {
-        if (!selectedEvent || !user) return; // Ensure event and user exist before proceeding
+        console.log("Submitting application:", application);
         submitApplication(application);
-
         setExpanded(null); // Collapse the application form after submission
-        setError(null); // Clear any previous errors
-    };
+        };
 
     const handleEventSubmit = async (updatedEventData: any) => {
         //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
@@ -126,13 +124,15 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                 }}
                             >View Applications
                             </Button>
+                            {/*Event control menu: edit, block dates, delete*/}
                             <Box position="relative">
                                 <Button
                                     colorScheme='teal'
                                     type='button'
                                     className="float-right w-20 items-center"
                                     onClick={() => setMenuOpen(!menuOpen)}
-                                ><MdSettings /></Button>
+                                ><MdSettings />
+                                </Button>
                                 {menuOpen && (
                                     <Box
                                         position="absolute"
@@ -175,20 +175,23 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                 )}
                             </Box>
                         </Box>
+                        {/*Applications list*/}
                         {expanded === "viewApplications" && (
                             <Box mt={4} pl={4}>
                                 <ApplicantList event={selectedEvent} />
                             </Box>
                         )}
+                        {/*Blocking Dates*/}
                         {expanded === "blockDates" && (
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
-                                    event={selectedEvent} // Passes the entire event object to the form
-                                    onSubmit={handleApplicationSubmit} // Passes the eventId to the submit handler
+                                    event={selectedEvent}
+                                    onSubmit={handleApplicationSubmit}
                                     onClose={() => setExpanded(null)}
                                 />
                             </Box>
                         )}
+                        {/*Event edit/create Form*/}
                         {eventForm && (
                             <EventFormModal
                                 mode={eventForm.mode}

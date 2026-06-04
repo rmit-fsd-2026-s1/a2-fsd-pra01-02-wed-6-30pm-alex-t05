@@ -141,3 +141,10 @@ export const userService = {
     //    return data;
     //},
 };
+
+export const applicationService = {
+    getUnavailableDatesForEvent: async (eventId: number): Promise<{ startDate: string; endDate: string }[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/unavailable-dates`);
+        return data;
+    }
+}

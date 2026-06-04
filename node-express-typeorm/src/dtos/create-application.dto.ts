@@ -13,10 +13,6 @@ export class CreateApplicationDTO {
     @IsNotEmpty()
     status: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    rating: number;
-
     @IsString()
     @IsNotEmpty()
     startDate: string;

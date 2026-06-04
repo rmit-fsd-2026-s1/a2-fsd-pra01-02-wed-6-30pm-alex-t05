@@ -6,7 +6,7 @@ import { validateApplication } from "@/services/applicationService";
 import { Application } from "@/types/application";
 import { Event } from "@/types/event";
 import { useAuth } from "../context/AuthContext";
-
+import { applicationService } from "@/services/api";
 
 export default function ApplicationForm({
     event, 
@@ -17,49 +17,104 @@ export default function ApplicationForm({
         onClose: () => void,
     }) {
     //TODO needs to include more fields for hiring request
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [errors, setErrors] = useState<null | { startDate?: string; endDate?: string }>(null);
     const { user } = useAuth();
+    const applicantUserName = user?.userName || "";
+
+    const [formData, setFormData] = useState({
+        eventId: event.eventId,
+        applicantUserName: applicantUserName,
+        startDate: "",
+        endDate: "",
+        status: "",
+    });
     useEffect(() => {
-        //used to reactively validate if set dates are valid
-        if (!startDate || !endDate) {
-            setErrors(null);
-            return;
-        }     
-        const tempApplication = createApplication(event.eventId, user!.userName, startDate, endDate);
-        
-        //TODO reimplement validation
-        //const validation = validateApplication(tempApplication, event);
-        //validation ? setErrors({ [validation[0]]: validation[1] }) : setErrors(null);
-    }, [startDate, endDate]);
-    
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === "startDate") {
-            setStartDate(value);
-        } else if (name === "endDate") {
-            setEndDate(value);
+        //ensure formdata is populated correctly as props are loaded
+        setFormData({
+            ...formData,
+            eventId: event.eventId,
+            applicantUserName: applicantUserName,
+        });
+        if (user!.role === "hirer") {
+            setFormData((prev) => ({
+                ...prev,
+                status: "pending",
+            }));
+        } else if (user!.role === "vendor") {
+            setFormData((prev) => ({
+                ...prev,
+                status: "approved",
+            }));
+        }
+    }, [event.eventId, applicantUserName]);
+    //populate unavailable dates for the event on component load
+    const [unvailableDates, setUnavailableDates] = useState<{ startDate: string; endDate: string }[]>([]);
+    useEffect(() => {
+        const fetchUnavailableDates = async () => {
+            try {
+                const dates = await applicationService.getUnavailableDatesForEvent(event.eventId);
+                setUnavailableDates(dates);
+            } catch (error) {
+                console.error("Error fetching unavailable dates:", error);
+            }
+        };
+        fetchUnavailableDates();
+    }, [event.eventId]);
+    const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const validateForm = () => {
+        const newErrors: { [key: string]: string } = {};
+        if (!formData.startDate) {
+            newErrors.startDate = "Start date is required.";
+        }
+        if (!formData.endDate) {
+            newErrors.endDate = "End date is required.";
+        }
+        if (formData.startDate && formData.endDate && formData.startDate > formData.endDate) {
+            newErrors.endDate = "End date must be after start date.";
+        }
+        //check for overlapping dates with unavailable dates
+        if (formData.startDate && formData.endDate) {
+            if (unvailableDates.some(dateRange => 
+                (formData.startDate >= dateRange.startDate && formData.startDate <= dateRange.endDate) ||
+                (formData.endDate >= dateRange.startDate && formData.endDate <= dateRange.endDate) ||
+                (formData.startDate <= dateRange.startDate && formData.endDate >= dateRange.endDate)
+            )) {
+                newErrors.startDate = "Selected dates overlap with unavailable dates.";
+                newErrors.endDate = "Selected dates overlap with unavailable dates.";
+            }
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value,
+        });
+        // Clear the error for this field when the user starts typing
+        if (errors && errors[e.target.name as keyof typeof errors]) {
+            setErrors({
+                ...errors,
+                [e.target.name]: ""
+            });
         }
     };
 
     //const unvailableDates = getBlockedDatesForEvent(event)
-    const unvailableDates: string[] = []
     const handleSubmit = () => {
         //prevent submission if there are validation errors
-        if (errors) return;
-        if (startDate === "" || endDate === "") {
-            setErrors({ startDate: "Start date is required.", endDate: "End date is required." });
+        if (!validateForm()) {
             return;
         }
-        if (user!.role === "hirer") {
-            const application = createApplication(event.eventId, user!.userName, startDate, endDate);
-            onSubmit(application);
-        } else if (user!.role === "vendor") {
-            //for blocking dates it creates a dummy application
-            const application = setApplicationStatus(createApplication(event.eventId, user!.userName, startDate, endDate), "approved");
-            onSubmit(application);
-        }
+        const newApplication = createApplication(
+            formData.eventId, 
+            formData.applicantUserName,
+            formData.startDate,
+            formData.endDate,
+            formData.status as "pending" | "approved",
+        );
+        onSubmit(newApplication);
+        onClose();
     };
 
     return (
@@ -86,7 +141,7 @@ export default function ApplicationForm({
             label = "Start Date"
             type = "date"
             name = "startDate"
-            value={startDate}
+            value={formData.startDate}
             onChange={handleInputChange}
             error={errors?.startDate}
         />
@@ -94,7 +149,7 @@ export default function ApplicationForm({
             label = "End Date"
             type = "date"
             name = "endDate"
-            value={endDate}
+            value={formData.endDate}
             onChange={handleInputChange}
             error={errors?.endDate}
         />

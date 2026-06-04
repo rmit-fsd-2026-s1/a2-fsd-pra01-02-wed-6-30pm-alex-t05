@@ -134,4 +134,15 @@ async findUserRating(request: Request, response: Response) {
     return response.json(result[0].averageRating);
     // Return 0 if there are no ratings
 }
+
+async findUnavailableDatesForEvent(request: Request, response: Response) {
+  const eventId = parseInt(request.params.eventId);
+  const query = 
+    `SELECT "startDate", "endDate"
+    FROM application
+    WHERE "eventId" = @0 
+    AND status = 'approved'`;
+  const result = await this.applicationRepository.query(query, [eventId]);
+  return response.json(result);
+}
 }

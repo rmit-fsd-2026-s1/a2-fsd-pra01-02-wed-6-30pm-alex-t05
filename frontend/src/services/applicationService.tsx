@@ -49,13 +49,14 @@ export function createApplication(
     eventId: number, 
     applicantUserName: string, 
     startDate: string, 
-    endDate: string
+    endDate: string,
+    status: "pending" | "approved",
     ) : Application {
     return {
         applicationId: null!, // Will be set by the backend
         eventId,
         applicantUserName,
-        status: "pending",
+        status,
         rating: null,
         startDate: normaliseDate(startDate),
         endDate: normaliseDate(endDate)
