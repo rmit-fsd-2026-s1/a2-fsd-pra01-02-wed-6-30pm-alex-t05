@@ -88,11 +88,22 @@ export const updateApplication = async (updatedApplication: Application) => {
     //sends put request with updated application
     try {
     await axios.put(`${API_BASE_URL}/applications/${updatedApplication.applicationId}`, updatedApplication)
+    //auto decline overlapping applications if the application was approved
+    if (updatedApplication.status === "approved") {
+        try {
+            await axios.post(`${API_BASE_URL}/events/${updatedApplication.eventId}/auto-decline`, updatedApplication);
+            return true;
+        } catch (error) {
+            console.error("Error auto-declining overlapping applications:", error);
+            return false;
+        }
+    }
     return true;
     } catch (error) {
         console.error("Error updating application:", error);
         return false;
     }
+    
 };export function setApplicationStatus(application: Application, newStatus: "pending" | "approved" | "rejected") : Application {
     return {...application, status: newStatus};
 }

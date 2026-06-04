@@ -145,4 +145,21 @@ async findUnavailableDatesForEvent(request: Request, response: Response) {
   const result = await this.applicationRepository.query(query, [eventId]);
   return response.json(result);
 }
+
+async autoDeclineOverlappingApplications(request: Request, response: Response) {
+  const eventId = parseInt(request.params.eventId);
+  const { startDate, endDate } = request.body;
+  const query = 
+    `UPDATE application
+    SET status = 'rejected'
+    WHERE "eventId" = @0 
+    AND status = 'pending'
+    AND (
+      ("startDate" <= @1 AND "endDate" >= @1) OR
+      ("startDate" <= @2 AND "endDate" >= @2) OR
+      ("startDate" >= @1 AND "endDate" <= @2)
+    )`;
+    const result = await this.applicationRepository.query(query, [eventId, startDate, endDate]);
+    return response.json(result);
+}
 }
