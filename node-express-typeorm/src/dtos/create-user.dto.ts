@@ -24,7 +24,4 @@ export class CreateUserDTO {
     @IsString()
     @IsNotEmpty()
     role: string;
-
-    @IsString()
-    phoneNumber?: string;
 }

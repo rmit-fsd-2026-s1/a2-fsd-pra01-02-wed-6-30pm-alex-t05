@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import { Event } from "../entity/Event";
+import * as argon2 from "argon2";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
@@ -46,6 +47,11 @@ export class UserController {
    * @returns JSON response containing the created user or error message
    */
   async create(request: Request, response: Response) {
+    // Hashes the password before creating the user
+    const hashedPassword = await argon2.hash(request.body.password);
+
+    // users password gets replace with the argon2 encryption
+    request.body.password = hashedPassword;
     const user = this.userRepository.create(request.body);
 
     try {
@@ -99,6 +105,33 @@ export class UserController {
     } catch (error) {
       return response.status(500).json({ message: "Error updating user", error });
     }
+  }
+
+  async login(request: Request, response: Response) {
+    // Gets users userName
+    const userName = request.body.userName;
+    // finds the user from database based on the userName
+    const user = await this.userRepository.findOne({
+      where: { userName },
+    });
+
+    // if users provided the wrong username
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    // Gets users password
+    const password = request.body.password;
+
+    // Compares the password and the password from database with argon2
+    const isPasswordValid = await argon2.verify(user.password, password);
+
+    // if users password is wrong
+    if (!isPasswordValid) {
+      return response.status(401).json({ message: "Invalid password" });
+    }
+
+    return response.json({ user });
   }
 
   // Vendor CRUD
@@ -230,7 +263,7 @@ export class UserController {
   }
 
   // Set comment
-  async validateUserRoles(vendorUserName: string, hirerUserName: string) : Promise<{ success: boolean; message: string; status: number }> {
+  async validateUserRoles(vendorUserName: string, hirerUserName: string): Promise<{ success: boolean; message: string; status: number }> {
     const vendor = await this.userRepository.findOneBy({
       userName: vendorUserName,
     });
