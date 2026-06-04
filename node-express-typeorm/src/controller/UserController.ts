@@ -230,33 +230,38 @@ export class UserController {
   }
 
   // Set comment
+  async validateUserRoles(vendorUserName: string, hirerUserName: string) : Promise<{ success: boolean; message: string; status: number }> {
+    const vendor = await this.userRepository.findOneBy({
+      userName: vendorUserName,
+    });
+    if (!vendor) {
+      return { success: false, message: "Vendor user not found", status: 404 };
+    }
+
+    if (vendor.role !== "vendor") {
+      return { success: false, message: "User is not a vendor", status: 403 };
+    }
+    const hirer = await this.userRepository.findOneBy({
+      userName: hirerUserName,
+    });
+    if (!hirer) {
+      return { success: false, message: "Hirer user not found", status: 404 };
+    }
+
+    if (hirer.role !== "hirer") {
+      return { success: false, message: "User is not a hirer", status: 403 };
+    }
+    return { success: true, message: "Validation successful", status: 200 };
+  }
+
   async findComments(request: Request, response: Response) {
-    const vendorUserName = await this.userRepository.findOneBy({
-      userName: request.params.UserName,
-    });
-
-    if (!vendorUserName) {
-      return response.status(404).json({ message: "Vendor user not found" });
-    }
-
-    if (vendorUserName.role !== "vendor") {
-      return response.status(403).json({ message: "User is not a vendor" });
-    }
-
-    const hirerUserName = await this.userRepository.findOneBy({
-      userName: request.params.UserName,
-    });
-
-    if (!hirerUserName) {
-      return response.status(404).json({ message: "Hirer user not found" });
-    }
-
-    if (hirerUserName.role !== "hirer") {
-      return response.status(403).json({ message: "User is not a hirer" });
+    const validate = await this.validateUserRoles(request.params.vendorUserName, request.params.hirerUserName);
+    if (!validate.success) {
+      return response.status(validate.status).json({ message: validate.message });
     }
 
     const comments = await this.vendorCommentRepository.findOne({
-      where: { vendorUserName, hirerUserName },
+      where: { vendorUserName: request.params.vendorUserName, hirerUserName: request.params.hirerUserName },
     });
 
     if (!comments) {
@@ -269,65 +274,27 @@ export class UserController {
     //Reference: AI suggestion
     //I wanted to set if no comment or update if comment already exists
     //it suggested upsert
-    const vendorUserName = await this.userRepository.findOneBy({
-      userName: request.params.UserName,
-    });
-
-    if (!vendorUserName) {
-      return response.status(404).json({ message: "Vendor user not found" });
-    }
-
-    if (vendorUserName.role !== "vendor") {
-      return response.status(403).json({ message: "User is not a vendor" });
-    }
-
-    const hirerUserName = await this.userRepository.findOneBy({
-      userName: request.params.UserName,
-    });
-
-    if (!hirerUserName) {
-      return response.status(404).json({ message: "Hirer user not found" });
-    }
-
-    if (hirerUserName.role !== "hirer") {
-      return response.status(403).json({ message: "User is not a hirer" });
+    const validate = await this.validateUserRoles(request.params.vendorUserName, request.params.hirerUserName);
+    if (!validate.success) {
+      return response.status(validate.status).json({ message: validate.message });
     }
 
     const comment = request.body.comment;
     await AppDataSource.getRepository("VendorComment").upsert(
-      { vendorUserName, hirerUserName, comment },
+      { vendorUserName: request.params.vendorUserName, hirerUserName: request.params.hirerUserName, comment },
       ["vendorUserName", "hirerUserName"]
     );
     return response.json({ message: "Comment set successfully" });
   }
 
   async deleteUserCommentFromVendor(request: Request, response: Response) {
-    const vendorUserName = await this.userRepository.findOneBy({
-      userName: request.params.userName,
-    });
-
-    if (!vendorUserName) {
-      return response.status(404).json({ message: "Vendor user not found" });
-    }
-
-    if (vendorUserName.role !== "vendor") {
-      return response.status(403).json({ message: "User is not a vendor" });
-    }
-
-    const hirerUserName = await this.userRepository.findOneBy({
-      userName: request.params.UserName,
-    });
-
-    if (!hirerUserName) {
-      return response.status(404).json({ message: "Hirer user not found" });
-    }
-
-    if (hirerUserName.role !== "hirer") {
-      return response.status(403).json({ message: "User is not a hirer" });
+    const validate = await this.validateUserRoles(request.params.vendorUserName, request.params.hirerUserName);
+    if (!validate.success) {
+      return response.status(validate.status).json({ message: validate.message });
     }
 
     const commentToDelete = await this.vendorCommentRepository.findOne({
-      where: { vendorUserName, hirerUserName },
+      where: { vendorUserName: request.params.vendorUserName, hirerUserName: request.params.hirerUserName },
     });
 
     if (!commentToDelete) {

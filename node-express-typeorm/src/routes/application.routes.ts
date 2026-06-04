@@ -42,5 +42,9 @@ router.get("/events/:eventId/unavailable-dates", async (req, res) => {
   await applicationController.findUnavailableDatesForEvent(req, res);
 });
 
+router.put("/events/:eventId/auto-decline", async (req, res) => {
+  await applicationController.autoDeclineOverlappingApplications(req, res);
+});
+
 
 export default router;
