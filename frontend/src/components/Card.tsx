@@ -5,15 +5,13 @@ import { useEffect, useState } from "react";
 import ApplicantList from "./vendor/ApplicantList";
 import ApplicationForm from "./ApplicationForm";
 import { Application } from "@/types/application";
-import { updateUser } from "@/services/userService";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Event } from "@/types/event";
-import { submitApplication } from "@/services/applicationService";
 import { userService } from "@/services/api";
 import { MdArrowDropDown, MdSettings } from 'react-icons/md'
 import EventFormModal from "./vendor/modals/EventFormModal";
 import { useRouter } from "next/router";
-import { eventService } from "@/services/api";
+import { eventService, applicationService } from "@/services/api";
 
 
 interface CardProps {
@@ -38,7 +36,7 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
     const router = useRouter();
     const handleApplicationSubmit = (application: Application) => {
         console.log("Submitting application:", application);
-        submitApplication(application);
+        applicationService.submitApplication(application);
         setExpanded(null); // Collapse the application form after submission
         };
 

@@ -1,14 +1,13 @@
 import { Box, Button, IconButton, Link } from "@chakra-ui/react";
 import { MdClose, MdStar } from "react-icons/md";
 import { Application } from "@/types/application";
-import { getUserByUserName, getUserCommentsFromVendor, setUserCommentFromVendor, deleteUserCommentFromVendor } from "@/services/userService";
-import { getRatingForUser } from "@/services/applicationService";
 import { Event } from "@/types/event";
 import { setApplicationStatus, setApplicationRating } from "@/services/applicationService";
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useUserRating } from "@/hooks/useUserRating";
 import { useAuth } from "@/context/AuthContext";
+import { applicationService, userService } from "@/services/api";
 
 export default function ApplicantModal({
     application,
@@ -26,7 +25,7 @@ export default function ApplicantModal({
         try{
         async function fetchUser() {
             //fetches user details based on url
-            const applicant = await getUserByUserName(application.applicantUserName);
+            const applicant = await userService.getOneUser(application.applicantUserName);
             setApplicant(applicant); //set the profileUser state to the fetched user details
         }
         fetchUser();
@@ -46,7 +45,7 @@ export default function ApplicantModal({
                 return;
             }
             try{
-                const comments = await getUserCommentsFromVendor(user.userName, fullApplicant.userName);
+                const comments = await userService.getUserCommentsFromVendor(user.userName, fullApplicant.userName);
                 setUserComments(comments);
 
             } catch (error) {
@@ -102,11 +101,11 @@ export default function ApplicantModal({
                             if (newComment.trim() === "") {
                                 //if blank, delete
                                 if (userComments) { //only call delete if there's an existing comment to delete
-                                    deleteUserCommentFromVendor(user?.userName || "", fullApplicant?.userName || "");
+                                    userService.deleteUserCommentFromVendor(user?.userName || "", fullApplicant?.userName || "");
                                     setUserComments(null); //update local state to reflect deletion
                                 }
                             } else {
-                                setUserCommentFromVendor(user?.userName || "", fullApplicant?.userName || "", newComment);
+                                userService.setUserCommentFromVendor(user?.userName || "", fullApplicant?.userName || "", newComment);
                                 setUserComments(newComment); //update local state to reflect the new comment
                             }
                         };

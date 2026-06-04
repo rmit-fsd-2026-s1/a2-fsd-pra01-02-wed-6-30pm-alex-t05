@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
   // and update them when entity definitions change. This is useful during development
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true, 
-  logging: true, // Enable logging for debugging purposes
+  logging: ["error", "warn"], //enable logging for errors and warnings to help with debugging
   entities: ["src/entity/**/*.ts"], //load all entities from the specified directory
   migrations: [],
   subscribers: [],

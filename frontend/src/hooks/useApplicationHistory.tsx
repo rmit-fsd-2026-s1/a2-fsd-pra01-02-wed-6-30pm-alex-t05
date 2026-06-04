@@ -1,7 +1,7 @@
 import { useEvent } from "@/context/EventContext";
-import { getApplicationsForUser } from "@/services/applicationService";
 import { Application } from "@/types/application";
 import { useEffect, useState } from "react";
+import { applicationService } from "@/services/api";
 
 export default function useApplicationHistory(userName: string) {
     const { events } = useEvent();
@@ -10,7 +10,7 @@ export default function useApplicationHistory(userName: string) {
     useEffect(() => {
         const fetchApplicationHistory = async () => {
             try {
-                const applications = await getApplicationsForUser(userName);
+                const applications = await applicationService.getApplicationsForUser(userName);
                                 
                 setApplicationHistory(applications);
             } catch (error) {

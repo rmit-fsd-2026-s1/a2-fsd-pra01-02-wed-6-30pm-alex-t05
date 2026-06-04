@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { FormControl, FormLabel, Button, Input, Box } from "@chakra-ui/react";
 import { useAuth } from "../../context/AuthContext";
 import { useCurrentUser } from '../../hooks/useCurrentUser';
-import { updateUser, getUserByUserName } from '../../services/userService';
 import { User } from "../../types/user";
 import { useRouter } from "next/router";
 import { useUserRating } from '@/hooks/useUserRating';
 import useApplicationHistory from '@/hooks/useApplicationHistory';
 import { fileUploader } from '@/services/FileUploader';
 import ApplicationHistory from '@/components/ApplicationHistory';
+import { userService } from '@/services/api';
 
 export default function Profile() {
     //setup
@@ -42,7 +42,7 @@ export default function Profile() {
         try{
         async function fetchUser() {
             //fetches user details based on url
-            const user = await getUserByUserName(profileUserName);
+            const user = await userService.getOneUser(profileUserName);
             setProfileUser(user); //set the profileUser state to the fetched user details
         }
         fetchUser();
@@ -77,7 +77,7 @@ export default function Profile() {
                     lastName: lastName.trim(),
                     phoneNumber: phoneNumber.trim() || '' // Ensure phone number is a string, even if empty
                 };
-                const update = await updateUser(updatedUser); // Update user data in database
+                const update = await userService.updateUser(updatedUser); // Update user data in database
                 if (!update) {
                     setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`); // Set color for message
                     setValidation('Error updating profile. Please try again later.');
@@ -98,7 +98,7 @@ export default function Profile() {
             const result = await fileUploader(profileUser, file);
             if (result.success && result.updatedUser) {
                 //runs profile update
-                updateUser(result.updatedUser);
+                await userService.updateUser(result.updatedUser);
                 login(result.updatedUser);
                 setProfileUser(result.updatedUser);
             } else {

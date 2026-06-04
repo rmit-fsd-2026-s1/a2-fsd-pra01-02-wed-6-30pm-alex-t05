@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useEvent } from "../context/EventContext";
-import { getRatingForUser } from "../services/applicationService";
-
+import { applicationService } from "../services/api";
 export const useUserRating = (applicantUserName: string): number | null => {
     const { events } = useEvent();
     const [rating, setRating] = useState<number | null>(null);
@@ -9,7 +8,7 @@ export const useUserRating = (applicantUserName: string): number | null => {
     useEffect(() => {
         const fetchUserRating = async () => {
             try {
-                const userRating = await getRatingForUser(applicantUserName);
+                const userRating = await applicationService.getRatingForUser(applicantUserName);
                 setRating(userRating);
             } catch (error) {
                 console.error("Error fetching user rating:", error);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getUserByUserName } from '../services/userService';
 import { User } from '../types/user';
+import { userService } from '../services/api';
 
 export const useCurrentUser = (): User | null => {
     const { user } = useAuth();
@@ -13,7 +13,7 @@ export const useCurrentUser = (): User | null => {
             return;
         }
             const fetchFullUser = async () => {
-            const fetchedUser = await getUserByUserName(user.userName);
+            const fetchedUser = await userService.getOneUser(user.userName);
             setFullUser(fetchedUser);
         };
         fetchFullUser();
