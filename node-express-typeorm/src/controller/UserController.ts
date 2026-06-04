@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import { Event } from "../entity/Event";
+import * as argon2 from "argon2";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
@@ -46,6 +47,11 @@ export class UserController {
    * @returns JSON response containing the created user or error message
    */
   async create(request: Request, response: Response) {
+    // Hashes the password before creating the user
+    const hashedPassword = await argon2.hash(request.body.password);
+
+    // users password gets replace with the argon2 encryption
+    request.body.password = hashedPassword;
     const user = this.userRepository.create(request.body);
 
     try {
