@@ -357,6 +357,7 @@ export class UserController {
 
     const preferredVenues = await this.preferredVenueRepository.find({
       where: { user: { userName: user.userName } },
+      order: { ranking: "ASC" },
       relations: ["event"],
     });
 

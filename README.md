@@ -54,6 +54,9 @@ in 'create' for user and 'login' in UserController.ts:
 for .count
     https://typeorm.io/docs/working-with-entity-manager/repository-api/
 
+for order: { ranking: "ASC }
+    https://typeorm.io/docs/working-with-entity-manager/find-options/
+
 
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
