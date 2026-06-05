@@ -3,18 +3,16 @@ import { Event } from '../types/event';
 import { eventService, userService } from '@/services/api';
 import { useRouter } from 'next/router';
 import { useAuth } from './AuthContext';
+import { preferredEvent } from '@/types/preferredEvents';
 
 type EventContextType = {
-    //event: Event | null;
-    //setEvent: (event: Event | null) => void;
-
     events: Event[];
     eventsForVendor: Event[];
+    eventsForHirer: preferredEvent[];
     setEvents: (events: Event[]) => void;
-
-    //selectedEventID?: number | null;
-    //setSelectedEventID: (id: number | null) => void;
-    //updateEvent: (updatedEvent: Event) => void;
+    fetchEvents: () => void;
+    fetchEventsForVendor: () => void;
+    fetchPreferredForHirer: () => void;
 }
 
 const EventContext = createContext<EventContextType | undefined>(undefined);
@@ -23,6 +21,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     const router = useRouter();
     const [events, setEvents] = useState<Event[]>([]);
     const [eventsForVendor, setEventsForVendor] = useState<Event[]>([]);
+    const [eventsForHirer, setEventsForHirer] = useState<preferredEvent[]>([]);
     const { user } = useAuth();
 
     //const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
@@ -32,6 +31,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         fetchEvents();
         if (user?.userName) {
             fetchEventsForVendor();
+            fetchPreferredForHirer();
         }
     }, [user?.userName]);
 
@@ -45,7 +45,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const fetchEventsForVendor = async () => {
-        if (!user?.role || user.role === "vendor") {
+        if (user?.role === "vendor") {
             try {
                 const data = await userService.getAllEventsForVendor(user?.userName as string);
                 setEventsForVendor(data);
@@ -55,8 +55,19 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const fetchPreferredForHirer = async () => {
+        if (user?.role === "hirer") {
+            try {
+                const data = await userService.getAllPreferredVenuesForUser(user?.userName as string);
+                setEventsForHirer(data);
+            } catch (error) {
+                console.error("Error fetching preferred events for hirer:", error);
+            }
+        }
+    };
+
     return (
-        <EventContext.Provider value={{ events, setEvents, eventsForVendor }}>
+        <EventContext.Provider value={{ events, setEvents, eventsForVendor, eventsForHirer, fetchEvents, fetchEventsForVendor, fetchPreferredForHirer }}>
             {children}
         </EventContext.Provider>
     );

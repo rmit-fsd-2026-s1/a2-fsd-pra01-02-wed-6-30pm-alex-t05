@@ -51,6 +51,10 @@ in 'create' for user and 'login' in UserController.ts:
     https://www.npmjs.com/package/argon2
     
 
+for .count
+    https://typeorm.io/docs/working-with-entity-manager/repository-api/
+
+
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
 apply them to the routes

@@ -15,9 +15,7 @@ export class EventController {
    * @returns JSON response containing an array of all events
    */
   async all(request: Request, response: Response) {
-    const events = await this.eventRepository.find({
-      relations: ["preferredUsers"],
-    });
+    const events = await this.eventRepository.find();
     return response.json(events);
   }
 
@@ -31,7 +29,6 @@ export class EventController {
     const eventId = parseInt(request.params.id);
     const event = await this.eventRepository.findOne({
       where: { eventId },
-      relations: ["preferredUsers"],
     });
 
     if (!event) {

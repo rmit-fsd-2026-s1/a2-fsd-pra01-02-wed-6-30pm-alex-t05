@@ -1,12 +1,13 @@
 export type preferredEvent = {
-    eventID: number;
-    eventName: string;
-    numberOfGuest: number;
-    date: string;
-    time: string;
-    duration: number;
-    shortDescription?: string;
-    owner: string; // The unique username of the hirer who created the event
-    image?: string; // Optional field for event image URL
-    isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
+    preferredVenueId: number;
+    ranking: number;
+    event: {
+        eventId: number;
+        eventName: string;
+        numberOfGuest: number;
+        address?: string; // Optional field for event address
+        shortDescription?: string;
+        image?: string; // Optional field for event image URL
+        isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
+    };
 };

@@ -2,6 +2,7 @@ import axios from "axios";
 import { Event } from "../types/event";
 import { User } from "../types/user";
 import { Application } from "@/types/application";
+import { preferredEvent } from "@/types/preferredEvents";
 
 const API_BASE_URL = "http://localhost:3001/api";
 
@@ -86,7 +87,7 @@ export const userService = {
         await axios.post(`${API_BASE_URL}/vendor/${userName}/events`, event);
     },
 
-    getUserCommentsFromVendor: async (vendorUserName: string, hirerUserName: string) : Promise<string> => {
+    getUserCommentsFromVendor: async (vendorUserName: string, hirerUserName: string): Promise<string> => {
         try {
             const { data } = await axios.get(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`);
             console.log("Fetched comments:", data);
@@ -104,7 +105,7 @@ export const userService = {
         }
     },
 
-    setUserCommentFromVendor: async (vendorUserName: string, hirerUserName: string, comment: string) : Promise<void> => {
+    setUserCommentFromVendor: async (vendorUserName: string, hirerUserName: string, comment: string): Promise<void> => {
         try {
             await axios.post(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`, { comment });
         } catch (error) {
@@ -112,24 +113,24 @@ export const userService = {
         }
     },
     updateUser: async (updatedUser: User) => {
-    //sends put request with updated user
+        //sends put request with updated user
         try {
-        await axios.put(`${API_BASE_URL}/users/${updatedUser.userName}`, updatedUser)
-        return true;
+            await axios.put(`${API_BASE_URL}/users/${updatedUser.userName}`, updatedUser)
+            return true;
         } catch (error) {
             console.error("Error updating user:", error);
             return false;
         }
     },
-    
-    authenticateUser: async (email: string, password: string) => {            
+
+    authenticateUser: async (email: string, password: string) => {
         const existingData = await userService.getAllUsers();
         const user = existingData.find((user: User) => user.email === email && user.password === password);
         return user || null;
     },
-    
 
-    deleteUserCommentFromVendor: async (vendorUserName: string, hirerUserName: string) : Promise<void> => {
+
+    deleteUserCommentFromVendor: async (vendorUserName: string, hirerUserName: string): Promise<void> => {
         try {
             await axios.delete(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`);
         } catch (error) {
@@ -137,22 +138,20 @@ export const userService = {
         }
     },
 
-
-    getAllPreferredEventsForHirer: async (userName: string): Promise<Event[]> => {
-        const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/preferredevents`);
+    getAllPreferredVenuesForUser: async (userName: string): Promise<preferredEvent[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/hirer/${userName}/preferred-events`);
         return data;
     },
 
-    addPreferredEvent: async (eventId: number, userName: string): Promise<void> => {
-        const { data } = await axios.post(`${API_BASE_URL}/users/${userName}/preferredevents/${eventId}`);
-        return data;
+    createPreferredEventForUser: async (userName: string, eventId: number): Promise<void> => {
+        await axios.post(`${API_BASE_URL}/hirer/${userName}/preferred-events/${eventId}`);
     },
 };
 
 export const applicationService = {
     //get
-    getApplicationsForUser: async (userName: string) : Promise<Application[] | []> => {
-    //fetches all applications for a user from the backend
+    getApplicationsForUser: async (userName: string): Promise<Application[] | []> => {
+        //fetches all applications for a user from the backend
         try {
             if (!userName) return [];
             const { data } = await axios.get(`${API_BASE_URL}/users/${userName}/applications`);
@@ -166,8 +165,8 @@ export const applicationService = {
         const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/unavailable-dates`);
         return data;
     },
-    getRatingForUser: async (applicantUserName: string) : Promise<number | null> => {
-    //filters applications based on username, and averages the ratings
+    getRatingForUser: async (applicantUserName: string): Promise<number | null> => {
+        //filters applications based on username, and averages the ratings
         try {
             if (!applicantUserName) return 0;
             console.log("Fetching rating for user:", applicantUserName);
@@ -179,8 +178,8 @@ export const applicationService = {
             return 0;
         }
     },
-    getApplicationsForEvent: async (eventId: number) : Promise<Application[] | []> => {
-    //fetches all applications for an event from the backend
+    getApplicationsForEvent: async (eventId: number): Promise<Application[] | []> => {
+        //fetches all applications for an event from the backend
         try {
             const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/applications`);
             return data;
@@ -191,7 +190,7 @@ export const applicationService = {
     },
 
     //post
-    submitApplication: async(application: Application): Promise<boolean> => {
+    submitApplication: async (application: Application): Promise<boolean> => {
         try {
             await axios.post(`${API_BASE_URL}/applications`, application);
             return true;
@@ -201,25 +200,25 @@ export const applicationService = {
         }
     },
     updateApplication: async (updatedApplication: Application) => {
-    //sends put request with updated application
-    try {
-    await axios.put(`${API_BASE_URL}/applications/${updatedApplication.applicationId}`, updatedApplication)
-    //auto decline overlapping applications if the application was approved
-    if (updatedApplication.status === "approved") {
+        //sends put request with updated application
         try {
-            await axios.put(`${API_BASE_URL}/events/${updatedApplication.eventId}/auto-decline`, updatedApplication);
+            await axios.put(`${API_BASE_URL}/applications/${updatedApplication.applicationId}`, updatedApplication)
+            //auto decline overlapping applications if the application was approved
+            if (updatedApplication.status === "approved") {
+                try {
+                    await axios.put(`${API_BASE_URL}/events/${updatedApplication.eventId}/auto-decline`, updatedApplication);
+                    return true;
+                } catch (error) {
+                    console.error("Error auto-declining overlapping applications:", error);
+                    return false;
+                }
+            }
             return true;
         } catch (error) {
-            console.error("Error auto-declining overlapping applications:", error);
+            console.error("Error updating application:", error);
             return false;
         }
-    }
-    return true;
-    } catch (error) {
-        console.error("Error updating application:", error);
-        return false;
-    }
-    
+
     },
 
 

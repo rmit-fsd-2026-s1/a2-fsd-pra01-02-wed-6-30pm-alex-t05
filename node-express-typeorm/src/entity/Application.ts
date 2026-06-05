@@ -26,9 +26,9 @@ export class Application {
     endDate: string;
 
     @ManyToOne(() => User)
-    @JoinColumn ({ name: "applicantUserName", referencedColumnName: "userName" })
+    @JoinColumn({ name: "applicantUserName", referencedColumnName: "userName" })
     user: User;
     @ManyToOne(() => Event)
-    @JoinColumn ({ name: "eventId", referencedColumnName: "eventId" })
+    @JoinColumn({ name: "eventId", referencedColumnName: "eventId" })
     event: Event;
 }

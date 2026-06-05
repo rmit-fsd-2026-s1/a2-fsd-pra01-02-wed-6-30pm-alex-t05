@@ -1,29 +1,16 @@
 import { useAuth } from "@/context/AuthContext";
 import { useEffect, useState } from "react";
 import PreferredEventCard from "@/components/preferredEventCard";
-import { Event } from "@/types/event";
+import { preferredEvent } from "@/types/preferredEvents";
 import { userService } from '@/services/api';
+import { useEvent } from "@/context/EventContext";
 
 
 export default function PreferredEvent() {
     const { user } = useAuth();
-    const [preferredEvents, setPreferredEvents] = useState<Event[]>([]);
+    const [preferredEvents, setPreferredEvents] = useState<preferredEvent[]>([]);
+    const { eventsForHirer } = useEvent();
 
-
-    const fetchPreferredEvents = async () => {
-        try {
-            const data = await userService.getAllPreferredEventsForHirer(user?.userName as string);
-            setPreferredEvents(data);
-        } catch (error) {
-            console.error("Error fetching preferred events:", error);
-        }
-    };
-
-    useEffect(() => {
-        if (user?.userName) {
-            fetchPreferredEvents();
-        }
-    }, [user?.userName]);
 
     /*
     const moveUp = (index: number) => {
@@ -73,7 +60,7 @@ export default function PreferredEvent() {
         (!user || user.role === "hirer") ? ( // This only works if the user is a hirer
             <div className="min-h-screen items-center justify-center bg-gray-100">
                 <h1 className="!text-2xl flex items-center justify-center">Preferred Events</h1>
-                {preferredEvents === null || preferredEvents.length === 0 ? ( // This checks if events are empty or null
+                {eventsForHirer === null || eventsForHirer.length === 0 ? ( // This checks if events are empty or null
                     <div className="min-h-screen flex items-center justify-center bg-gray-100">
                         <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
                             <h1 className="text-2xl font-bold mb-4">No preferred event found</h1>
@@ -84,16 +71,16 @@ export default function PreferredEvent() {
                     include will match the users search and return the event if it matches.
                     filter will get the found events and put in an array */
                     <div className="gap-4">
-                        {preferredEvents.map((event) => ( // Map prints the found events
-                            <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
+                        {eventsForHirer.map((preferredEvent) => ( // Map prints the found events
+                            <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={preferredEvent.event.eventId}>
                                 <PreferredEventCard
-                                    eventId={event.eventId}
-                                    eventName={event.eventName}
-                                    numberOfGuest={event.numberOfGuest}
-                                    address={event.address || "No address provided"}
-                                    image={event.image}
-                                    shortDescription={event.shortDescription}
-                                    isBlocked={event.isBlocked}
+                                    eventId={preferredEvent.event.eventId}
+                                    eventName={preferredEvent.event.eventName}
+                                    numberOfGuest={preferredEvent.event.numberOfGuest}
+                                    address={preferredEvent.event.address || "No address provided"}
+                                    image={preferredEvent.event.image}
+                                    shortDescription={preferredEvent.event.shortDescription}
+                                    isBlocked={preferredEvent.event.isBlocked}
                                 />
                                 {/*}
                                 <div className="flex justify-end gap-2 mt-2">

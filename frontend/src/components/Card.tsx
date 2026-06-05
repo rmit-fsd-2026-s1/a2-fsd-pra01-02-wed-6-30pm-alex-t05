@@ -13,7 +13,6 @@ import EventFormModal from "./vendor/modals/EventFormModal";
 import { useRouter } from "next/router";
 import { eventService, applicationService } from "@/services/api";
 
-
 interface CardProps {
     eventId: number;
     eventName: string;
@@ -25,12 +24,11 @@ interface CardProps {
 }
 
 export default function Card({ eventId, eventName, numberOfGuest, address, image, isBlocked, shortDescription }: CardProps) {
-    const { events } = useEvent();
+    const { events, fetchPreferredForHirer, fetchEventsForVendor } = useEvent();
     const { user } = useAuth();
-    const loggedinUser = useCurrentUser();
     const [expanded, setExpanded] = useState<"createApplication" | "viewApplications" | "blockDates" | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [eventForm, setEventForm] = useState<{mode: "editEvent", event: Event} | null>(null);
+    const [eventForm, setEventForm] = useState<{ mode: "editEvent", event: Event } | null>(null);
     const [error, setError] = useState<string | null>(null);
     const selectedEvent = events.find((event) => event.eventId === eventId)!;
     const router = useRouter();
@@ -38,19 +36,20 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
         console.log("Submitting application:", application);
         applicationService.submitApplication(application);
         setExpanded(null); // Collapse the application form after submission
-        };
+    };
 
     const handleEventSubmit = async (updatedEventData: any) => {
         //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
         console.log("Updated event data:", updatedEventData);
         await eventService.updateEvent(selectedEvent.eventId, updatedEventData);
         setEventForm(null); // Close the event form modal after submission
-        router.reload(); // Refresh the page to show updated event details, ideally this should be replaced with a more efficient state update
+        fetchEventsForVendor(); // Fetchs all vendor events again to update the list
     }
 
     const addPreferredEvents = async (eventID: number) => {
         try {
-            await userService.addPreferredEvent(eventID, loggedinUser!.userName);
+            await userService.createPreferredEventForUser(user!.userName, eventID);
+            fetchPreferredForHirer(); // Refresh the preferred events list after adding a new preferred event
         } catch (error) {
             console.error("Error adding preferred event:", error);
             setError("Failed to add preferred event. Please try again.");
@@ -141,33 +140,33 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                         bg="white"
                                         shadow="md"
                                     >
-                                    <Button
-                                        variant="ghost"
-                                        colorScheme="blue"
-                                        onClick={() => {setEventForm({mode: "editEvent", event: selectedEvent}); setMenuOpen(false)}
+                                        <Button
+                                            variant="ghost"
+                                            colorScheme="blue"
+                                            onClick={() => { setEventForm({ mode: "editEvent", event: selectedEvent }); setMenuOpen(false) }
                                             }
-                                    >
-                                        Edit    
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        colorScheme="yellow"
-                                        onClick={() => setExpanded(expanded !== "blockDates" ? "blockDates" : null)}
-                                    >
-                                        Block Dates
-                                    </Button>
-                                    <Button
-                                        colorScheme="red"
-                                        variant="ghost"
-                                        onClick={ async () => {
-                                            if (confirm("Are you sure you want to delete this event?")) {
-                                                await eventService.deleteEvent(selectedEvent);
-                                                router.reload();
-                                            }
-                                        }}
-                                    >
-                                        Delete
-                                    </Button>
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="ghost"
+                                            colorScheme="yellow"
+                                            onClick={() => setExpanded(expanded !== "blockDates" ? "blockDates" : null)}
+                                        >
+                                            Block Dates
+                                        </Button>
+                                        <Button
+                                            colorScheme="red"
+                                            variant="ghost"
+                                            onClick={async () => {
+                                                if (confirm("Are you sure you want to delete this event?")) {
+                                                    await eventService.deleteEvent(selectedEvent);
+                                                    router.reload();
+                                                }
+                                            }}
+                                        >
+                                            Delete
+                                        </Button>
                                     </Box>
 
                                 )}
