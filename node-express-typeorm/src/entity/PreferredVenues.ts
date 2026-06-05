@@ -3,7 +3,6 @@ import {
     PrimaryGeneratedColumn,
     Column,
     ManyToOne,
-    Generated
 } from "typeorm";
 import { User } from "./User";
 import { Event } from "./Event";

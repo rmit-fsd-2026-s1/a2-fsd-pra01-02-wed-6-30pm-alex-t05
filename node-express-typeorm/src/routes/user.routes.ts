@@ -6,6 +6,7 @@ import { UpdateUserDTO } from "../dtos/update-user.dto";
 import { CreateEventDTO } from "../dtos/create-event.dto";
 import { UpdateEventDTO } from "../dtos/update-event.dto";
 import { CreateVendorCommentDTO } from "../dtos/create-vendorcomment.dto";
+import { LoginDTO } from "../dtos/login.dto";
 
 const router = Router();
 const userController = new UserController();
@@ -37,7 +38,7 @@ router.delete("/users/:userName", async (req, res) => {
 });
 
 // User login
-router.post("/users/login", async (req, res) => {
+router.post("/users/login", validateDto(LoginDTO), async (req, res) => {
   await userController.login(req, res);
 });
 
@@ -84,10 +85,12 @@ router.delete("/vendor/:vendorUserName/comments/:hirerUserName", async (req, res
 });
 
 // ---Preferred Events---
+// Gets all preferred events for a hirer by their username
 router.get("/hirer/:userName/preferred-events", async (req, res) => {
   await userController.getAllPreferredVenuesForUser(req, res);
 });
 
+// Adds a preferred event for a hirer by their username and event id
 router.post("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
   await userController.addPreferredVenue(req, res);
 });

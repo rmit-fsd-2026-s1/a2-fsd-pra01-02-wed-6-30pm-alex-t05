@@ -367,7 +367,7 @@ export class UserController {
   async addPreferredVenue(request: Request, response: Response) {
     // Gets the user by their username
     const user = await this.userRepository.findOneBy({
-      userName: request.params.id,
+      userName: request.params.userName,
     });
 
     // Checks if user exists
