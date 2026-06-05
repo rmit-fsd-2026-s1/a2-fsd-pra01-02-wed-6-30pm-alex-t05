@@ -27,7 +27,7 @@ export class UserController {
 
   /**
    * Retrieves a single user by their userName
-   * @param request - Express request object containing the user ID in params
+   * @param request - Express request object containing the userName in params
    * @param response - Express response object
    * @returns JSON response containing the user if found, or 404 error if not found
    */
@@ -110,6 +110,12 @@ export class UserController {
     }
   }
 
+  /**
+ * Log in a user by veriying their email and password
+ * @param request - Express request object containing email and password in body
+ * @param response - Express response object
+ * @returns JSON response containing details of logged in user
+ */
   async login(request: Request, response: Response) {
     console.log("Login request received with body:", request.body); // Debug log to check incoming request body
     // Gets users email
@@ -138,6 +144,12 @@ export class UserController {
   }
 
   // Vendor CRUD
+  /**
+   * Retrieves all events for a specific vendor
+   * @param request - Express request object
+   * @param response - Express response object
+   * @returns JSON response containing an array of all events for the vendor
+   */
   async getAllEventsForVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -158,6 +170,12 @@ export class UserController {
     response.json(VendorEvents);
   }
 
+  /**
+ * Retrieves one events for a specific vendor
+ * @param request - Express request object containing the userName and event ID in params
+ * @param response - Express response object
+ * @returns JSON response containing one events for the vendor
+ */
   async getOneEventForVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -185,6 +203,12 @@ export class UserController {
     response.json(event);
   }
 
+  /**
+* Creates a new event in the database
+* @param request - Express request object containing details of the event and userName of the vendor
+* @param response - Express response object
+* @returns JSON response containing the created event
+*/
   async createEventforVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -210,6 +234,12 @@ export class UserController {
     }
   }
 
+  /**
+* Updates an event in the database
+* @param request - Express request object containing new details of the event and userName of the vendor
+* @param response - Express response object
+* @returns JSON response containing the updated event
+*/
   async updateEventforVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -241,6 +271,12 @@ export class UserController {
     }
   }
 
+  /**
+* Removes an event from the database
+* @param request - Express request object containing the userName and event ID in params
+* @param response - Express response object
+* @returns JSON response indicating success or failure
+*/
   async removeEventforVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -364,7 +400,12 @@ export class UserController {
     response.json(preferredVenues);
   }
 
-
+  /**
+* Adds a preferred venue to the database for a hirer
+* @param request - Express request object containing the userName and event ID in params
+* @param response - Express response object
+* @returns JSON response containing the created preferred venue or an error
+*/
   async addPreferredVenue(request: Request, response: Response) {
     // Gets the user by their username
     const user = await this.userRepository.findOneBy({
@@ -423,6 +464,12 @@ export class UserController {
     response.status(201).json(preferredVenue);
   }
 
+  /**
+* Removes an preferred venue from the database
+* @param request - Express request object containing the userName and event ID in params
+* @param response - Express response object
+* @returns JSON response indicating success or failure
+*/
   async removePreferredVenue(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
