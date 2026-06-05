@@ -81,8 +81,9 @@ export default function PreferredEvent() {
                     include will match the users search and return the event if it matches.
                     filter will get the found events and put in an array */
                     <div className="gap-4">
-                        {eventsForHirer.map((preferredEvent) => ( // Map prints the found events
+                        {eventsForHirer.map((preferredEvent, index) => ( // Map prints the found events
                             <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={preferredEvent.event.eventId}>
+                                <div className="text-lg font-bold float-right">Rank {index + 1}</div>
                                 <PreferredEventCard
                                     eventId={preferredEvent.event.eventId}
                                     eventName={preferredEvent.event.eventName}
