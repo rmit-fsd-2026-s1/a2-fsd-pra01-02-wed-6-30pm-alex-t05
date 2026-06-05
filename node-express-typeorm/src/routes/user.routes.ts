@@ -69,33 +69,27 @@ router.delete("/vendor/:userName/events/:eventId", async (req, res) => {
 
 // ---User Comments---
 //finds comments for a hirer by a vendor by their usernames
-router.get("/users/:vendorUserName/comments/:hirerUserName", async (req, res) => {
+router.get("/vendor/:vendorUserName/comments/:hirerUserName", async (req, res) => {
   await userController.findComments(req, res);
 });
 
 //sets a comment for a hirer by a vendor by their usernames
-router.post("/users/:vendorUserName/comments/:hirerUserName", validateDto(CreateVendorCommentDTO), async (req, res) => {
+router.post("/vendor/:vendorUserName/comments/:hirerUserName", validateDto(CreateVendorCommentDTO), async (req, res) => {
   await userController.setUserCommentFromVendor(req, res);
 });
 
 //deletes comments
-router.delete("/users/:vendorUserName/comments/:hirerUserName", async (req, res) => {
+router.delete("/vendor/:vendorUserName/comments/:hirerUserName", async (req, res) => {
   await userController.deleteUserCommentFromVendor(req, res);
 });
 
 // ---Preferred Events---
-// Gets all preferred events for a user
-router.get("/users/:userName/preferredEvents", async (req, res) => {
-  await userController.getAllPreferredEvents(req, res);
+router.get("/hirer/:userName/preferred-events", async (req, res) => {
+  await userController.getAllPreferredVenuesForUser(req, res);
 });
 
-// Removes a preferred event for a user
-router.delete("/users/:userName/preferredEvents/:eventId", async (req, res) => {
-  await userController.removePreferredEvent(req, res);
-});
-
-router.post("/users/:userName/preferredevents/:eventId", async (req, res) => {
-  await userController.addPreferredEvents(req, res);
+router.post("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
+  await userController.addPreferredVenue(req, res);
 });
 
 export default router;

@@ -9,6 +9,7 @@ import {
   JoinTable
 } from "typeorm";
 import { Event } from "./Event";
+import { PreferredVenues } from "./PreferredVenues";
 
 @Entity()
 export class User {
@@ -37,8 +38,6 @@ export class User {
   @OneToMany(() => Event, (event: Event) => event.user)
   events: Event[];
 
-  @ManyToMany(() => Event, event => event.preferredUsers, { eager: true })
-  @JoinTable()
-  preferredEvents: Event[];
-
+  @OneToMany(() => PreferredVenues, (preferredVenue: PreferredVenues) => preferredVenue.user)
+  preferredVenues: PreferredVenues[];
 }

@@ -4,9 +4,10 @@ import {
     Column,
     ManyToOne,
     ManyToMany,
+    OneToMany
 } from "typeorm";
 import { User } from "./User";
-
+import { PreferredVenues } from "./PreferredVenues";
 @Entity()
 export class Event {
     @PrimaryGeneratedColumn()
@@ -36,7 +37,6 @@ export class Event {
     })
     user: User;
 
-    @ManyToMany(() => User, user => user.preferredEvents)
-    preferredUsers: User[];
-
+    @OneToMany(() => PreferredVenues, (preferredVenue: PreferredVenues) => preferredVenue.event)
+    preferredVenues: PreferredVenues[];
 }

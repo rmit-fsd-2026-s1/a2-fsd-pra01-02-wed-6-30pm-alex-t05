@@ -2,12 +2,15 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import { Event } from "../entity/Event";
+import { PreferredVenues } from "../entity/PreferredVenues";
+import { VendorComment } from "../entity/VendorComment";
 import * as argon2 from "argon2";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
-  private vendorCommentRepository = AppDataSource.getRepository("VendorComment");
+  private vendorCommentRepository = AppDataSource.getRepository(VendorComment);
   private eventRepository = AppDataSource.getRepository(Event);
+  private preferredVenueRepository = AppDataSource.getRepository(PreferredVenues);
 
   /**
    * Retrieves all users from the database
@@ -17,7 +20,7 @@ export class UserController {
    */
   async all(request: Request, response: Response) {
     const users = await this.userRepository.find({
-      relations: ["events", "preferredEvents"],
+      relations: ["events"],
     });
     return response.json(users);
   }
@@ -32,7 +35,7 @@ export class UserController {
     const userName = request.params.userName;
     const user = await this.userRepository.findOne({
       where: { userName },
-      relations: ["events", "preferredEvents"],
+      relations: ["events"],
     });
 
     if (!user) {
@@ -338,35 +341,10 @@ export class UserController {
     return response.json({ message: "Comment deleted successfully" });
   }
 
-  async getAllPreferredEvents(req: Request, res: Response) {
+  // ---Preferred Venues---
+  async getAllPreferredVenuesForUser(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
-      userName: req.params.userName,
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    const preferredEvents = await this.eventRepository.find({
-      where: { preferredUsers: { userName: user.userName } },
-    });
-
-    res.json(preferredEvents);
-  }
-
-  async addPreferredEvents(request: Request, response: Response) {
-    const event = await this.eventRepository.findOne({
-      where: { eventId: parseInt(request.params.eventId) },
-      relations: ["preferredUsers"],
-    });
-
-    if (!event) {
-      return response.status(404).json({ message: "Event not found" });
-    }
-
-    // Find the profile
-    const user = await this.userRepository.findOne({
-      where: { userName: request.params.userName },
+      userName: request.params.userName,
     });
 
     if (!user) {
@@ -374,58 +352,62 @@ export class UserController {
     }
 
     if (user.role !== "hirer") {
-      return response.status(403).json({ message: "Only hirers can prefer events" });
+      return response.status(403).json({ message: "User is not a hirer" });
     }
 
-    if (!event.preferredUsers) {
-      event.preferredUsers = [];
-    }
+    const preferredVenues = await this.preferredVenueRepository.find({
+      where: { user: { userName: user.userName } },
+      relations: ["event"],
+    });
 
-    event.preferredUsers.push(user);
-
-    try {
-      await this.eventRepository.save(event);
-      response.json({ message: "Event added to preferred events" });
-    } catch (error) {
-      return response
-        .status(500)
-        .json({ message: "Error adding event to preferred events", error });
-    }
+    response.json(preferredVenues);
   }
 
-  // Loads to long (broken)
-  async removePreferredEvent(req: Request, res: Response) {
+
+  async addPreferredVenue(request: Request, response: Response) {
+    // Gets the user by their username
     const user = await this.userRepository.findOneBy({
-      userName: req.params.userName,
+      userName: request.params.id,
     });
 
+    // Checks if user exists
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return response.status(404).json({ message: "User not found" });
     }
 
+    // Checks if user is a hirer
     if (user.role !== "hirer") {
-      return res.status(403).json({ message: "Only hirers can remove preferred events" });
+      return response.status(403).json({ message: "User is not a hirer" });
     }
 
-    const preferredevent = await this.eventRepository.findOne({
-      where: { eventId: parseInt(req.params.eventId) },
-      relations: ["preferredUsers"],
+    // Gets the event by its id
+    const event = await this.eventRepository.findOneBy({
+      eventId: parseInt(request.params.eventId),
     });
 
-    if (!preferredevent) {
-      return res.status(404).json({ message: "Event not found" });
+    // Checks if event exists
+    if (!event) {
+      return response.status(404).json({ message: "Event not found" });
     }
 
-    if (preferredevent.preferredUsers) {
-      preferredevent.preferredUsers = preferredevent.preferredUsers.filter((preferredUser) =>
-        preferredUser.userName !== user.userName
-      );
-    }
+    // Counts the number of preferred venues has so when a new preferred venue gets added, it will be ranked the lowest
+    const count = await this.preferredVenueRepository.count({
+      where: { user: { userName: user.userName } }
+    });
+
+    // Creates a new preferred venue
+    const preferredVenue = this.preferredVenueRepository.create({
+      user: user,
+      event: event,
+      ranking: count + 1,
+    });
 
     try {
-      await this.eventRepository.save(preferredevent);
+      await this.preferredVenueRepository.save(preferredVenue);
     } catch (error) {
-      return res.status(500).json({ message: "Error removing preferred event", error });
+      return response.status(500).json({ message: "Error saving preferred venue", error });
     }
+
+    response.status(201).json(preferredVenue);
   }
 };
