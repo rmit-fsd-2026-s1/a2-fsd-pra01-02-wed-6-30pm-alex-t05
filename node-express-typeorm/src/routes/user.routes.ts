@@ -95,4 +95,9 @@ router.post("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
   await userController.addPreferredVenue(req, res);
 });
 
+// Removes a preferred event for a hirer by their username and event id
+router.delete("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
+  await userController.removePreferredVenue(req, res);
+});
+
 export default router;

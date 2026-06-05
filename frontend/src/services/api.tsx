@@ -146,6 +146,10 @@ export const userService = {
     createPreferredEventForUser: async (userName: string, eventId: number): Promise<void> => {
         await axios.post(`${API_BASE_URL}/hirer/${userName}/preferred-events/${eventId}`);
     },
+
+    deletePreferredEventForUser: async (userName: string, eventId: number): Promise<void> => {
+        await axios.delete(`${API_BASE_URL}/hirer/${userName}/preferred-events/${eventId}`);
+    },
 };
 
 export const applicationService = {

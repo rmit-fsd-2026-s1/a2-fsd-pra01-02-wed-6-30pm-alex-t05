@@ -1,15 +1,16 @@
 import { useAuth } from "@/context/AuthContext";
-import { useEffect, useState } from "react";
+import { MdDelete } from "react-icons/md";
+import { Button } from "@chakra-ui/react";
 import PreferredEventCard from "@/components/preferredEventCard";
-import { preferredEvent } from "@/types/preferredEvents";
 import { userService } from '@/services/api';
 import { useEvent } from "@/context/EventContext";
 
 
 export default function PreferredEvent() {
     const { user } = useAuth();
-    const [preferredEvents, setPreferredEvents] = useState<preferredEvent[]>([]);
     const { eventsForHirer } = useEvent();
+    const { fetchPreferredForHirer } = useEvent();
+
 
 
     /*
@@ -52,6 +53,15 @@ export default function PreferredEvent() {
     };
     */
 
+    const deletePreferredEvent = async (eventId: number) => {
+        try {
+            await userService.deletePreferredEventForUser(user!.userName, eventId);
+            fetchPreferredForHirer(); // Refresh the preferred events list after deletion
+        } catch (error) {
+            console.error("Failed to delete preferred event:", error);
+        }
+    };
+
     if (!user) {
         return <div>Loading...</div>;
     }
@@ -82,34 +92,15 @@ export default function PreferredEvent() {
                                     shortDescription={preferredEvent.event.shortDescription}
                                     isBlocked={preferredEvent.event.isBlocked}
                                 />
-                                {/*}
                                 <div className="flex justify-end gap-2 mt-2">
                                     <Button
                                         colorScheme='teal'
                                         type='button'
                                         className="w-15 items-center"
-                                        onClick={() => removePreferredEvents(event.eventId)}
-                                    >
+                                        onClick={() => deletePreferredEvent(preferredEvent.event.eventId)}>
                                         <MdDelete />
                                     </Button>
-                                    <Button
-                                        colorScheme='teal'
-                                        type='button'
-                                        className="w-15 items-center"
-                                        onClick={() => moveUp(profileUser.preferredEvents!.indexOf(event))}
-                                    >
-                                        <MdArrowUpward />
-                                    </Button>
-                                    <Button
-                                        colorScheme='teal'
-                                        type='button'
-                                        className="w-15 items-center"
-                                        onClick={() => moveDown(profileUser.preferredEvents!.indexOf(event))}
-                                    >
-                                        <MdArrowDownward />
-                                    </Button>
                                 </div>
-                                */}
                             </div>
                         ))}
                     </div>

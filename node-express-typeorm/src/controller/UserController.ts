@@ -391,16 +391,27 @@ export class UserController {
       return response.status(404).json({ message: "Event not found" });
     }
 
-    // Counts the number of preferred venues has so when a new preferred venue gets added, it will be ranked the lowest
-    const count = await this.preferredVenueRepository.count({
-      where: { user: { userName: user.userName } }
+    // Checks if the preferred venue exists with the user
+    const existingPreferredVenue = await this.preferredVenueRepository.findOneBy({
+      user: { userName: user.userName },
+      event: { eventId: event.eventId }
     });
+
+    //return nothing if preferred venue was found in the list
+    if (existingPreferredVenue) {
+      return;
+    }
+
+    // This get the maximum ranking number 
+    const maximum = await this.preferredVenueRepository.maximum(
+      "ranking", { user: { userName: user.userName } },
+    );
 
     // Creates a new preferred venue
     const preferredVenue = this.preferredVenueRepository.create({
       user: user,
       event: event,
-      ranking: count + 1,
+      ranking: maximum ? + 1 : 1, // If the user has no preferred venues, the newly added venue will be ranked 1. If the user has venues, it will +1 from the higest ranking number
     });
 
     try {
@@ -410,5 +421,30 @@ export class UserController {
     }
 
     response.status(201).json(preferredVenue);
+  }
+
+  async removePreferredVenue(request: Request, response: Response) {
+    const user = await this.userRepository.findOneBy({
+      userName: request.params.userName,
+    });
+
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+
+    if (user.role !== "hirer") {
+      return response.status(403).json({ message: "User is not a hirer" });
+    }
+
+    const result = await this.preferredVenueRepository.delete({
+      user: { userName: user.userName },
+      event: { eventId: parseInt(request.params.eventId) }
+    });
+
+    if (!result.affected) {
+      return response.status(404).json({ message: "Preferred venue not found for this user and event" });
+    }
+
+    response.status(204).send();
   }
 };
