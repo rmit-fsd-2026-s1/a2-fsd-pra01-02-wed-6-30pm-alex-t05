@@ -165,7 +165,7 @@ export const applicationService = {
             return [];
         }
     },
-    getUnavailableDatesForEvent: async (eventId: number): Promise<{ startDate: string; endDate: string }[]> => {
+    getUnavailableDatesForEvent: async (eventId: number): Promise<{ startDate: string; endDate: string; applicantUserName : string; applicationId: number }[]> => {
         const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/unavailable-dates`);
         return data;
     },

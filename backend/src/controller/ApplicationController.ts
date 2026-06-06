@@ -144,7 +144,7 @@ async findUserRating(request: Request, response: Response) {
 async findUnavailableDatesForEvent(request: Request, response: Response) {
   const eventId = parseInt(request.params.eventId);
   const query = 
-    `SELECT "startDate", "endDate"
+    `SELECT "startDate", "endDate", "applicantUserName", "applicationId"
     FROM application
     WHERE "eventId" = @0 
     AND status = 'approved'`;

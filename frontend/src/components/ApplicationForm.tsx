@@ -26,6 +26,7 @@ export default function ApplicationForm({
         endDate: "",
         status: "",
         guests: "",
+        rating: "",
     });
     useEffect(() => {
         //ensure formdata is populated correctly as props are loaded
@@ -47,12 +48,17 @@ export default function ApplicationForm({
         }
     }, [event.eventId, applicantUserName]);
     //populate unavailable dates for the event on component load
-    const [unvailableDates, setUnavailableDates] = useState<{ startDate: string; endDate: string }[]>([]);
+    const [unvailableDates, setUnavailableDates] = useState<{ startDate: string; endDate: string, applicantUserName : string; applicationId: number }[]>([]);
     useEffect(() => {
         const fetchUnavailableDates = async () => {
             try {
                 const dates = await applicationService.getUnavailableDatesForEvent(event.eventId);
                 setUnavailableDates(dates);
+                console.log("Fetched unavailable dates:", dates);
+                console.log("you are:", user?.userName);
+                dates.forEach(date => {
+                    console.log(`Date range: ${date.startDate} to ${date.endDate}, booked by ${date.applicantUserName}`);
+                });
             } catch (error) {
                 console.error("Error fetching unavailable dates:", error);
             }
@@ -85,18 +91,20 @@ export default function ApplicationForm({
         if (!formData.guests) {
             newErrors.guests = "Number of guests is required.";
         } else {
-            const guestsNumber = parseInt(formData.guests);
-            if (isNaN(guestsNumber)) {
-                newErrors.guests = "Number of guests must be a valid number.";
-            }
-            if (guestsNumber % 1 !== 0) {
-                newErrors.guests = "Number of guests must be a whole number.";
-            }
-            if (guestsNumber <= 0) {
-                newErrors.guests = "Number of guests must be greater than zero.";
-            }
-            if (guestsNumber > event.numberOfGuest) {
-                newErrors.guests = `Number of guests cannot exceed event capacity of ${event.numberOfGuest}.`;
+            if (user?.role === "hirer") {
+                const guestsNumber = parseInt(formData.guests);
+                if (isNaN(guestsNumber)) {
+                    newErrors.guests = "Number of guests must be a valid number.";
+                }
+                if (guestsNumber % 1 !== 0) {
+                    newErrors.guests = "Number of guests must be a whole number.";
+                }
+                if (guestsNumber <= 0) {
+                    newErrors.guests = "Number of guests must be greater than zero.";
+                }
+                if (guestsNumber > event.numberOfGuest) {
+                    newErrors.guests = `Number of guests cannot exceed event capacity of ${event.numberOfGuest}.`;
+                }
             }
         }
         setErrors(newErrors);
@@ -123,17 +131,44 @@ export default function ApplicationForm({
         if (!validateForm()) {
             return;
         }
+        if (user!.role === "vendor") {
+            // For vendors, we want to create a blocking application with the status "approved"
+            formData.status = "approved";
+            formData.guests = "0";
+            formData.rating = "0";
+        } else if (user!.role === "hirer") {
+            // For hirers, we want to create a pending application
+            formData.status = "pending";
+        }
         const newApplication = createApplication(
             formData.eventId, 
             formData.applicantUserName,
             formData.startDate,
             formData.endDate,
             formData.status as "pending" | "approved",
-            parseInt(formData.guests)
+            parseInt(formData.guests),
+            formData.rating ? parseInt(formData.rating) : undefined
         );
         onSubmit(newApplication);
         onClose();
     };
+
+    const cancelBlock = async (dateRange: { startDate: string; endDate: string; applicantUserName: string, applicationId: number }) => {
+        const applicationToCancel = createApplication(
+            event.eventId,
+            dateRange.applicantUserName,
+            dateRange.startDate,
+            dateRange.endDate,
+            "rejected", // Set status to rejected to cancel the block
+            0, // guests is not relevant for blocks
+            0 // rating is not relevant for blocks
+        );
+        applicationToCancel.applicationId = dateRange.applicationId; // Set the applicationId to identify which application to update
+        console.log("Cancelling block for application:", applicationToCancel);
+        await applicationService.updateApplication(applicationToCancel)
+        onClose();
+    }
+        
 
     return (
         <Box p={4}>
@@ -142,8 +177,6 @@ export default function ApplicationForm({
                 {unvailableDates.length === 0 ? (
                     <p>None</p>
                 ) : (
-
-                    //TODO not yet implemented
                     //displays unavailable dates and sorts by end date
                     unvailableDates
                     .filter(dateRange => dateRange.endDate > normaliseDate(new Date().toISOString())) // Filter out past dates
@@ -151,6 +184,7 @@ export default function ApplicationForm({
                     .map((dateRange, index) => (
                         <p key={index}>
                             {dateRange.startDate} to {dateRange.endDate}
+                            {dateRange.applicantUserName == user?.userName && <Button onClick={() => cancelBlock(dateRange)} variant="link" color="blue"> Cancel Block </Button>}
                         </p>
                     ))
                 )}
@@ -178,6 +212,15 @@ export default function ApplicationForm({
             value={formData.guests}
             onChange={handleInputChange}
             error={errors?.guests}
+        />
+        {/* hidden field to allow vendors to set their own rating to 0 */}
+        <InputField
+            label = "Rating"
+            type = "hidden"
+            name = "rating"
+            value={""}
+            onChange={handleInputChange}
+            
         />
         <Button mt={4} colorScheme="teal" onClick={handleSubmit}>
             {user!.role === "hirer" ? "Submit Application" : "Block Dates"}
