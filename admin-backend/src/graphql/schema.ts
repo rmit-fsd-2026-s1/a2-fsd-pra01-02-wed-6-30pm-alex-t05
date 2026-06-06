@@ -9,11 +9,22 @@ export const typeDefs = gql`
     type Event {
         eventId: ID!
         eventName: String!
-        description: String
-        eventType: String!
-        address: String!
-        isBlocked: Boolean!
+        numberOfGuest: Int!
+        address: String
+        shortDescription: String
         image: String
+        isBlocked: Boolean!
+        user: User
+        }
+    
+    type User {
+        userName: String!
+        firstName: String!
+        lastName: String!
+        email: String!
+        password: String!
+        role: String!
+        events: [Event!]!
     }
 
   type Query {
@@ -21,6 +32,8 @@ export const typeDefs = gql`
     admin(userName: String!): Admin
     events: [Event!]!
     event(id: ID!): Event
+    users: [User!]!
+    user(userName: String!): User
   }
 
   type Mutation {

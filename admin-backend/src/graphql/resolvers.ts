@@ -1,7 +1,12 @@
 import { AppDataSource } from "../data-source";
 import { Admin } from "../entity/Admin";
+import { Event } from "../entity/Event";
+import { User } from "../entity/User";
+import { PreferredEvents } from "../entity/PreferredEvents";
 
 const adminRepository = AppDataSource.getRepository(Admin);
+const eventRepository = AppDataSource.getRepository(Event);
+const userRepository = AppDataSource.getRepository(User);
 
 export const resolvers = {
     Query: {
@@ -10,6 +15,18 @@ export const resolvers = {
         },
         admin: async (_: any, { userName }: { userName: string }) => {
             return await adminRepository.findOne({ where: { userName } });
+        },
+        events: async () => {
+            return await eventRepository.find();
+        },
+        event: async (_: any, { id }: { id: number }) => {
+            return await eventRepository.findOne({ where: { eventId: id } });
+        },
+        users: async () => {
+            return await userRepository.find();
+        },
+        user: async (_: any, { userName }: { userName: string }) => {
+            return await userRepository.findOne({ where: { userName } });
         },
     },
     Mutation: {

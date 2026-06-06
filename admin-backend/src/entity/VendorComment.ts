@@ -13,11 +13,12 @@ import { User } from "./User";
 export class VendorComment {
     @PrimaryColumn()
     vendorUserName: string;
+
     @PrimaryColumn()
     hirerUserName: string;
+
     @Column()
     comment: string;
-
 
     @ManyToOne(() => User)
     @JoinColumn({ name: "vendorUserName", referencedColumnName: "userName" })
