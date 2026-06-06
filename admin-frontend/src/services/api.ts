@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { client } from "./graphql";
-import { Event, User, Admin } from "../types/types";
+import { Event, User, Admin, FeatureEvent } from "../types/types";
 
 // GraphQL Queries
 const GET_ADMINS = gql`
@@ -51,6 +51,22 @@ const GET_USER = gql`
         }
     }
   }
+`;
+
+const GET_FEATURED_EVENTS = gql`
+  query GetFeaturedEvents {
+    featuredEvents {
+      FeaturedId
+      event {
+        eventId
+        eventName
+        numberOfGuest
+        address
+        shortDescription
+        image
+    }
+  }
+}
 `;
 
 const GET_VENDOR_USERNAMES = gql`
@@ -154,21 +170,26 @@ const DELETE_EVENT = gql`
   }
 `
 
-const ADD_PET_TO_PROFILE = gql`
-  mutation AddPetToProfile($profileId: ID!, $petId: ID!) {
-    addPetToProfile(profileId: $profileId, petId: $petId) {
-      profile_id
-      pets {
-        pet_id
-        name
+const ADD_FEATURED_EVENT = gql`
+  mutation AddFeaturedEvent($eventId: ID!) {
+    addFeaturedEvent(eventId: $eventId) {
+      FeaturedId
+      event {
+        eventId
       }
     }
+  }    
+`;
+
+const DELETE_FEATURED_EVENT = gql`
+  mutation DeleteFeaturedEvent($featuredId: ID!) {
+    deleteFeaturedEvent(featuredId: $featuredId)
   }
 `;
 
-const REMOVE_PET_FROM_PROFILE = gql`
-  mutation RemovePetFromProfile($profileId: ID!, $petId: ID!) {
-    removePetFromProfile(profileId: $profileId, petId: $petId) {
+const ADD_PET_TO_PROFILE = gql`
+  mutation AddPetToProfile($profileId: ID!, $petId: ID!) {
+    addPetToProfile(profileId: $profileId, petId: $petId) {
       profile_id
       pets {
         pet_id
@@ -221,6 +242,11 @@ export const AdminService = {
     return data.user;
   },
 
+  getAllFeaturedEvents: async (): Promise<FeatureEvent[]> => {
+    const { data } = await client.query({ query: GET_FEATURED_EVENTS });
+    return data.featuredEvents;
+  },
+
   // Admin CRUD
   createEvent: async (event: {
     eventName: string,
@@ -261,5 +287,19 @@ export const AdminService = {
       variables: { eventId, ...event },
     });
     return data.updateEvent;
+  },
+  addFeaturedEvent: async (eventId: string): Promise<FeatureEvent> => {
+    const { data } = await client.mutate({
+      mutation: ADD_FEATURED_EVENT,
+      variables: { eventId },
+    });
+    return data.addFeaturedEvent;
+  },
+  deleteFeaturedEvent: async (featuredId: string): Promise<boolean> => {
+    const { data } = await client.mutate({
+      mutation: DELETE_FEATURED_EVENT,
+      variables: { featuredId },
+    });
+    return data.deleteFeaturedEvent;
   },
 };

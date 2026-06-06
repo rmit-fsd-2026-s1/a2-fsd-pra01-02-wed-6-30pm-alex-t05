@@ -4,14 +4,12 @@ export interface Admin {
 }
 
 export interface Event {
-    eventId: number;
+    eventId: string;
     eventName: string;
     numberOfGuest: number;
     address: string;
     shortDescription?: string;
     image: string;
-    isBlocked: boolean;
-    userName: string;
 }
 
 export interface User {
@@ -22,4 +20,9 @@ export interface User {
     password: string;
     role: string;
     events?: Event[];
+}
+
+export interface FeatureEvent {
+    FeaturedId: string;
+    event: Event;
 }
