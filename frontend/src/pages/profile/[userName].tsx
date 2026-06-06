@@ -27,8 +27,7 @@ export default function Profile() {
     //toggle for application history display
     const [history, setHistory] = useState(false);
     //gets application history from custom hook
-    const applicationHistory = useApplicationHistory(profileUser?.userName || '');
-
+    const applicationHistory = useApplicationHistory(profileUserName);
     //gets rating from custom hook
     const rating = useUserRating(profileUser?.userName || '');
     const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
@@ -205,19 +204,19 @@ export default function Profile() {
                 </Box>
                 {history && (
                     <Box mt={6}>
-                        <p> Application History:</p>
-                        <Box as="li" mt={2}>
-                            {applicationHistory.map(application => {
-                                return (
-                                    <ApplicationHistory
-                                        key={application.applicationId}
-                                        application={application}
-                                    />
-                                );
-                            })}
-                        </Box>                    
+                        {applicationHistory.length > 0 ? (
+                            <Box>
+                                {applicationHistory.map((app) => (
+                                    <Box key={app.applicationId} p={2} borderWidth="1px" borderRadius="md" mb={2}>
+                                        <ApplicationHistory application={app}/>
+                                    </Box>
+                                ))}
+                            </Box>
+                        ) : (
+                            <p>No application history available.</p>
+                        )}
                     </Box>
-                    )}
+                )}
             </FormControl>
         </Box>
 

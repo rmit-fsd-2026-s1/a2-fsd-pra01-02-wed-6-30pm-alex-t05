@@ -103,10 +103,15 @@ export class ApplicationController {
     }
   }
   async findByUser(request: Request, response: Response) {
-    const applicantUserName = request.params.applicantUserName;
+    const applicantUserName = request.params.userName;
+    if (!applicantUserName) {
+      return response.status(400).json({ message: "Applicant userName is required" });
+    }
+    console.log("Finding applications for user:", applicantUserName);
     const applications = await this.applicationRepository.find({
       where: { user: { userName: applicantUserName } },
     });
+    console.log("Applications found:", applications);
 
     return response.json(applications);
 }
@@ -131,6 +136,7 @@ async findUserRating(request: Request, response: Response) {
       WHERE "applicantUserName" = @0 
       AND rating IS NOT NULL`;
     const result = await this.applicationRepository.query(query, [applicantUserName]);
+    console.log("Rating query result:", result);
     return response.json(result[0].averageRating);
     // Return 0 if there are no ratings
 }

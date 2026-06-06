@@ -8,7 +8,13 @@ export default function useApplicationHistory(userName: string) {
     const [applicationHistory, setApplicationHistory] = useState<Application[]>([]);
 
     useEffect(() => {
+        if (!userName) {
+
+            setApplicationHistory([]);
+            return;
+        }
         const fetchApplicationHistory = async () => {
+            console.log("Fetching application history for user:", userName);
             try {
                 const applications = await applicationService.getApplicationsForUser(userName);
                                 
@@ -19,7 +25,7 @@ export default function useApplicationHistory(userName: string) {
             }
         };
         fetchApplicationHistory();
-    }, [userName, events]);
+    }, [userName]);
 
     return applicationHistory;
 }
