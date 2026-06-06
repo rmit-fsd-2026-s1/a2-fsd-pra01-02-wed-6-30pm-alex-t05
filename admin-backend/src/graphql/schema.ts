@@ -15,9 +15,8 @@ export const typeDefs = gql`
         image: String
         isBlocked: Boolean!
         isArchived: Boolean!
-        user: User
+        userName: String
         }
-    
     type User {
         userName: String!
         firstName: String!
@@ -25,7 +24,7 @@ export const typeDefs = gql`
         email: String!
         password: String!
         role: String!
-        events: [Event!]!
+        events: [Event!]
     }
 
   type Query {
@@ -33,8 +32,9 @@ export const typeDefs = gql`
     admin(userName: String!): Admin
     events: [Event!]!
     event(id: ID!): Event
-    users: [User!]!
+    users(role: String): [User!]!
     user(userName: String!): User
+    vendorUserNames: [String!]!
   }
 
   type Mutation {
@@ -50,24 +50,26 @@ export const typeDefs = gql`
 
     deleteAdmin(userName: String!): Boolean!
 
+
     createEvent(
         eventName: String!
         numberOfGuest: Int!
         address: String
         shortDescription: String
         image: String
-        UserName: String!
+        userName: String!
     ): Event!
 
     updateEvent(
         eventId: ID!
-        eventName: String!
-        numberOfGuest: Int!
+        eventName: String
+        numberOfGuest: Int
         address: String
         shortDescription: String
         image: String
         isBlocked: Boolean
         isArchived: Boolean
+        userName: String
     ): Event!
 
     addEventToVendor(userName: String!, eventId: ID!): Event!

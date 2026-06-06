@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
   // and update them when entity definitions change. This is useful during development
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true,
-  logging: true, // Enable logging for debugging purposes
+  logging: ["log", "error"], // Enable logging for debugging purposes
   entities: ["src/entity/**/*.ts"], // Register the Tutorial entity with TypeORM, allowing it to manage the corresponding database table and perform CRUD operations based on the defined schema.
   migrations: [],
   subscribers: [],

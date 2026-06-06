@@ -74,6 +74,7 @@ export class EventController {
     const eventToRemove = await this.eventRepository.findOne({
       where: { eventId },
     });
+    console.log("Attempting to remove event:", eventToRemove);
 
     if (!eventToRemove) {
       return response.status(404).json({ message: "Event not found" });
@@ -83,7 +84,9 @@ export class EventController {
       // If there are applications associated with the event, set isArchived to true instead of deleting
       eventToRemove.isArchived = true;
       try {
+        console.log("Archiving event with ID:", request.params.id);
         await this.eventRepository.save(eventToRemove);
+        console.log("Event archived successfully:", eventToRemove);
         return response.json({ message: "Event archived successfully" });
       } catch (error) {
         return response.status(500).json({ message: "Error archiving event", error });
