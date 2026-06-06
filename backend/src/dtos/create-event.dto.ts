@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsBoolean } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsBoolean, isBoolean } from "class-validator";
 
 export class CreateEventDTO {
     @IsString()
@@ -22,4 +22,8 @@ export class CreateEventDTO {
 
     @IsString()
     image?: string;
+
+    @IsBoolean()
+    isArchived?: boolean = false;
+
 }

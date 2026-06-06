@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, IsBoolean } from "class-validator";
+import { IsNotEmpty, IsNumber, IsString, IsBoolean, IsOptional } from "class-validator";
 
 export class UpdateEventDTO {
     @IsString()
@@ -12,6 +12,10 @@ export class UpdateEventDTO {
     @IsString()
     @IsNotEmpty()
     address: string;
+
+    @IsString()
+    @IsOptional()
+    isArchived?: boolean = false;
 
     @IsString()
     shortDescription?: string;
