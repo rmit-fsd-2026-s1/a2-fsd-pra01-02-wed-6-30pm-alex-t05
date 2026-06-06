@@ -6,15 +6,16 @@ export function createApplication(
     applicantUserName: string, 
     startDate: string, 
     endDate: string,
-    status: "pending" | "approved",
-    guests: number
+    status: "pending" | "approved" | "rejected",
+    guests: number,
+    rating?: number
     ) : Application {
     return {
         applicationId: null!, // Will be set by the backend
         eventId,
         applicantUserName,
         status,
-        rating: null,
+        rating: rating ?? null,
         startDate: normaliseDate(startDate),
         endDate: normaliseDate(endDate),
         guests,
