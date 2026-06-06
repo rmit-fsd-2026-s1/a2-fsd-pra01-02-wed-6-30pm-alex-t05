@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Button, Input, Icon } from "@chakra-ui/react";
 import { MdSearch } from "react-icons/md";
-//import Card from "../../components/Card";
+import Card from "@/components/Card";
 import { useRouter } from "next/router";
 import { AdminService } from "@/services/api";
+import { Event } from '@/types/types';
 
-export default function Hirer() {
+export default function AdminDashboard() {
     const router = useRouter();
     const { userName } = router.query;
-    const { user } = useAuth()
     const [userSearch, setUserSearch] = useState('')
     const [events, setEvents] = useState<Event[]>([]);
+    const [vendorUserNames, setVendorUserNames] = useState<string[]>([]);
 
     const fetchEvent = async () => {
         try {
@@ -20,12 +21,24 @@ export default function Hirer() {
             console.error("Error fetching events:", error);
         }
     }
+    useEffect(() => {
+            const fetchVendorUserNames = async () => {
+                try {
+                    const names = await AdminService.getVendorUserNames();
+                    setVendorUserNames(names);
+                    console.log("Fetched vendor usernames:", names);
+                } catch (error) {
+                    console.error("Error fetching vendor usernames:", error);
+                }
+            };
+            fetchVendorUserNames();
+        }, []);
 
     useEffect(() => {
         fetchEvent();
     }, []);
 
-    return (user && user.role === "hirer" && user.userName === userName) ? (
+    return (
         <div className="min-h-screen items-center justify-center bg-gray-100">
             <h1 className="!text-2xl flex items-center justify-center">Venue List</h1>
             <form className="flex items-center">
@@ -57,25 +70,13 @@ export default function Hirer() {
                         )).map((event) => (
                             <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
                                 <Card
-                                    eventId={event.eventId}
-                                    eventName={event.eventName}
-                                    numberOfGuest={event.numberOfGuest}
-                                    address={event.address || "No address provided"}
-                                    image={event.image}
-                                    shortDescription={event.shortDescription}
-                                    isBlocked={event.isBlocked}
+                                    event={event}
+                                    vendorUserNames={vendorUserNames}
                                 />
                             </div>
                         ))}
                 </div>
             )}
-        </div>
-    ) : (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
-                <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
-                <p className="text-gray-700">You must be signed in as a hirer to view this page.</p>
-            </div>
         </div>
     );
 }

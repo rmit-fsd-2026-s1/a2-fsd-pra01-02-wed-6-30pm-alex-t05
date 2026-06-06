@@ -153,7 +153,7 @@ export class UserController {
    */
   async getAllEventsForVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
-      userName: request.params.userName,
+      userName: request.params.userName, 
     });
 
     if (!user) {
@@ -165,7 +165,7 @@ export class UserController {
     }
 
     const VendorEvents = await this.eventRepository.find({
-      where: { user: { userName: user.userName } },
+      where: { user: { userName: user.userName }, isArchived: false },
     });
 
     response.json(VendorEvents);

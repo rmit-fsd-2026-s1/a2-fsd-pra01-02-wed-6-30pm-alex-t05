@@ -53,6 +53,14 @@ const GET_USER = gql`
   }
 `;
 
+const GET_VENDOR_USERNAMES = gql`
+  query GetVendorUserNames {
+    users(role: "vendor") {
+        userName
+    }
+  }
+`;  
+
 const GET_EVENTS = gql`
   query GetEvents {
     events {
@@ -63,9 +71,7 @@ const GET_EVENTS = gql`
       shortDescription
       image
       isBlocked
-        user {
-            userName
-        }   
+      userName   
     }
   }
 `;
@@ -80,9 +86,7 @@ const GET_EVENT = gql`
       shortDescription
       image
       isBlocked
-      user {
-        userName
-      }
+      userName
     }
   }
 `;
@@ -120,38 +124,37 @@ const CREATE_EVENT = gql`
     }
   }
 `;
-
 const UPDATE_EVENT = gql`
   mutation UpdateEvent(
-    $id: ID!
-    $eventName: String!
-    $numberOfGuest: Int!
-    $address: String!
-    $shortDescription: String
-    $image: String
-    $isBlocked: Boolean
-    $UserName: String!
-  ) {
+  $eventId: ID!, 
+  $eventName: String, 
+  $numberOfGuest: Int, 
+  $address: String, 
+  $shortDescription: String, 
+  $image: String, 
+  $isBlocked: Boolean,
+  $isArchived: Boolean, 
+  $userName: String) {
     updateEvent(
-        id: $eventId
-        eventName: $eventName
-        numberOfGuest: $numberOfGuest
-        address: $address
-        shortDescription: $shortDescription
-        image: $image
-        isBlocked: $isBlocked
-        UserName: $UserName
+      eventId: $eventId,
+      eventName: $eventName,
+      numberOfGuest: $numberOfGuest,
+      address: $address,
+      shortDescription: $shortDescription,
+      image: $image,
+      isBlocked: $isBlocked,
+      isArchived: $isArchived,
+      userName: $userName
     ) {
-        eventId
-        eventName
-        numberOfGuest
-        address
-        shortDescription
-        image
-        isBlocked
-        user {
-            userName
-        }
+      eventId
+      eventName
+      numberOfGuest
+      address
+      shortDescription
+      image
+      isBlocked
+      isArchived
+      userName
     }
   }
 `;
@@ -198,6 +201,11 @@ export const AdminService = {
     });
     return data.admin;
   },
+
+  getVendorUserNames: async (): Promise<string[]> => {
+    const { data } = await client.query({ query: GET_VENDOR_USERNAMES });
+    return data.users.map((user: { userName: string }) => user.userName);
+  },
   getAllEvents: async (): Promise<Event[]> => {
     const { data } = await client.query({ query: GET_EVENTS });
     return data.events;
@@ -232,7 +240,7 @@ export const AdminService = {
     shortDescription?: string,
     image?: string,
     isBlocked?: boolean,
-    UserName: string,
+    userName: string,
   }): Promise<Event> => {
     const { data } = await client.mutate({
       mutation: CREATE_EVENT,
@@ -241,30 +249,30 @@ export const AdminService = {
     return data.createEvent;
   },
 
-  deleteEvent: async (eventId: string): Promise<boolean> => {
+  deleteEvent: async (eventId: number): Promise<boolean> => {
     const { data } = await client.mutate({
       mutation: DELETE_EVENT,
       variables: { eventId },
     });
     return data.deleteEvent;
   },
+updateEvent: async (eventId: number, event: Event): Promise<Event> => {
+  console.log("Updating event with ID:", eventId, "Data:", event); // Debug log
+  const { data } = await client.mutate({
+    mutation: UPDATE_EVENT,
+    variables: {
+      eventId: Number(eventId),
+      eventName: event.eventName,
+      numberOfGuest: event.numberOfGuest,
+      address: event.address,
+      shortDescription: event.shortDescription,
+      image: event.image,
+      isBlocked: event.isBlocked,
+      isArchived: false,
+      userName: event.userName,
+    },
+  });
 
-  updateEvent: async (
-    eventId: string,
-    event: {
-      eventName?: string;
-      numberOfGuest?: number;
-      address?: string;
-      shortDescription?: string;
-      image?: string;
-      isBlocked?: boolean;
-      UserName?: string;
-    }
-  ): Promise<Event> => {
-    const { data } = await client.mutate({
-      mutation: UPDATE_EVENT,
-      variables: { eventId, ...event },
-    });
-    return data.updateEvent;
-  },
+  return data.updateEvent;
+},
 };

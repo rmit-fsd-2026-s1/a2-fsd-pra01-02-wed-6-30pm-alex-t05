@@ -11,7 +11,7 @@ export interface Event {
     shortDescription?: string;
     image: string;
     isBlocked: boolean;
-    user?: User;
+    userName: string;
 }
 
 export interface User {
