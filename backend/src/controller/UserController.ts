@@ -105,6 +105,7 @@ export class UserController {
 
     try {
       await this.userRepository.save(user);
+      return response.json(user);
     } catch (error) {
       return response.status(500).json({ message: "Error updating user", error });
     }
