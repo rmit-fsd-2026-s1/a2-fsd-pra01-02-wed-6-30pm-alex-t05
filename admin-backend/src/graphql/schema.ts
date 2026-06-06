@@ -68,6 +68,8 @@ export const typeDefs = gql`
         image: String
     ): Event!
 
+    deleteEvent(eventId: ID!): Boolean!
+    
     addEventToVendor(userName: String!, eventId: ID!): Event!
     removeEventFromVendor(userName: String!, eventId: ID!): Event!
   }

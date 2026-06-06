@@ -61,6 +61,10 @@ export const resolvers = {
                 relations: ["user"],
             });
         },
+        deleteEvent: async (_: any, { eventId }: { eventId: string }) => {
+            const result = await eventRepository.delete(eventId);
+            return result.affected !== 0;
+        },
         addEventToVendor: async (
             _: any,
             { userName, eventId }: { userName: string; eventId: string }
