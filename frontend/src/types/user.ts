@@ -16,4 +16,5 @@ export type User = {
         fileType: string;
         data: string; //base64 encoded file data
     }[]
+    CreatedAt?: Date;
 };
