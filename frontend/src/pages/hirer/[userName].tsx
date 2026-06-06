@@ -45,13 +45,7 @@ export default function Hirer() {
                         )).map((event) => (
                             <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
                                 <Card
-                                    eventId={event.eventId}
-                                    eventName={event.eventName}
-                                    numberOfGuest={event.numberOfGuest}
-                                    address={event.address || "No address provided"}
-                                    image={event.image}
-                                    shortDescription={event.shortDescription}
-                                    isBlocked={event.isBlocked}
+                                    event={event}
                                 />
                             </div>
                         ))}

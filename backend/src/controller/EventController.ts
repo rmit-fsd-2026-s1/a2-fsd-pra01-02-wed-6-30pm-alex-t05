@@ -44,7 +44,7 @@ export class EventController {
    */
   async create(request: Request, response: Response) {
     const event = this.eventRepository.create(request.body);
-
+    console.log("Creating event with data:", request.body);
     try {
       await this.eventRepository.save(event);
     } catch (error) {

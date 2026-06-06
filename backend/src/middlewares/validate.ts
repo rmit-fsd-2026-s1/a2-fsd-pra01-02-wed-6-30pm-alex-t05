@@ -8,6 +8,7 @@ export function validateDto(dtoClass: any) {
         const errors = await validate(instance, { whitelist: true });
 
         if (errors.length > 0) {
+            console.error("Validation errors:", errors);
             return res.status(400).json({
                 errors: errors.map((e) => ({
                     property: e.property,

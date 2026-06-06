@@ -14,23 +14,17 @@ import { useRouter } from "next/router";
 import { eventService, applicationService } from "@/services/api";
 
 interface CardProps {
-    eventId: number;
-    eventName: string;
-    numberOfGuest: number;
-    address?: string;
-    image?: string; // Optional field for event image URL
-    isBlocked: boolean;
-    shortDescription?: string;
+    event: Event;
 }
 
-export default function Card({ eventId, eventName, numberOfGuest, address, image, isBlocked, shortDescription }: CardProps) {
+export default function Card({ event }: CardProps) {
     const { events, fetchPreferredForHirer, fetchEventsForVendor } = useEvent();
     const { user } = useAuth();
     const [expanded, setExpanded] = useState<"createApplication" | "viewApplications" | "blockDates" | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
-    const [eventForm, setEventForm] = useState<{ mode: "editEvent", event: Event } | null>(null);
+    const [eventForm, setEventForm] = useState<{ mode: "editEvent" | "createEvent", event: Event } | null>(null);
     const [error, setError] = useState<string | null>(null);
-    const selectedEvent = events.find((event) => event.eventId === eventId)!;
+    
     const router = useRouter();
     const handleApplicationSubmit = (application: Application) => {
         console.log("Submitting application:", application);
@@ -41,7 +35,11 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
     const handleEventSubmit = async (updatedEventData: any) => {
         //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
         console.log("Updated event data:", updatedEventData);
-        await eventService.updateEvent(selectedEvent.eventId, updatedEventData);
+        const updatedEvent: Event = {
+            ...updatedEventData,
+            numberOfGuest: parseInt(updatedEventData.numberOfGuest),
+        };
+        await eventService.updateEvent(event.eventId, updatedEvent);
         setEventForm(null); // Close the event form modal after submission
         fetchEventsForVendor(); // Fetchs all vendor events again to update the list
     }
@@ -61,13 +59,13 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
     } else
         return (
             <Box>
-                <img src={image} alt={eventName} className="w-full h-24 object-cover mb-4" />
-                <h2 className="!text-2xl font-semibold mb-2">{eventName}</h2>
+                <img src={event.image} alt={event.eventName} className="w-full h-24 object-cover mb-4" />
+                <h2 className="!text-2xl font-semibold mb-2">{event.eventName}</h2>
                 <div className="grid grid-cols-2">
-                    <p className="text-gray-600">Occupancy: {numberOfGuest}</p>
-                    <p className="text-gray-600">Address: {address || "No address provided"}</p>
+                    <p className="text-gray-600">Occupancy: {event.numberOfGuest}</p>
+                    <p className="text-gray-600">Address: {event.address || "No address provided"}</p>
                 </div>
-                <p className="text-gray-600 mt-2">Description: {shortDescription}</p>
+                <p className="text-gray-600 mt-2">Description: {event.shortDescription}</p>
                 {error && <p className="text-red-500">{error}</p>}
                 {/*Hirer interface*/}
                 {user && (user.role === "hirer" ? (
@@ -79,10 +77,10 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                         h="100%"
                     >
                         {expanded === "createApplication" && (
-                            console.log(`Rendering ApplicationForm for event ID: ${selectedEvent.eventId}`),
+                            console.log(`Rendering ApplicationForm for event ID: ${event.eventId}`),
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
-                                    event={selectedEvent} // Passes the entire event object to the form
+                                    event={event} // Passes the entire event object to the form
                                     onSubmit={handleApplicationSubmit}
                                     onClose={() => setExpanded(null)}
                                 />
@@ -95,14 +93,13 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                 onClick={() => {
                                     setExpanded(!expanded ? "createApplication" : null);
                                 }}
-                                isDisabled={isBlocked}
                             >{expanded ? "Hide" : "Apply"}
                             </Button>
 
                             <Button
                                 colorScheme='teal'
                                 type='button'
-                                onClick={() => addPreferredEvents(eventId)}
+                                onClick={() => addPreferredEvents(event.eventId)}
                             >Save Preferrences
                             </Button>
                         </Box>
@@ -117,7 +114,7 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                 className="w-50 items-center"
                                 onClick={() => {
                                     setExpanded(expanded !== "viewApplications" ? "viewApplications" : null);
-                                    console.log(`Selected Event ID: ${eventId}`);
+                                    console.log(`Selected Event ID: ${event.eventId}`);
                                 }}
                             >View Applications
                             </Button>
@@ -143,8 +140,12 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                         <Button
                                             variant="ghost"
                                             colorScheme="blue"
-                                            onClick={() => { setEventForm({ mode: "editEvent", event: selectedEvent }); setMenuOpen(false) }
-                                            }
+                                            onClick={() => { 
+                                                setEventForm({ mode: "editEvent", event: event }); 
+                                                setMenuOpen(false) 
+                                                fetchEventsForVendor(); 
+                                                
+                                            }}
                                         >
                                             Edit
                                         </Button>
@@ -160,8 +161,8 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                                             variant="ghost"
                                             onClick={async () => {
                                                 if (confirm("Are you sure you want to delete this event?")) {
-                                                    await eventService.deleteEvent(selectedEvent);
-                                                    router.reload();
+                                                    await eventService.deleteEvent(event);
+                                                    fetchEventsForVendor(); // Refresh the event list after deletion
                                                 }
                                             }}
                                         >
@@ -175,14 +176,14 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                         {/*Applications list*/}
                         {expanded === "viewApplications" && (
                             <Box mt={4} pl={4}>
-                                <ApplicantList event={selectedEvent} />
+                                <ApplicantList event={event} />
                             </Box>
                         )}
                         {/*Blocking Dates*/}
                         {expanded === "blockDates" && (
                             <Box mt={4} pl={4}>
                                 <ApplicationForm
-                                    event={selectedEvent}
+                                    event={event}
                                     onSubmit={handleApplicationSubmit}
                                     onClose={() => setExpanded(null)}
                                 />
@@ -192,7 +193,7 @@ export default function Card({ eventId, eventName, numberOfGuest, address, image
                         {eventForm && (
                             <EventFormModal
                                 mode={eventForm.mode}
-                                selectedEvent={selectedEvent}
+                                selectedEvent={event}
                                 onClose={() => setEventForm(null)}
                                 onSubmit={handleEventSubmit}
                             />

@@ -11,23 +11,11 @@ export class UpdateEventDTO {
 
     @IsString()
     @IsNotEmpty()
-    date: string;
-
-    @IsString()
-    @IsNotEmpty()
-    time: string;
-
-    @IsString()
-    @IsNotEmpty()
-    duration: number;
+    address: string;
 
     @IsString()
     shortDescription?: string;
 
     @IsString()
     image?: string;
-
-    // Unsure of this one
-    @IsBoolean()
-    isBlocked: boolean;
 }

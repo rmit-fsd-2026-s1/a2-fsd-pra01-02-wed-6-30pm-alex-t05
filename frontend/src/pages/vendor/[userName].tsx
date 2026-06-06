@@ -11,17 +11,26 @@ import EventFormModal from "@/components/vendor/modals/EventFormModal";
 
 export default function Vendor() {
     const { user } = useAuth()
-    const { eventsForVendor } = useEvent();
+    const { eventsForVendor, fetchEventsForVendor } = useEvent();
     const [visualisationsVisible, setVisualisationsVisible] = useState(false);
     const [eventForm, setEventForm] = useState<{ mode: "createEvent" } | null>(null);
 
     const router = useRouter();
-    const { userName } = router.query;
-    const handleEventFormSubmit = async (event: Event) => {
-        await eventService.createEvent(event);
-        //this is kinda bad and is a workaround to not having to update event context properly, but it works for now
-        router.reload();
+    const userName = router.query.userName as string;
+    const handleEventFormSubmit = async (event: any) => {
+        const updatedEvent: Event = {
+            ...event,
+            numberOfGuest: parseInt(event.numberOfGuest),
+            user: userName
+        };
+        console.log("Submitting event:", updatedEvent);
+        await eventService.createEvent(updatedEvent);
+        setEventForm(null); // Close the event form modal after submission
+        await fetchEventsForVendor(); // Fetchs all vendor events again to update the list
     };
+    useEffect(() => {
+        fetchEventsForVendor();
+    }, [userName]);
 
 
     return (!user || user.role === "vendor" && user.userName !== userName) ? (
@@ -58,13 +67,7 @@ export default function Vendor() {
                 {eventsForVendor.map((vendorEvent) => (
                     <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={vendorEvent.eventId}>
                         <Card
-                            eventId={vendorEvent.eventId}
-                            eventName={vendorEvent.eventName}
-                            numberOfGuest={vendorEvent.numberOfGuest}
-                            address={vendorEvent.address || "No address provided"}
-                            shortDescription={vendorEvent.shortDescription}
-                            image={vendorEvent.image}
-                            isBlocked={vendorEvent.isBlocked}
+                            event={vendorEvent}
                         />
                     </div>
                 ))}

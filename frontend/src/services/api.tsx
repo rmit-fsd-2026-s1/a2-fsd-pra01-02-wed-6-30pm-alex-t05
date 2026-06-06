@@ -89,7 +89,7 @@ export const userService = {
 
     getUserCommentsFromVendor: async (vendorUserName: string, hirerUserName: string): Promise<string> => {
         try {
-            const { data } = await axios.get(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`);
+            const { data } = await axios.get(`${API_BASE_URL}/vendor/${vendorUserName}/comments/${hirerUserName}`);
             console.log("Fetched comments:", data);
             return data.comment;
         } catch (error) {
@@ -107,7 +107,7 @@ export const userService = {
 
     setUserCommentFromVendor: async (vendorUserName: string, hirerUserName: string, comment: string): Promise<void> => {
         try {
-            await axios.post(`${API_BASE_URL}/users/${vendorUserName}/comments/${hirerUserName}`, { comment });
+            await axios.post(`${API_BASE_URL}/vendor/${vendorUserName}/comments/${hirerUserName}`, { comment });
         } catch (error) {
             console.error("Error setting user comment from vendor:", error);
         }
