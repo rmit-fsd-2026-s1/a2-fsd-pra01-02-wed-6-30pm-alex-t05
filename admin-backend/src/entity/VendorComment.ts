@@ -13,7 +13,6 @@ import { User } from "./User";
 export class VendorComment {
     @PrimaryColumn()
     vendorUserName: string;
-
     @PrimaryColumn()
     hirerUserName: string;
 

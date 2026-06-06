@@ -1,8 +1,16 @@
 import { gql } from "@apollo/client";
 import { client } from "./graphql";
-import { Event, User } from "../types/types";
+import { Event, User, Admin } from "../types/types";
 
 // GraphQL Queries
+const GET_ADMINS = gql`
+  query GetAdmins {
+    admins {
+      userName
+      password
+    }
+  }
+`;
 const GET_USERS = gql`
   query GetUsers {
     users {
@@ -179,6 +187,17 @@ const REMOVE_PET_FROM_PROFILE = gql`
 `;
 
 export const AdminService = {
+  getAllAdmins: async (): Promise<Admin[]> => {
+    const { data } = await client.query({ query: GET_ADMINS });
+    return data.admins;
+  },
+  getAdmin: async (userName: string): Promise<Admin> => {
+    const { data } = await client.query({
+      query: GET_ADMINS,
+      variables: { userName },
+    });
+    return data.admin;
+  },
   getAllEvents: async (): Promise<Event[]> => {
     const { data } = await client.query({ query: GET_EVENTS });
     return data.events;

@@ -47,5 +47,37 @@ export const resolvers = {
             const result = await adminRepository.delete(userName);
             return result.affected !== 0;
         },
+        createEvent: async (_: any, args: any) => {
+            const event = eventRepository.create(args);
+            return await eventRepository.save(event);
+        },
+        updateEvent: async (
+            _: any,
+            { eventId, ...args }: { eventId: number } & Partial<Event>
+        ) => {
+            await eventRepository.update(eventId, args);
+            return await eventRepository.findOne({
+                where: { eventId: eventId },
+            });
+        },
+        addEventToVendor: async (
+            _: any,
+            { userName, eventId }: { userName: string; eventId: number }
+        ) => {
+            const user = await userRepository.findOne({
+                where: { userName },
+                relations: ["events"],
+            });
+            const event = await eventRepository.findOne({
+                where: { eventId },
+            });
+
+            if (!user || !event) {
+                throw new Error("User or Event not found");
+            }
+
+            user.events = [...user.events, event];
+            return await userRepository.save(user);
+        },
     },
 };

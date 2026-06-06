@@ -23,7 +23,9 @@ export class Event {
     @Column({ nullable: true })
     image?: string; // Optional field for event image URL
     @Column({ default: false })
-    isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
+    isBlocked: boolean; //set by admin to block an event from being applied to, without deleting it
+    @Column({ default: false })
+    isArchived: boolean; //set if an event with an application history is deleted, to be set instead to maintain history
 
     @ManyToOne(() => User, (user) => user.events, {
         lazy: true,

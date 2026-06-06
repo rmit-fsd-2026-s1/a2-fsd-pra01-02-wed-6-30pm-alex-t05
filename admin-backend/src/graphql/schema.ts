@@ -14,6 +14,7 @@ export const typeDefs = gql`
         shortDescription: String
         image: String
         isBlocked: Boolean!
+        isArchived: Boolean!
         user: User
         }
     
@@ -50,21 +51,23 @@ export const typeDefs = gql`
     deleteAdmin(userName: String!): Boolean!
 
     createEvent(
-      eventName: String!
-      description: String
-      eventType: String!
-      address: String!
-      image: String
+        eventName: String!
+        numberOfGuest: Int!
+        address: String
+        shortDescription: String
+        image: String
+        UserName: String!
     ): Event!
 
     updateEvent(
-      id: ID!
-      eventName: String
-      description: String
-      eventType: String
-      address: String
-      isBlocked: Boolean
-      image: String
+        eventId: ID!
+        eventName: String!
+        numberOfGuest: Int!
+        address: String
+        shortDescription: String
+        image: String
+        isBlocked: Boolean
+        isArchived: Boolean
     ): Event!
 
     addEventToVendor(userName: String!, eventId: ID!): Event!

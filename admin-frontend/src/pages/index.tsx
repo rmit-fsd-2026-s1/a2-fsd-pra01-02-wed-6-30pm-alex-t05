@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
-import axios from 'axios';
+import { useAuth } from "@/context/AuthContext";
 
 export default function Home() {
   const [adminData, setAdminData] = useState({
@@ -9,10 +9,19 @@ export default function Home() {
     password: '',
   });
   const [error, setError] = useState("") //intial state is empty. also making it false since it has no value in it
+  const router = useRouter();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
+
+    const success = await login(adminData);
+    if (success) {
+      router.push("/");
+    } else {
+      setError("Invalid username or password");
+    }
   }
 
   return (
