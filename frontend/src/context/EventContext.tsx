@@ -58,7 +58,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     const fetchPreferredForHirer = async () => {
         if (user?.role === "hirer") {
             try {
-                const data = await userService.getAllPreferredVenuesForUser(user?.userName as string);
+                const data = await userService.getAllPreferredEventsForUser(user?.userName as string);
                 setEventsForHirer(data);
             } catch (error) {
                 console.error("Error fetching preferred events for hirer:", error);

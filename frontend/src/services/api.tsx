@@ -138,7 +138,7 @@ export const userService = {
         }
     },
 
-    getAllPreferredVenuesForUser: async (userName: string): Promise<preferredEvent[]> => {
+    getAllPreferredEventsForUser: async (userName: string): Promise<preferredEvent[]> => {
         const { data } = await axios.get(`${API_BASE_URL}/hirer/${userName}/preferred-events`);
         return data;
     },
