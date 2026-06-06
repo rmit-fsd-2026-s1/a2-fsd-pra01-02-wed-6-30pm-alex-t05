@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { client } from "./graphql";
-import { Profile, Pet } from "../types/types";
+import { Event, User } from "../types/types";
 
 // GraphQL Queries
 const GET_USERS = gql`
@@ -25,7 +25,7 @@ const GET_USERS = gql`
 `;
 
 const GET_USER = gql`
-  query GetUser($userName: Username!) {
+  query GetUser($userName: String!) {
     user(userName: $userName) {
         userName
         firstName
@@ -63,7 +63,7 @@ const GET_EVENTS = gql`
 `;
 
 const GET_EVENT = gql`
-  query GetEvent($eventId: eventId!) {
+  query GetEvent($eventId: ID!) {
     event(id: $eventId) {
       eventId
       eventName
@@ -88,7 +88,7 @@ const CREATE_EVENT = gql`
     $shortDescription: String
     $image: String
     $isBlocked: Boolean
-    UserName: String!
+    $UserName: String!
     ) {
     createEvent(
         eventName: $eventName
@@ -114,7 +114,7 @@ const CREATE_EVENT = gql`
 `;
 
 const UPDATE_EVENT = gql`
-  mutation UpdateProfile(
+  mutation UpdateEvent(
     $id: ID!
     $eventName: String!
     $numberOfGuest: Int!
@@ -124,8 +124,8 @@ const UPDATE_EVENT = gql`
     $isBlocked: Boolean
     $UserName: String!
   ) {
-    updateProfile(
-        id: $id
+    updateEvent(
+        id: $eventId
         eventName: $eventName
         numberOfGuest: $numberOfGuest
         address: $address
@@ -148,20 +148,11 @@ const UPDATE_EVENT = gql`
   }
 `;
 
-const DELETE_PROFILE = gql`
-  mutation DeleteProfile($id: ID!) {
-    deleteProfile(id: $id)
+const DELETE_EVENT = gql`
+  mutation DeleteEvent($eventId: ID!) {
+    deleteEvent(id: $eventId)
   }
-`;
-
-const CREATE_PET = gql`
-  mutation CreatePet($name: String!) {
-    createPet(name: $name) {
-      pet_id
-      name
-    }
-  }
-`;
+`
 
 const ADD_PET_TO_PROFILE = gql`
   mutation AddPetToProfile($profileId: ID!, $petId: ID!) {
@@ -187,126 +178,74 @@ const REMOVE_PET_FROM_PROFILE = gql`
   }
 `;
 
-const DELETE_PET = gql`
-  mutation DeletePet($id: ID!) {
-    deletePet(id: $id)
-  }
-`;
+export const AdminService = {
+  getAllEvents: async (): Promise<Event[]> => {
+    const { data } = await client.query({ query: GET_EVENTS });
+    return data.events;
+  },
 
-export const profileService = {
-    getAllProfiles: async (): Promise<Profile[]> => {
-        const { data } = await client.query({ query: GET_PROFILES });
-        return data.profiles;
-    },
+  getEvent: async (eventId: string): Promise<Event> => {
+    const { data } = await client.query({
+      query: GET_EVENT,
+      variables: { eventId },
+    });
+    return data.event;
+  },
 
-    createProfile: async (profile: {
-        first_name: string;
-        last_name: string;
-        email: string;
-        mobile?: string;
-        street?: string;
-        city?: string;
-        state?: string;
-        postcode?: string;
-    }): Promise<Profile> => {
-        const { data } = await client.mutate({
-            mutation: CREATE_PROFILE,
-            variables: profile,
-        });
-        return data.createProfile;
-    },
+  getAllUsers: async (): Promise<User[]> => {
+    const { data } = await client.query({ query: GET_USERS });
+    return data.users;
+  },
 
-    getProfile: async (id: string): Promise<Profile> => {
-        const { data } = await client.query({
-            query: GET_PROFILE,
-            variables: { id },
-        });
-        return data.profile;
-    },
+  getUser: async (userName: string): Promise<User> => {
+    const { data } = await client.query({
+      query: GET_USER,
+      variables: { userName },
+    });
+    return data.user;
+  },
 
-    deleteProfile: async (id: string): Promise<boolean> => {
-        const { data } = await client.mutate({
-            mutation: DELETE_PROFILE,
-            variables: { id },
-        });
-        return data.deleteProfile;
-    },
+  // Admin CRUD
+  createEvent: async (event: {
+    eventName: string,
+    numberOfGuest: number,
+    address: string,
+    shortDescription?: string,
+    image?: string,
+    isBlocked?: boolean,
+    UserName: string,
+  }): Promise<Event> => {
+    const { data } = await client.mutate({
+      mutation: CREATE_EVENT,
+      variables: event,
+    });
+    return data.createEvent;
+  },
 
-    updateProfile: async (
-        id: string,
-        profile: {
-            first_name?: string;
-            last_name?: string;
-            email?: string;
-            mobile?: string;
-            street?: string;
-            city?: string;
-            state?: string;
-            postcode?: string;
-        }
-    ): Promise<Profile> => {
-        const { data } = await client.mutate({
-            mutation: UPDATE_PROFILE,
-            variables: { id, ...profile },
-        });
-        return data.updateProfile;
-    },
-};
+  deleteEvent: async (eventId: string): Promise<boolean> => {
+    const { data } = await client.mutate({
+      mutation: DELETE_EVENT,
+      variables: { eventId },
+    });
+    return data.deleteEvent;
+  },
 
-export const petService = {
-    getAllPets: async (): Promise<Pet[]> => {
-        const { data } = await client.query({ query: GET_PETS });
-        return data.pets;
-    },
-
-    getPets: async (profileId: string): Promise<Pet[]> => {
-        const { data } = await client.query({
-            query: GET_PROFILE,
-            variables: { id: profileId },
-        });
-        return data.profile.pets;
-    },
-
-    getPet: async (petId: string): Promise<Pet> => {
-        const { data } = await client.query({
-            query: GET_PET,
-            variables: { id: petId },
-        });
-        return data.pet;
-    },
-
-    createPet: async (name: string): Promise<Pet> => {
-        const { data } = await client.mutate({
-            mutation: CREATE_PET,
-            variables: { name },
-        });
-        return data.createPet;
-    },
-
-    associatePetWithProfile: async (
-        petId: string,
-        profileId: string
-    ): Promise<Profile> => {
-        const { data } = await client.mutate({
-            mutation: ADD_PET_TO_PROFILE,
-            variables: { petId, profileId },
-        });
-        return data.addPetToProfile;
-    },
-
-    getPetProfiles: async (petId: string): Promise<Profile[]> => {
-        const { data } = await client.query({
-            query: GET_PET,
-            variables: { id: petId },
-        });
-        return data.pet.profiles;
-    },
-
-    deletePet: async (petId: string): Promise<boolean> => {
-        const { data } = await client.mutate({
-            mutation: DELETE_PET,
-            variables: { id: petId },
-        });
-        return data.deletePet;
-    },
+  updateEvent: async (
+    eventId: string,
+    event: {
+      eventName?: string;
+      numberOfGuest?: number;
+      address?: string;
+      shortDescription?: string;
+      image?: string;
+      isBlocked?: boolean;
+      UserName?: string;
+    }
+  ): Promise<Event> => {
+    const { data } = await client.mutate({
+      mutation: UPDATE_EVENT,
+      variables: { eventId, ...event },
+    });
+    return data.updateEvent;
+  },
 };
