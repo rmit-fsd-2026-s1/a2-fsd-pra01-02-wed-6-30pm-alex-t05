@@ -8,14 +8,14 @@ import { User } from "./User";
 import { Event } from "./Event";
 
 @Entity()
-export class PreferredVenues {
+export class PreferredEvents {
     @PrimaryGeneratedColumn()
-    preferredVenueId: number
+    preferredEventId: number
 
-    @ManyToOne(() => User, (user: User) => user.preferredVenues)
+    @ManyToOne(() => User, (user: User) => user.preferredEvents)
     user: User;
 
-    @ManyToOne(() => Event, (event: Event) => event.preferredVenues)
+    @ManyToOne(() => Event, (event: Event) => event.preferredEvents)
     event: Event;
 
     @Column()

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import { Event } from "../entity/Event";
-import { PreferredVenues } from "../entity/PreferredVenues";
+import { PreferredEvents } from "../entity/PreferredEvents";
 import { VendorComment } from "../entity/VendorComment";
 import * as argon2 from "argon2";
 
@@ -10,7 +10,7 @@ export class UserController {
   private userRepository = AppDataSource.getRepository(User);
   private vendorCommentRepository = AppDataSource.getRepository(VendorComment);
   private eventRepository = AppDataSource.getRepository(Event);
-  private preferredVenueRepository = AppDataSource.getRepository(PreferredVenues);
+  private preferredEventRepository = AppDataSource.getRepository(PreferredEvents);
 
   /**
    * Retrieves all users from the database
@@ -377,8 +377,8 @@ export class UserController {
     return response.json({ message: "Comment deleted successfully" });
   }
 
-  // ---Preferred Venues---
-  async getAllPreferredVenuesForUser(request: Request, response: Response) {
+  // ---Preferred Events---
+  async getAllPreferredEventsForUser(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
     });
@@ -391,22 +391,22 @@ export class UserController {
       return response.status(403).json({ message: "User is not a hirer" });
     }
 
-    const preferredVenues = await this.preferredVenueRepository.find({
+    const preferredEvents = await this.preferredEventRepository.find({
       where: { user: { userName: user.userName } },
       order: { ranking: "ASC" },
       relations: ["event"],
     });
 
-    response.json(preferredVenues);
+    response.json(preferredEvents);
   }
 
   /**
-* Adds a preferred venue to the database for a hirer
+* Adds a preferred event to the database for a hirer
 * @param request - Express request object containing the userName and event ID in params
 * @param response - Express response object
-* @returns JSON response containing the created preferred venue or an error
+* @returns JSON response containing the created preferred event or an error
 */
-  async addPreferredVenue(request: Request, response: Response) {
+  async addPreferredEvent(request: Request, response: Response) {
     // Gets the user by their username
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -432,46 +432,46 @@ export class UserController {
       return response.status(404).json({ message: "Event not found" });
     }
 
-    // Checks if the preferred venue exists with the user
-    const existingPreferredVenue = await this.preferredVenueRepository.findOneBy({
+    // Checks if the preferred event exists with the user
+    const existingPreferredEvent = await this.preferredEventRepository.findOneBy({
       user: { userName: user.userName },
       event: { eventId: event.eventId }
     });
 
-    //return nothing if preferred venue was found in the list
-    if (existingPreferredVenue) {
+    //return nothing if preferred event was found in the list
+    if (existingPreferredEvent) {
       return;
     }
 
     // This get the maximum ranking number 
-    const maximum = await this.preferredVenueRepository.maximum(
+    const maximum = await this.preferredEventRepository.maximum(
       "ranking", { user: { userName: user.userName } },
     );
 
-    // Creates a new preferred venue
-    const preferredVenue = this.preferredVenueRepository.create({
+    // Creates a new preferred event
+    const preferredEvent = this.preferredEventRepository.create({
       user: user,
       event: event,
-      ranking: maximum ? + 1 : 1, // If the user has no preferred venues, the newly added venue will be ranked 1. If the user has venues, it will +1 from the higest ranking number
+      ranking: maximum ? + 1 : 1, // If the user has no preferred events, the newly added event will be ranked 1. If the user has events, it will +1 from the higest ranking number
     });
 
     try {
-      // Saves the preferred venue to the database
-      await this.preferredVenueRepository.save(preferredVenue);
+      // Saves the preferred event to the database
+      await this.preferredEventRepository.save(preferredEvent);
     } catch (error) {
-      return response.status(500).json({ message: "Error saving preferred venue", error });
+      return response.status(500).json({ message: "Error saving preferred event", error });
     }
 
-    response.status(201).json(preferredVenue);
+    response.status(201).json(preferredEvent);
   }
 
   /**
-* Removes an preferred venue from the database
+* Removes an preferred event from the database
 * @param request - Express request object containing the userName and event ID in params
 * @param response - Express response object
 * @returns JSON response indicating success or failure
 */
-  async removePreferredVenue(request: Request, response: Response) {
+  async removePreferredEvent(request: Request, response: Response) {
     // Gets the user by their username
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
@@ -487,15 +487,15 @@ export class UserController {
       return response.status(403).json({ message: "User is not a hirer" });
     }
 
-    // Deletes the preferred venue based on the user and event
-    const result = await this.preferredVenueRepository.delete({
+    // Deletes the preferred event based on the user and event
+    const result = await this.preferredEventRepository.delete({
       user: { userName: user.userName },
       event: { eventId: parseInt(request.params.eventId) }
     });
 
-    // If venue was not found
+    // If event was not found
     if (!result.affected) {
-      return response.status(404).json({ message: "Preferred venue not found for this user and event" });
+      return response.status(404).json({ message: "Preferred event not found for this user and event" });
     }
 
     response.status(204).send();

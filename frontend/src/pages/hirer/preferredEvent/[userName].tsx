@@ -30,7 +30,7 @@ export default function PreferredEvent() {
     }
 
     return ( // Denie access if they are not a hirer
-        (!user || user.role === "hirer" && user.userName === userName) ? (
+        (!user || user.role === "hirer" && user.userName !== userName) ? (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
                 <div className="bg-white p-8 rounded-lg shadow-md w-96 text-center">
                     <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
