@@ -2,11 +2,13 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Event } from "../entity/Event";
 import { User } from "../entity/User";
+import { Application } from "../entity/Application";
 
 
 export class EventController {
   private eventRepository = AppDataSource.getRepository(Event);
   private userRepository = AppDataSource.getRepository(User);
+  private applicationRepository = AppDataSource.getRepository(Application);
 
   /**
    * Retrieves all events from the database
@@ -15,7 +17,7 @@ export class EventController {
    * @returns JSON response containing an array of all events
    */
   async all(request: Request, response: Response) {
-    const events = await this.eventRepository.find();
+    const events = await this.eventRepository.find( { where: { isArchived: false } });
     return response.json(events);
   }
 
@@ -28,7 +30,7 @@ export class EventController {
   async one(request: Request, response: Response) {
     const eventId = parseInt(request.params.id);
     const event = await this.eventRepository.findOne({
-      where: { eventId },
+      where: { eventId, isArchived: false },
     });
 
     if (!event) {
@@ -75,6 +77,17 @@ export class EventController {
 
     if (!eventToRemove) {
       return response.status(404).json({ message: "Event not found" });
+    }
+    const applicationCount = await this.applicationRepository.count({ where: { event: { eventId } } });
+    if (applicationCount > 0) {
+      // If there are applications associated with the event, set isArchived to true instead of deleting
+      eventToRemove.isArchived = true;
+      try {
+        await this.eventRepository.save(eventToRemove);
+        return response.json({ message: "Event archived successfully" });
+      } catch (error) {
+        return response.status(500).json({ message: "Error archiving event", error });
+      }
     }
 
     await this.eventRepository.remove(eventToRemove);
@@ -138,7 +151,7 @@ try {
   async findByUser(request: Request, response: Response) {
     const userName = request.params.userName;
     const events = await this.eventRepository.find({
-      where: { user: { userName } },
+      where: { user: { userName }, isArchived: false },
       relations: ["user"],
     });
     return response.json(events);
