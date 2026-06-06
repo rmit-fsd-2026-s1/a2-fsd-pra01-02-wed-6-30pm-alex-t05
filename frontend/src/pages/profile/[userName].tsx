@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { FormControl, FormLabel, Button, Input, Box } from "@chakra-ui/react";
-import { useAuth } from "../../context/AuthContext";
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { User } from "../../types/user";
 import { useRouter } from "next/router";
@@ -16,7 +15,6 @@ export default function Profile() {
     const currentUser = useCurrentUser(); //get the current full user details from the custom hook
     const profileUserName = router.query.userName as string; //get the username from url
     const [profileUser, setProfileUser] = useState<User | null>(null); //state to hold the user details
-    const { login } = useAuth(); //get the login function from the AuthContext 
 
     const [editing, setEditing] = useState(false); //state to track if the form is in editing mode
     //states for form fields
@@ -83,7 +81,6 @@ export default function Profile() {
                     setValidation('Error updating profile. Please try again later.');
                     return;
                 }
-                login(updatedUser); // Update user data in AuthContext
                 setColor(`bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded`); // Set color for message
                 setValidation('Profile updated successfully.'); // Set success message
                 setEditing(false); // Exit editing mode
@@ -99,7 +96,6 @@ export default function Profile() {
             if (result.success && result.updatedUser) {
                 //runs profile update
                 await userService.updateUser(result.updatedUser);
-                login(result.updatedUser);
                 setProfileUser(result.updatedUser);
             } else {
                 setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`); // Set color for message
@@ -142,7 +138,8 @@ export default function Profile() {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         isDisabled={!editing} // Disable input when not in editing mode
-                        className="border border-gray-300 rounded py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        className="border border-gray-300 rounded py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        variant="flushed" />
                 </Box>
                 <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
                     <FormLabel htmlFor='lastName'>Last Name</FormLabel>
@@ -152,6 +149,7 @@ export default function Profile() {
                         onChange={(e) => setLastName(e.target.value)}
                         isDisabled={!editing} // Disable input when not in editing mode
                         className="border border-gray-300 rounded py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        variant="flushed"
                     />
                 </Box>
                 <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
@@ -162,6 +160,7 @@ export default function Profile() {
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         isDisabled={!editing} // Disable input when not in editing mode
                         className="border border-gray-300 rounded py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        variant="flushed"
                     />
                 </Box>
                 <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
