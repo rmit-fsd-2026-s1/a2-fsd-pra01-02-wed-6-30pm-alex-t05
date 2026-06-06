@@ -33,32 +33,24 @@ Lectorial Week 9:
         used attachProfile the same way to attach users(hirers) to events. This way, its like a preferred Event
         Vendor CRUD was copied from ProfileController.ts
         
-removePreferredEvent in 'UserController.ts'
-I used this to get it to work:
-    Reference: https://stackoverflow.com/questions/71259876/removing-a-single-row-in-a-manytomany-table-with-typeorm-nestjs
-
 'siginup.tsx' with the validation:
     Reference:
-    https://www.c-sharpcorner.com/blogs/various-types-of-password-validation-in-javascript1
-    https://iamkartikeya.medium.com/form-validation-in-javascript-ddc776f76920
-    https://www.the-art-of-web.com/javascript/validate-password/
+    Chand, G 2014, Various types of password validation in JavaScript, C-sharpcorner.com, C# Corner, viewed 6 June 2026, <https://www.c-sharpcorner.com/blogs/various-types-of-password-validation-in-javascript1>.
+    Mishra, K 2024, Form Validation in JavaScript, Medium, viewed 6 June 2026, <https://iamkartikeya.medium.com/form-validation-in-javascript-ddc776f76920>.
+    Chirp Internet 2017, Password Validation using regular expressions and HTML5 < JavaScript | The Art of Web, The-art-of-web.com, viewed 6 June 2026, <https://www.the-art-of-web.com/javascript/validate-password/>.
 
 in 'create' for user and 'login' in UserController.ts:
     Reference:
-    https://medium.com/@gaganparmar110/build-a-login-and-registration-system-using-nestjs-and-typeorm-with-postgresql-a-step-by-step-d913e344eff8
-    https://medium.com/@ggluopeihai/unlocking-system-security-master-authentication-and-access-control-with-nestjs-jwt-and-redis-b2c60c4383b4
-    https://peaklab.fr/en/glossaire/argon2
-    https://www.npmjs.com/package/argon2
-    
-
-for .count
-    https://typeorm.io/docs/working-with-entity-manager/repository-api/
-
+    argon2 2025, npm, viewed 3 June 2026, <https://www.npmjs.com/package/argon2>.
+    BuildWithGagan 2024, Build a Login and Registration System Using NestJS and TypeORM with PostgreSQL: A Step-By-Step…, Medium, viewed 4 June 2026, <https://medium.com/@gaganparmar110/build-a-login-and-registration-system-using-nestjs-and-typeorm-with-postgresql-a-step-by-step-d913e344eff8>.
+    Luo, N 2024, Unlocking System Security: Master Authentication and Access Control with NestJS, JWT, and Redis, Medium, viewed 4 June 2026, <https://medium.com/@ggluopeihai/unlocking-system-security-master-authentication-and-access-control-with-nestjs-jwt-and-redis-b2c60c4383b4>.
+    ‌PeakLab 2026, peaklab, PeakLab, viewed 6 June 2026, <https://peaklab.fr/en/glossaire/argon2>.
+‌
 for .max
-    https://typeorm.io/docs/working-with-entity-manager/repository-api/
-    
+    Repository APIs | TypeORM 2020, Typeorm.io, viewed 5 June 2026, <https://typeorm.io/docs/working-with-entity-manager/repository-api/>.
+
 for order: { ranking: "ASC }
-    https://typeorm.io/docs/working-with-entity-manager/find-options/
+    Find Options | TypeORM 2020, Typeorm.io, viewed 4 June 2026, <https://typeorm.io/docs/working-with-entity-manager/find-options/>.
 
 
 NEED TO DO:
