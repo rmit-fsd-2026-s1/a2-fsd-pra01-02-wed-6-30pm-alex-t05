@@ -298,7 +298,7 @@ export const AdminService = {
   deleteFeaturedEvent: async (featuredId: string): Promise<boolean> => {
     const { data } = await client.mutate({
       mutation: DELETE_FEATURED_EVENT,
-      variables: { featuredId },
+      variables: { id: featuredId },
     });
     return data.deleteFeaturedEvent;
   },
