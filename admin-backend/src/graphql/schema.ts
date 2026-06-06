@@ -57,7 +57,6 @@ export const typeDefs = gql`
         address: String
         shortDescription: String
         image: String
-        userName: String!
     ): Event!
 
     updateEvent(
@@ -67,9 +66,6 @@ export const typeDefs = gql`
         address: String
         shortDescription: String
         image: String
-        isBlocked: Boolean
-        isArchived: Boolean
-        userName: String
     ): Event!
 
     addEventToVendor(userName: String!, eventId: ID!): Event!

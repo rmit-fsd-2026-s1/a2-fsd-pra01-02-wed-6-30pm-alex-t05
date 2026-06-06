@@ -7,11 +7,6 @@ import { PreferredEvents } from "../entity/PreferredEvents";
 const adminRepository = AppDataSource.getRepository(Admin);
 const eventRepository = AppDataSource.getRepository(Event);
 const userRepository = AppDataSource.getRepository(User);
-console.log("Repositories initialized:", {
-    adminRepository: !!adminRepository,
-    eventRepository: !!eventRepository,
-    userRepository: !!userRepository,
-});
 
 export const resolvers = {
     Query: {
@@ -27,10 +22,7 @@ export const resolvers = {
         event: async (_: any, { id }: { id: number }) => {
             return await eventRepository.findOne({ where: { eventId: id } });
         },
-        users: async (_: any, args: { role?: string }) => {
-            if (args.role) {
-                return await userRepository.find({ where: { role: args.role } });
-            }
+        users: async () => {
             return await userRepository.find();
         },
         user: async (_: any, { userName }: { userName: string }) => {
@@ -59,40 +51,40 @@ export const resolvers = {
             const event = eventRepository.create(args);
             return await eventRepository.save(event);
         },
-        
-        updateEvent: async (_: any, { eventId, event } : { eventId: number; event: any }) => {
-            const existingEvent = await eventRepository.findOne({ where: { eventId } });
-            if (!existingEvent) {
-                console.error(`Event with ID ${eventId} not found`);
-                return null;
-            }
-
-            const user = await userRepository.findOne({ where: { userName: event.userName } });
-            if (!user) {
-                console.error(`User with userName ${event.userName} not found`);
-                return null;
-            }
-            event.user = user;
-            return await eventRepository.save(event);
+        updateEvent: async (
+            _: any,
+            { eventId, ...args }: { eventId: string } & Partial<Event>
+        ) => {
+            await eventRepository.update(eventId, args);
+            return await eventRepository.findOne({
+                where: { eventId: eventId },
+                relations: ["user"],
+            });
         },
         addEventToVendor: async (
             _: any,
-            { userName, eventId }: { userName: string; eventId: number }
+            { userName, eventId }: { userName: string; eventId: string }
         ) => {
             const user = await userRepository.findOne({
                 where: { userName },
                 relations: ["events"],
             });
+
+            if (!user) {
+                throw new Error("User not found");
+            }
+
             const event = await eventRepository.findOne({
-                where: { eventId },
+                where: { eventId: parseInt(eventId) },
             });
 
             if (!user || !event) {
                 throw new Error("User or Event not found");
             }
 
-            user.events = [...user.events, event];
-            return await userRepository.save(user);
+            event.user = user;
+
+            return await eventRepository.save(event);
         },
     },
 };
