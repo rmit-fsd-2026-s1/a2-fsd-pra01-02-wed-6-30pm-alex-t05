@@ -52,6 +52,10 @@ for .max
 for order: { ranking: "ASC }
     Find Options | TypeORM 2020, Typeorm.io, viewed 4 June 2026, <https://typeorm.io/docs/working-with-entity-manager/find-options/>.
 
+for one-to-one relations
+    One-to-one relations | TypeORM 2026, Typeorm.io, viewed 6 June 2026, <https://typeorm.io/docs/relations/one-to-one-relations/>.
+‌
+
 
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments

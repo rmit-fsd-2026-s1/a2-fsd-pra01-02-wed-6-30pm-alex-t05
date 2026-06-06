@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { client } from "./graphql";
-import { Event, User, Admin } from "../types/types";
+import { Event, User, Admin, FeatureEvent } from "../types/types";
 
 // GraphQL Queries
 const GET_ADMINS = gql`
@@ -53,13 +53,29 @@ const GET_USER = gql`
   }
 `;
 
+const GET_FEATURED_EVENTS = gql`
+  query GetFeaturedEvents {
+    featuredEvents {
+      FeaturedId
+      event {
+        eventId
+        eventName
+        numberOfGuest
+        address
+        shortDescription
+        image
+    }
+  }
+}
+`;
+
 const GET_VENDOR_USERNAMES = gql`
   query GetVendorUserNames {
     users(role: "vendor") {
         userName
     }
   }
-`;  
+`;
 
 const GET_EVENTS = gql`
   query GetEvents {
@@ -71,7 +87,6 @@ const GET_EVENTS = gql`
       shortDescription
       image
       isBlocked
-      userName   
     }
   }
 `;
@@ -86,7 +101,6 @@ const GET_EVENT = gql`
       shortDescription
       image
       isBlocked
-      userName
     }
   }
 `;
@@ -100,7 +114,6 @@ const CREATE_EVENT = gql`
     $shortDescription: String
     $image: String
     $isBlocked: Boolean
-    $UserName: String!
     ) {
     createEvent(
         eventName: $eventName
@@ -109,7 +122,6 @@ const CREATE_EVENT = gql`
         shortDescription: $shortDescription
         image: $image
         isBlocked: $isBlocked
-        UserName: $UserName
     ) {
       eventId
       eventName
@@ -118,33 +130,25 @@ const CREATE_EVENT = gql`
       shortDescription
       image
       isBlocked
-        user {
-            userName
-        }
     }
   }
 `;
 const UPDATE_EVENT = gql`
   mutation UpdateEvent(
-  $eventId: ID!, 
-  $eventName: String, 
-  $numberOfGuest: Int, 
-  $address: String, 
-  $shortDescription: String, 
-  $image: String, 
-  $isBlocked: Boolean,
-  $isArchived: Boolean, 
-  $userName: String) {
+    $eventId: ID!,
+    $eventName: String!,
+    $numberOfGuest: Int!,
+    $address: String,
+    $shortDescription: String,
+    $image: String
+  ) {
     updateEvent(
       eventId: $eventId,
       eventName: $eventName,
       numberOfGuest: $numberOfGuest,
       address: $address,
       shortDescription: $shortDescription,
-      image: $image,
-      isBlocked: $isBlocked,
-      isArchived: $isArchived,
-      userName: $userName
+      image: $image
     ) {
       eventId
       eventName
@@ -152,34 +156,40 @@ const UPDATE_EVENT = gql`
       address
       shortDescription
       image
-      isBlocked
-      isArchived
-      userName
-    }
-  }
-`;
-
-const DELETE_EVENT = gql`
-  mutation DeleteEvent($eventId: ID!) {
-    deleteEvent(id: $eventId)
-  }
-`
-
-const ADD_PET_TO_PROFILE = gql`
-  mutation AddPetToProfile($profileId: ID!, $petId: ID!) {
-    addPetToProfile(profileId: $profileId, petId: $petId) {
-      profile_id
-      pets {
-        pet_id
-        name
+      user {
+        userName
       }
     }
   }
 `;
 
-const REMOVE_PET_FROM_PROFILE = gql`
-  mutation RemovePetFromProfile($profileId: ID!, $petId: ID!) {
-    removePetFromProfile(profileId: $profileId, petId: $petId) {
+
+const DELETE_EVENT = gql`
+  mutation DeleteEvent($eventId: ID!) {
+    deleteEvent(eventId: $eventId)
+  }
+`
+
+const ADD_FEATURED_EVENT = gql`
+  mutation AddFeaturedEvent($eventId: ID!) {
+    addFeaturedEvent(eventId: $eventId) {
+      FeaturedId
+      event {
+        eventId
+      }
+    }
+  }    
+`;
+
+const DELETE_FEATURED_EVENT = gql`
+  mutation DeleteFeaturedEvent($featuredId: ID!) {
+    deleteFeaturedEvent(featuredId: $featuredId)
+  }
+`;
+
+const ADD_PET_TO_PROFILE = gql`
+  mutation AddPetToProfile($profileId: ID!, $petId: ID!) {
+    addPetToProfile(profileId: $profileId, petId: $petId) {
       profile_id
       pets {
         pet_id
@@ -232,6 +242,11 @@ export const AdminService = {
     return data.user;
   },
 
+  getAllFeaturedEvents: async (): Promise<FeatureEvent[]> => {
+    const { data } = await client.query({ query: GET_FEATURED_EVENTS });
+    return data.featuredEvents;
+  },
+
   // Admin CRUD
   createEvent: async (event: {
     eventName: string,
@@ -249,30 +264,42 @@ export const AdminService = {
     return data.createEvent;
   },
 
-  deleteEvent: async (eventId: number): Promise<boolean> => {
+  deleteEvent: async (eventId: string): Promise<boolean> => {
     const { data } = await client.mutate({
       mutation: DELETE_EVENT,
       variables: { eventId },
     });
     return data.deleteEvent;
   },
-updateEvent: async (eventId: number, event: Event): Promise<Event> => {
-  console.log("Updating event with ID:", eventId, "Data:", event); // Debug log
-  const { data } = await client.mutate({
-    mutation: UPDATE_EVENT,
-    variables: {
-      eventId: Number(eventId),
-      eventName: event.eventName,
-      numberOfGuest: event.numberOfGuest,
-      address: event.address,
-      shortDescription: event.shortDescription,
-      image: event.image,
-      isBlocked: event.isBlocked,
-      isArchived: false,
-      userName: event.userName,
-    },
-  });
 
-  return data.updateEvent;
-},
+  updateEvent: async (
+    eventId: string,
+    event: {
+      eventName?: string,
+      numberOfGuest?: number,
+      address?: string,
+      shortDescription?: string,
+      image?: string,
+    }
+  ): Promise<Event> => {
+    const { data } = await client.mutate({
+      mutation: UPDATE_EVENT,
+      variables: { eventId, ...event },
+    });
+    return data.updateEvent;
+  },
+  addFeaturedEvent: async (eventId: string): Promise<FeatureEvent> => {
+    const { data } = await client.mutate({
+      mutation: ADD_FEATURED_EVENT,
+      variables: { eventId },
+    });
+    return data.addFeaturedEvent;
+  },
+  deleteFeaturedEvent: async (featuredId: string): Promise<boolean> => {
+    const { data } = await client.mutate({
+      mutation: DELETE_FEATURED_EVENT,
+      variables: { id: featuredId },
+    });
+    return data.deleteFeaturedEvent;
+  },
 };

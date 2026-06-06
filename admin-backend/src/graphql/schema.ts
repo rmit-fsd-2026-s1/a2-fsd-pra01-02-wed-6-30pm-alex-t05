@@ -27,6 +27,12 @@ export const typeDefs = gql`
         events: [Event!]
     }
 
+    type FeaturedEvent {
+      FeaturedId: ID!
+      event: Event!
+      }
+
+
   type Query {
     admins: [Admin!]!
     admin(userName: String!): Admin
@@ -35,6 +41,8 @@ export const typeDefs = gql`
     users(role: String): [User!]!
     user(userName: String!): User
     vendorUserNames: [String!]!
+    featuredEvents: [FeaturedEvent!]!
+    featuredEvent(featuredId: ID!): FeaturedEvent
   }
 
   type Mutation {
@@ -68,7 +76,11 @@ export const typeDefs = gql`
         image: String
     ): Event!
 
+    deleteEvent(eventId: ID!): Boolean!
+
     addEventToVendor(userName: String!, eventId: ID!): Event!
     removeEventFromVendor(userName: String!, eventId: ID!): Event!
+    addFeaturedEvent(eventId: ID!): FeaturedEvent!
+    deleteFeaturedEvent(featuredId: ID!): Boolean!
   }
 `;
