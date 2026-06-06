@@ -456,6 +456,7 @@ export class UserController {
     });
 
     try {
+      // Saves the preferred venue to the database
       await this.preferredVenueRepository.save(preferredVenue);
     } catch (error) {
       return response.status(500).json({ message: "Error saving preferred venue", error });
@@ -471,23 +472,28 @@ export class UserController {
 * @returns JSON response indicating success or failure
 */
   async removePreferredVenue(request: Request, response: Response) {
+    // Gets the user by their username
     const user = await this.userRepository.findOneBy({
       userName: request.params.userName,
     });
 
+    // Checks if user exists
     if (!user) {
       return response.status(404).json({ message: "User not found" });
     }
 
+    // Checks if user is a hirer
     if (user.role !== "hirer") {
       return response.status(403).json({ message: "User is not a hirer" });
     }
 
+    // Deletes the preferred venue based on the user and event
     const result = await this.preferredVenueRepository.delete({
       user: { userName: user.userName },
       event: { eventId: parseInt(request.params.eventId) }
     });
 
+    // If venue was not found
     if (!result.affected) {
       return response.status(404).json({ message: "Preferred venue not found for this user and event" });
     }
