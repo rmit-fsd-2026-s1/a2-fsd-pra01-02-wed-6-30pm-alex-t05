@@ -99,5 +99,13 @@ router.post("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
 router.delete("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
   await userController.removePreferredEvent(req, res);
 });
+//compliance document upload
+router.post("/hirer/:userName/compliance-document", async (req, res) => {
+  await userController.uploadComplianceDocument(req, res);
+});
+//get compliance document count for user
+router.get("/hirer/:userName/compliance-document/count", async (req, res) => {
+  await userController.getComplianceDocCountForUser(req, res);
+});
 
 export default router;

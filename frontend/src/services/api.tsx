@@ -150,6 +150,14 @@ export const userService = {
     deletePreferredEventForUser: async (userName: string, eventId: number): Promise<void> => {
         await axios.delete(`${API_BASE_URL}/hirer/${userName}/preferred-events/${eventId}`);
     },
+    uploadComplianceDocument: async (userName: string, fileName: string, file: string): Promise<void> => {
+        console.log(`Uploading compliance document for user: ${userName}, fileName: ${fileName}`);
+        await axios.post(`${API_BASE_URL}/hirer/${userName}/compliance-document`, { fileName, file });
+    },
+    getComplianceDocCountForUser: async (userName: string): Promise<number> => {
+        const { data } = await axios.get(`${API_BASE_URL}/hirer/${userName}/compliance-document/count`);
+        return data.count;
+    }
 };
 
 export const applicationService = {

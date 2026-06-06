@@ -5,9 +5,9 @@ import { User } from "../../types/user";
 import { useRouter } from "next/router";
 import { useUserRating } from '@/hooks/useUserRating';
 import useApplicationHistory from '@/hooks/useApplicationHistory';
-import { fileUploader } from '@/services/FileUploader';
 import ApplicationHistory from '@/components/ApplicationHistory';
 import { userService } from '@/services/api';
+import FileUploader from '@/components/FileUploader';
 
 export default function Profile() {
     //setup
@@ -30,7 +30,7 @@ export default function Profile() {
     const applicationHistory = useApplicationHistory(profileUserName);
     //gets rating from custom hook
     const rating = useUserRating(profileUser?.userName || '');
-    const credibilityScore = profileUser?.complianceDocuments?.length ?? 0;
+    const [credibilityScore, setCredibilityScore] = useState<number | null>(null);
 
     //fetches user to display
     //TODO refactor this to a hook
@@ -47,6 +47,21 @@ export default function Profile() {
         console.error("Error fetching user details:", error);
     }
     }, [profileUserName, currentUser, router.isReady]); //refetches if profile username query parameter or current user changes
+
+    useEffect(() => {
+        try {
+            async function fetchCredibilityScore() {
+                if (!profileUser) return;
+                const count = await userService.getComplianceDocCountForUser(profileUser.userName);
+                //this is a stand in system to set user credibility score based on documents uploaded
+                const score = Math.min(count / 4, 1);
+                setCredibilityScore(score);
+            }
+            fetchCredibilityScore();
+        } catch (error) {
+            console.error("Error fetching credibility score:", error);
+        }
+    }, [profileUserName]);
 
     useEffect(() => {
         // When the profileUser state changes, update the form fields with the new user details, also discards unsaved changes when editing
@@ -87,21 +102,16 @@ export default function Profile() {
             }
         }
     }
-    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        //submits file to uploader service
-        const file = e.target.files?.[0];
-        if (file && profileUser) {
-            const result = await fileUploader(profileUser, file);
-            if (result.success && result.updatedUser) {
-                //runs profile update
-                await userService.updateUser(result.updatedUser);
-                setProfileUser(result.updatedUser);
-            } else {
-                setColor(`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`); // Set color for message
-            }
-            setValidation(result.message);
+    const handleUpload = async (fileName: string, fileToUpload: string) => {
+        await userService.uploadComplianceDocument(profileUserName, fileName, fileToUpload);
+        try {
+            const updatedUser = await userService.getOneUser(profileUserName);
+            setProfileUser(updatedUser);
+        } catch (error) {
+            console.error("Error fetching updated user details after upload:", error);
         }
-    };
+    }
+        
     if (!profileUser) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -174,10 +184,9 @@ export default function Profile() {
                     {profileUser.role === "hirer" && editing && (
                         <Box mt={4} display="flex" gap={3}>
                             <p>Compliance Document Upload</p>
-                            <Input
-                                type="file"
-                                accept=".pdf, .png, .jpg, .jpeg"
-                                onChange={handleUpload}
+                            <FileUploader
+                                userName={profileUser.userName}
+                                onSubmit={handleUpload}
                             />
                         </Box>
                     )}

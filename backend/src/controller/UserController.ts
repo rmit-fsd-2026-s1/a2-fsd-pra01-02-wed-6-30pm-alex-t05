@@ -5,12 +5,14 @@ import { Event } from "../entity/Event";
 import { PreferredEvents } from "../entity/PreferredEvents";
 import { VendorComment } from "../entity/VendorComment";
 import * as argon2 from "argon2";
+import { ComplianceDocs } from "../entity/ComplianceDocs";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
   private vendorCommentRepository = AppDataSource.getRepository(VendorComment);
   private eventRepository = AppDataSource.getRepository(Event);
   private preferredEventRepository = AppDataSource.getRepository(PreferredEvents);
+  private complianceDocRepository = AppDataSource.getRepository(ComplianceDocs);
 
   /**
    * Retrieves all users from the database
@@ -501,4 +503,28 @@ export class UserController {
 
     response.status(204).send();
   }
+  async uploadComplianceDocument(request: Request, response: Response) {
+    const userName = request.params.userName;
+    const fileName = request.body.fileName;
+    const file = request.body.file;
+    const complianceDoc = this.complianceDocRepository.create({
+      hirerUserName: userName,
+      fileName: fileName,
+      fileAsBase64String: file
+    });
+    try {
+      await this.complianceDocRepository.save(complianceDoc);
+      response.status(201).json({ message: "Compliance document uploaded successfully" });
+    } catch (error) {
+      response.status(500).json({ message: "Error uploading compliance document", error });
+    }
+  }
+  async getComplianceDocCountForUser(request: Request, response: Response) {
+    const userName = request.params.userName;
+    const count = await this.complianceDocRepository.count({
+      where: { hirerUserName: userName },
+    });
+    response.json({ count });
+  }
+
 };
