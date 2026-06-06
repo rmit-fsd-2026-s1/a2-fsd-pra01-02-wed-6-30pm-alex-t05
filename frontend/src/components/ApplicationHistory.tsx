@@ -4,10 +4,9 @@ import { useEvent } from "@/context/EventContext";
 
 export default function ApplicationHistory({application}: {application: Application}) {
     const { events } = useEvent();
-    const eventByApplication = events.find(event => event.eventId === application.eventId);
     return (
         <Box>
-            {eventByApplication ? eventByApplication.eventName : "Unknown Event"}: {application.startDate} to {application.endDate.slice(5)} - Status: {application.status} {application.rating ? `- Rating: ${application.rating}/5` : ""}
+            <p>{events.find(e => e.eventId === application.eventId)?.eventName || 'Unknown Event'} |    Application ID: {application.applicationId} - Status: {application.status} - Rating: {application.rating !== null ? application.rating + " / 5" : 'Not Yet Rated'}</p>
         </Box>
     )
 }
