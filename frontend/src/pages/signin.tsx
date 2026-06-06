@@ -14,10 +14,14 @@ export default function Signin() {
     const router = useRouter();
     const { login } = useAuth();
 
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => { // When the submit button get pressed this executes
+    const handleSubmit = async (e: React.FormEvent<HTMLButtonElement>) => { // When the submit button get pressed this executes
         e.preventDefault(); // Page doesn't reload?
         setError(""); //clear previous error message on new submit attempt
+        console.log("attempting log in")
+        if (!validate()) { //if validation fails, stop the submission process
+            console.log("validation failed");
+            return;
+        }
         try {
             await login(email, password);
             router.push("/"); // Redirect to home page after successful login
@@ -32,6 +36,24 @@ export default function Signin() {
         }
     };
 
+    const validate = () => {
+        if (!email) {
+            setError("Email is required");
+            console.log("validation failed: email is required");
+            return false;
+        }
+        if (!email.includes("@")) {
+            console.log("validation failed: email must be valid");
+            setError("Email must be valid e.g., example@domain.com");
+            return false;
+        }
+        if (!password) {
+            setError("Password is required");
+            return false;
+        }
+        return true;
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-100 h-130">
@@ -40,30 +62,26 @@ export default function Signin() {
                         {error}
                     </div>
                 ) : null}
-                <form onSubmit={handleSubmit}>
                     <h1 className="!text-4xl">Sign in</h1>
-                    <FormControl isRequired>
+                    <FormControl>
                         <FormLabel>Email address</FormLabel>
                         <Input
-                            type='email'
+                            type='text'
                             placeholder='Email'
                             onChange={(e) => setEmail(e.target.value)} // Sets a new state for 'email'
                         />
-                    </FormControl>
-
-                    <FormControl isRequired>
                         <FormLabel>Password</FormLabel>
                         <Input
                             type='password'
                             placeholder='Password'
                             onChange={(e) => setPassword(e.target.value)} // Sets a new state for 'password'
                         />
-                    </FormControl>
+                    
 
-                    <Button mt={4} colorScheme='teal' type='submit'>
+                    <Button mt={4} colorScheme='teal' onClick={handleSubmit} type='submit'>
                         Sign In
                     </Button>
-                </form>
+                </FormControl>
             </div>
             <div className="bg-blue-200 p-8 rounded-lg shadow-md w-75 h-130">
                 <div>
