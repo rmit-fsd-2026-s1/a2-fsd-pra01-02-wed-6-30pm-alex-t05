@@ -68,7 +68,7 @@ export default function Vendor() {
                 <Button colorScheme='teal' type='button'
                     onClick={
                         () => {
-                            setVisualisationsVisible(!visualisationsVisible);
+                            alert("Not implemented :(");
                         }
                     }>
                     {visualisationsVisible ? "Hide Visualisations" : "Show Visualisations"}
