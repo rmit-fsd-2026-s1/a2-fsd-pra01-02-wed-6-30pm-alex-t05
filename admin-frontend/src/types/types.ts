@@ -24,5 +24,12 @@ export interface User {
 
 export interface FeatureEvent {
     FeaturedId: string;
-    event: Event;
+    event: {
+        eventId: string;
+        eventName: string;
+        numberOfGuest: number;
+        address: string;
+        shortDescription?: string;
+        image: string;
+    }
 }

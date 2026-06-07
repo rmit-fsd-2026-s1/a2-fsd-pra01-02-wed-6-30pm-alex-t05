@@ -155,7 +155,7 @@ export class UserController {
    */
   async getAllEventsForVendor(request: Request, response: Response) {
     const user = await this.userRepository.findOneBy({
-      userName: request.params.userName, 
+      userName: request.params.userName,
     });
 
     if (!user) {
@@ -381,28 +381,6 @@ export class UserController {
   }
 
   // ---Preferred Events---
-  async getAllPreferredEventsForUser(request: Request, response: Response) {
-    const user = await this.userRepository.findOneBy({
-      userName: request.params.userName,
-    });
-
-    if (!user) {
-      return response.status(404).json({ message: "User not found" });
-    }
-
-    if (user.role !== "hirer") {
-      return response.status(403).json({ message: "User is not a hirer" });
-    }
-
-    const preferredEvents = await this.preferredEventRepository.find({
-      where: { user: { userName: user.userName } },
-      order: { ranking: "ASC" },
-      relations: ["event"],
-    });
-
-    response.json(preferredEvents);
-  }
-
   /**
 * Adds a preferred event to the database for a hirer
 * @param request - Express request object containing the userName and event ID in params

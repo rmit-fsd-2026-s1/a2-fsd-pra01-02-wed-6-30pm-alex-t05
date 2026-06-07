@@ -9,13 +9,13 @@ import TagsCheckBox from "@/components/TagsCheckbox";
 import { eventService } from '@/services/api';
 import { Event } from '@/types/event';
 
-export default function Hirer() {
+export default function PreferredEvent() {
     const router = useRouter();
     const { userName } = router.query;
     const { user } = useAuth()
     const { events } = useEvent();
     const [userSearch, setUserSearch] = useState('')
-    const [tags, setTags] = useState<{ eventId: number; tag: string}[]>([]);
+    const [tags, setTags] = useState<{ eventId: number; tag: string }[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     useEffect(() => {
@@ -62,24 +62,24 @@ export default function Hirer() {
                 /* include will get userSearch(useState) with the events and see what matches.
                 filter will get the found events and return them */
                 <div className="grid grid-cols-2 gap-4">
-                    {events.filter(e => 
-                    (
-                        e.eventName.toLowerCase().includes(userSearch.toLowerCase()) ||
-                        e.numberOfGuest.toString().includes(userSearch.toLowerCase()) ||
-                        e.address?.toLowerCase().includes(userSearch.toLowerCase()) ||
-                        e.shortDescription?.toLowerCase().includes(userSearch.toLowerCase())
-                     ) &&
-                     (  selectedTags.length === 0 ||
-                        tags.filter(t => t.eventId === e.eventId).some(t => selectedTags.includes(t.tag))
-                     )
-                        ).map((event) => (
-                            <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
-                                <Card
-                                    event={event}
-                                    tags={tags.filter(t => t.eventId === event.eventId).map(t => t.tag)}
-                                    />
-                            </div>
-                        ))}
+                    {events.filter(e =>
+                        (
+                            e.eventName.toLowerCase().includes(userSearch.toLowerCase()) ||
+                            e.numberOfGuest.toString().includes(userSearch.toLowerCase()) ||
+                            e.address?.toLowerCase().includes(userSearch.toLowerCase()) ||
+                            e.shortDescription?.toLowerCase().includes(userSearch.toLowerCase())
+                        ) &&
+                        (selectedTags.length === 0 ||
+                            tags.filter(t => t.eventId === e.eventId).some(t => selectedTags.includes(t.tag))
+                        )
+                    ).map((event) => (
+                        <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
+                            <Card
+                                event={event}
+                                tags={tags.filter(t => t.eventId === event.eventId).map(t => t.tag)}
+                            />
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

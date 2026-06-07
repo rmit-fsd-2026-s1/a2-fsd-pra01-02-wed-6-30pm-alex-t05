@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 
 
 
-export default function PreferredEvent() {
+export default function FeaturedEvent() {
     const { user } = useAuth();
     const { eventsForHirer } = useEvent();
     const { featuredEvents } = useEvent();

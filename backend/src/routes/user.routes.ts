@@ -85,11 +85,6 @@ router.delete("/vendor/:vendorUserName/comments/:hirerUserName", async (req, res
 });
 
 // ---Preferred Events---
-// Gets all preferred events for a hirer by their username
-router.get("/hirer/:userName/preferred-events", async (req, res) => {
-  await userController.getAllPreferredEventsForUser(req, res);
-});
-
 // Adds a preferred event for a hirer by their username and event id
 router.post("/hirer/:userName/preferred-events/:eventId", async (req, res) => {
   await userController.addPreferredEvent(req, res);

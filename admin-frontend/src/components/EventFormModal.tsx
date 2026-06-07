@@ -6,14 +6,12 @@ export default function EventFormModal({
     mode,
     selectedEvent,
     onClose,
-    onSubmit,
-    vendorUserNames }: {
+    onSubmit }: {
         mode: "createEvent" | "editEvent",
         selectedEvent: Event | null,
         onClose: () => void,
         onSubmit: (eventData: any) => void,
-        vendorUserNames?: string[]
-}) {
+    }) {
     //set defaults on mount if in edit mode
     useEffect(() => {
         if (mode === "editEvent" && selectedEvent) {
@@ -23,33 +21,18 @@ export default function EventFormModal({
                 numberOfGuest: selectedEvent.numberOfGuest.toString(),
                 shortDescription: selectedEvent.shortDescription || "",
                 address: selectedEvent.address || "",
-                userName: selectedEvent.userName || "",
             });
         }
     }, [mode]);
 
     const [formData, setFormData] = useState({
-        eventName: mode === "editEvent" && selectedEvent ? selectedEvent.eventName : "",
-        numberOfGuest: mode === "editEvent" && selectedEvent ? selectedEvent.numberOfGuest.toString() : "",
-        shortDescription: mode === "editEvent" && selectedEvent ? selectedEvent.shortDescription || "" : "",
-        image: mode === "editEvent" && selectedEvent ? selectedEvent.image || "" : "",
-        address: mode === "editEvent" && selectedEvent ? selectedEvent.address || "" : "",
-        userName: selectedEvent?.userName || "",
+        eventName: "",
+        image: "",
+        numberOfGuest: "",
+        shortDescription: "",
+        address: "",
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
-        // Clear the error for this field when the user starts typing
-        if (errors[e.target.name]) {
-            setErrors({
-                ...errors,
-                [e.target.name]: ""
-            });
-        }
-    };
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
@@ -72,7 +55,7 @@ export default function EventFormModal({
         return Object.keys(newErrors).length === 0 ? null : "Please fix the errors in the form.";
     }
     return (
-        <Box 
+        <Box
             position="fixed"
             top={0}
             left={0}
@@ -84,72 +67,63 @@ export default function EventFormModal({
             bg="blackAlpha.600"
             zIndex={1000}
             onClick={onClose}>
-                <Box bg="white" p={6} rounded="md" shadow="md" onClick={(e) => e.stopPropagation()} width="400px">
-                    {mode === "editEvent" ? (
-                        <Box as="h2" mb={4}>Edit Event</Box>
-                    ) : (
-                        <Box as="h2" mb={4}>Create Event</Box>
-                    )}
-                    {/*TODO implement form*/}
-                    <FormControl>
-                        <InputField
-                            label="User"
-                            name="userName"
-                            type="select"
-                            value={formData.userName}
-                            onChange={handleInputChange}
-                            error={errors.userName}
-                            selectOptions={vendorUserNames || []}
-                        />
-                        <InputField
-                            label="Event Name"
-                            name="eventName"
-                            value={formData.eventName}
-                            onChange={handleInputChange}
-                            error={errors.eventName}
-                        />
-                        <InputField
-                            label="Image URL"
-                            name="image"
-                            value={formData.image}
-                            onChange={handleInputChange}
-                            error={errors.image}
-                        />
-                        <InputField
-                            label="Address"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleInputChange}
-                            error={errors.address}
-                        />
-                        <InputField
-                            label="Occupancy"
-                            name="numberOfGuest"
-                            type="number"
-                            value={formData.numberOfGuest}
-                            onChange={handleInputChange}
-                            error={errors.numberOfGuest}
-                        />
-                        <InputField
-                            label="Description"
-                            name="shortDescription"
-                            type="textarea"
-                            value={formData.shortDescription}
-                            onChange={handleInputChange}
-                            error={errors.shortDescription}
-                            helperText="Include keywords here that users may use to search for suitable venues"
-                        />
-                    </FormControl>
-                    <Button mt={4} colorScheme="teal" onClick={() => {
-                        const validationError = validateForm();
-                        if (!validationError) {
-                            console.log("Form data is valid, submitting:", formData);
-                            onSubmit({ ...formData });
-                        }
-                    }}>
-                        {mode === "editEvent" ? "Save Changes" : "Create Event"}
-                    </Button>
-                </Box>
+            <Box bg="white" p={6} rounded="md" shadow="md" onClick={(e) => e.stopPropagation()} width="400px">
+                {mode === "editEvent" ? (
+                    <Box as="h2" mb={4}>Edit Event</Box>
+                ) : (
+                    <Box as="h2" mb={4}>Create Event</Box>
+                )}
+                {/*TODO implement form*/}
+                <FormControl>
+                    <InputField
+                        label="Event Name"
+                        name="eventName"
+                        value={formData.eventName}
+                        onChange={(e) => setFormData({ ...formData, eventName: e.target.value })}
+                        error={errors.eventName}
+                    />
+                    <InputField
+                        label="Image URL"
+                        name="image"
+                        value={formData.image}
+                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                        error={errors.image}
+                    />
+                    <InputField
+                        label="Address"
+                        name="address"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        error={errors.address}
+                    />
+                    <InputField
+                        label="Occupancy"
+                        name="numberOfGuest"
+                        type="number"
+                        value={formData.numberOfGuest}
+                        onChange={(e) => setFormData({ ...formData, numberOfGuest: e.target.value })}
+                        error={errors.numberOfGuest}
+                    />
+                    <InputField
+                        label="Description"
+                        name="shortDescription"
+                        type="textarea"
+                        value={formData.shortDescription}
+                        onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                        error={errors.shortDescription}
+                        helperText="Include keywords here that users may use to search for suitable venues"
+                    />
+                </FormControl>
+                <Button mt={4} colorScheme="teal" onClick={() => {
+                    const validationError = validateForm();
+                    if (!validationError) {
+                        console.log("Form data is valid, submitting:", formData);
+                        onSubmit({ ...formData });
+                    }
+                }}>
+                    {mode === "editEvent" ? "Save Changes" : "Create Event"}
+                </Button>
+            </Box>
         </Box>
     )
 }

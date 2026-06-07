@@ -6,6 +6,8 @@ import eventRoutes from "./routes/event.routes";
 import featuredEventRoutes from "./routes/featuredEvents.routes";
 import cors from "cors";
 import applicationRoutes from "./routes/application.routes";
+import preferredEventRoutes from "./routes/preferredEvent.routes";
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -15,6 +17,7 @@ app.use("/api", userRoutes);
 app.use("/api", eventRoutes);
 app.use("/api", applicationRoutes);
 app.use("/api", featuredEventRoutes);
+app.use("/api", preferredEventRoutes);
 
 
 AppDataSource.initialize()

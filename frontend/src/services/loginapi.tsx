@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Event } from "../types/event";
 import { User } from "../types/user";
 
 const API_BASE_URL = "http://localhost:3001/api";

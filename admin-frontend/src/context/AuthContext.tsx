@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (foundUser) {
             setAdmin(foundUser);
-            localStorage.setItem('currentUser', JSON.stringify(foundUser));
+            localStorage.setItem('currentAdmin', JSON.stringify(foundUser));
             return true;
         }
         return false;
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const logout = () => {
         setAdmin(null);
-        localStorage.removeItem('currentUser');
+        localStorage.removeItem('currentAdmin');
     };
 
     return (

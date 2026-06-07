@@ -18,7 +18,7 @@ export default function Home() {
 
     const success = await login(adminData);
     if (success) {
-      router.push("/");
+      router.push(`/adminDashboard/${adminData.userName}`);
     } else {
       setError("Invalid username or password");
     }
@@ -33,7 +33,7 @@ export default function Home() {
           </div>
         ) : null}
         <form onSubmit={handleSubmit}>
-          <h1 className="!text-4xl">Sign in</h1>
+          <h1 className="!text-4xl">Admin Sign in</h1>
           <FormControl isRequired className="mt-4">
             <FormLabel>Username</FormLabel>
             <Input

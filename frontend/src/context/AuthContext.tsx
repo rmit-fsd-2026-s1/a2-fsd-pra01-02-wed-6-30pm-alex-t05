@@ -17,6 +17,7 @@ type login = {
 
 type AuthContextType = {
     user: AuthUser | null;
+    fetchUsers: () => Promise<User[]>;
     login: (userName: string, password: string) => Promise<void>;
     logout: () => void;
 }
@@ -44,13 +45,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.setItem('currentUser', JSON.stringify(userData));
     };
 
+    const fetchUsers = async () => {
+        try {
+            const data = await userService.getAllUsers();
+            return data;
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
     const logout = () => {
         setUser(null);
         localStorage.removeItem('currentUser');
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, fetchUsers, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

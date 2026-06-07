@@ -149,6 +149,7 @@ export default function Card({ event, vendorUserNames }: CardProps) {
                                 >
                                     Delete
                                 </Button>
+                                {/*}
                                 <Button
                                     colorScheme="yellow"
                                     variant="ghost"
@@ -156,6 +157,7 @@ export default function Card({ event, vendorUserNames }: CardProps) {
                                 >
                                     Attach
                                 </Button>
+                                {*/}
                             </Box>
 
                         )}
