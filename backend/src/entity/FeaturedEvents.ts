@@ -6,7 +6,7 @@ export class FeaturedEvents {
     @PrimaryGeneratedColumn()
     FeaturedId: number
 
-    @OneToOne(() => Event)
+    @OneToOne(() => Event, { cascade: true, onDelete: "CASCADE" })
     @JoinColumn()
     event: Event
 }

@@ -16,7 +16,7 @@ export class EventTags {
   @PrimaryColumn()
   tag: string;
 
-  @ManyToOne(() => Event)
+  @ManyToOne(() => Event, { cascade: true, onDelete: "CASCADE" })
   @JoinColumn({ name: "eventId", referencedColumnName: "eventId" })
   event: Event;
 

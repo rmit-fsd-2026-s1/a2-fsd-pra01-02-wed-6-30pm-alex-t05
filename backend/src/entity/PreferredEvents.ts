@@ -15,7 +15,7 @@ export class PreferredEvents {
     @ManyToOne(() => User, (user: User) => user.preferredEvents)
     user: User;
 
-    @ManyToOne(() => Event, (event: Event) => event.preferredEvents)
+    @ManyToOne(() => Event, (event: Event) => event.preferredEvents, { cascade: true, onDelete: "CASCADE" })
     event: Event;
 
     @Column()

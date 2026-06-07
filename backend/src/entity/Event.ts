@@ -4,10 +4,13 @@ import {
     Column,
     ManyToOne,
     ManyToMany,
-    OneToMany
+    OneToMany,
+    OneToOne
 } from "typeorm";
 import { User } from "./User";
 import { PreferredEvents } from "./PreferredEvents";
+import { EventTags } from "./EventTags";
+import { FeaturedEvents } from "./FeaturedEvents";
 @Entity()
 export class Event {
     @PrimaryGeneratedColumn()
@@ -34,4 +37,10 @@ export class Event {
 
     @OneToMany(() => PreferredEvents, (preferredEvent: PreferredEvents) => preferredEvent.event)
     preferredEvents: PreferredEvents[];
+
+    @OneToMany(() => EventTags, tag => tag.event)
+    eventTags: EventTags[];
+
+    @OneToOne(() => FeaturedEvents, featuredEvent => featuredEvent.event)
+    featuredEvent: FeaturedEvents;
 }

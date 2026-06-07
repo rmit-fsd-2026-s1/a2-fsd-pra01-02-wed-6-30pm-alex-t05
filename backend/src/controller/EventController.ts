@@ -85,6 +85,7 @@ export class EventController {
    * @returns JSON response with success message or 404 error if user not found
    */
   async remove(request: Request, response: Response) {
+    console.log("Received request to remove event with ID:", request.params.id);
     const eventId = parseInt(request.params.id);
     const eventToRemove = await this.eventRepository.findOne({
       where: { eventId },
@@ -94,7 +95,9 @@ export class EventController {
     if (!eventToRemove) {
       return response.status(404).json({ message: "Event not found" });
     }
+    console.log("Found event to remove:", eventToRemove);
     const applicationCount = await this.applicationRepository.count({ where: { event: { eventId } } });
+    console.log(`Number of applications associated with event ID ${eventId}:`, applicationCount);
     if (applicationCount > 0) {
       // If there are applications associated with the event, set isArchived to true instead of deleting
       eventToRemove.isArchived = true;
