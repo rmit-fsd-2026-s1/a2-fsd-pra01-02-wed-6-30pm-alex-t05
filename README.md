@@ -55,7 +55,12 @@ for order: { ranking: "ASC }
 for one-to-one relations
     One-to-one relations | TypeORM 2026, Typeorm.io, viewed 6 June 2026, <https://typeorm.io/docs/relations/one-to-one-relations/>.
 ‌
+Chakra v2 forms, used in componts EventModal, ApplicationModal
+Adebayo, S. (n.d.). Form Control. [online] Chakra UI: Simple, Modular and Accessible UI Components for your React Applications. Available at: https://v2.chakra-ui.com/docs/components/form-control [Accessed 7 Jun. 2026].
 
+
+Use of Generative AI:
+Generative AI tools including Claude, Chatgpt and Copilot were used in this project primarily for bug diagonisisand, inline completion for repetitive areas and for conceptual exploration. Generated code snippets were critically analysed and care was taken to suitibly modify and adapt any outputs before implementation.
 
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
