@@ -180,6 +180,10 @@ export default function Profile() {
                     <p>Credibility Score</p>
                     <p>{credibilityScore ? credibilityScore * 25 + "%" : 'Not rated'}</p>
                 </Box>
+                <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
+                    <p>Account Created At</p>
+                    <p>{profileUser.createdAt ? new Date(profileUser.createdAt).toLocaleDateString() : 'Not available'}</p>
+                </Box>
                 <Box>
                     {profileUser.role === "hirer" && editing && (
                         <Box mt={4} display="flex" gap={3}>
@@ -209,7 +213,6 @@ export default function Profile() {
                             {history ? 'Hide Application History' : 'Show Application History'}
                         </Button>
                     )}
-
                 </Box>
                 {history && (
                     <Box mt={6}>

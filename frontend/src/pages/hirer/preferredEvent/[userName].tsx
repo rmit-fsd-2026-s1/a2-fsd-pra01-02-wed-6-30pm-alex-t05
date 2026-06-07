@@ -5,6 +5,7 @@ import PreferredEventCard from "@/components/preferredEventCard";
 import { userService } from '@/services/api';
 import { useEvent } from "@/context/EventContext";
 import { useRouter } from "next/router";
+import { Event } from "@/types/event";
 
 
 
@@ -52,15 +53,12 @@ export default function PreferredEvent() {
                     {eventsForHirer.map((preferredEvent, index) => ( // Map prints the found events
                         <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={preferredEvent.event.eventId}>
                             <div className="text-lg font-bold float-right">Rank {index + 1}</div>
-                            <PreferredEventCard
-                                eventId={preferredEvent.event.eventId}
-                                eventName={preferredEvent.event.eventName}
-                                numberOfGuest={preferredEvent.event.numberOfGuest}
-                                address={preferredEvent.event.address || "No address provided"}
-                                image={preferredEvent.event.image}
-                                shortDescription={preferredEvent.event.shortDescription}
-                                isBlocked={preferredEvent.event.isBlocked}
-                            />
+                            {preferredEvent.event ? (
+                                <PreferredEventCard
+                                    event={preferredEvent?.event as Event} // Pass the entire event object to the card
+                                />
+                            ) : null}
+
                             <div className="flex justify-end gap-2 mt-2">
                                 <Button
                                     colorScheme='teal'

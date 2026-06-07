@@ -67,6 +67,7 @@ export const userService = {
 
     getOneUser: async (userName: string): Promise<User> => {
         const { data } = await axios.get(`${API_BASE_URL}/users/${userName}`);
+        console.log("Fetched user:", data);
         return data;
     },
 
