@@ -1,8 +1,5 @@
 import { useAuth } from "@/context/AuthContext";
-import { MdDelete } from "react-icons/md";
-import { Button } from "@chakra-ui/react";
 import PreferredEventCard from "@/components/preferredEventCard";
-import { userService } from '@/services/api';
 import { useEvent } from "@/context/EventContext";
 import { useRouter } from "next/router";
 import { Event } from "@/types/event";

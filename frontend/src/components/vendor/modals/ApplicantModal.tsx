@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { useUserRating } from "@/hooks/useUserRating";
 import { useAuth } from "@/context/AuthContext";
-import { applicationService, userService } from "@/services/api";
+import { userService } from "@/services/api";
 
 export default function ApplicantModal({
     application,

@@ -1,14 +1,13 @@
 import { Box, Button, Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/react";
 import { useAuth } from "../context/AuthContext";
 import { useEvent } from '../context/EventContext';
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ApplicantList from "./vendor/ApplicantList";
 import ApplicationForm from "./ApplicationForm";
 import { Application } from "@/types/application";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { Event } from "@/types/event";
 import { userService } from "@/services/api";
-import { MdArrowDropDown, MdSettings } from 'react-icons/md'
+import {  MdSettings } from 'react-icons/md'
 import EventFormModal from "./vendor/modals/EventFormModal";
 import { useRouter } from "next/router";
 import { eventService, applicationService } from "@/services/api";

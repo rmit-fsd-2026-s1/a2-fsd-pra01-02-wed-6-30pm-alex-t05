@@ -187,18 +187,6 @@ const DELETE_FEATURED_EVENT = gql`
   }
 `;
 
-const ADD_PET_TO_PROFILE = gql`
-  mutation AddPetToProfile($profileId: ID!, $petId: ID!) {
-    addPetToProfile(profileId: $profileId, petId: $petId) {
-      profile_id
-      pets {
-        pet_id
-        name
-      }
-    }
-  }
-`;
-
 export const AdminService = {
   getAllAdmins: async (): Promise<Admin[]> => {
     const { data } = await client.query({ query: GET_ADMINS });

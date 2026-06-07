@@ -5,8 +5,6 @@ import {
   UpdateDateColumn,
   PrimaryColumn,
   OneToMany,
-  ManyToMany,
-  JoinTable
 } from "typeorm";
 import { Event } from "./Event";
 import { PreferredEvents } from "./PreferredEvents";

@@ -75,7 +75,7 @@ Paramaterised queries in Application Controler
 Pleerock (2017) Re: parameterized queries in TypeORM with MSSQL. GitHub issue comment, 17 November. Available at: https://github.com/typeorm/typeorm/issues/881 (Accessed: 7 June 2026).
 
 Use of Generative AI:
-Generative AI tools including Claude, Chatgpt and Copilot were used in this project primarily for bug diagonisisand, inline completion for repetitive areas and for conceptual exploration. Generated code snippets were critically analysed and care was taken to suitibly modify and adapt any outputs before implementation. Specific areas of use were: several sql queries in applicationController
+Generative AI tools including Claude, Chatgpt and Copilot were used in this project primarily for bug diagonisisand, inline completion for repetitive areas and for conceptual exploration. Generated code snippets were critically analysed and care was taken to suitibly modify and adapt any outputs before implementation. Specific areas of use were: several sql queries in applicationController, repetition of back end entities, various front end css elememts, 
 
 FileReader component
 developer.mozilla.org. (n.d.). FileReader - Web APIs | MDN. [online] Available at: https://developer.mozilla.org/en-US/docs/Web/API/FileReader.

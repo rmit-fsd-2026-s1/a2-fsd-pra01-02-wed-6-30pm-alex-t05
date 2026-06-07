@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button, FormControl, FormLabel, Input } from '@chakra-ui/react';
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
-import { userService } from "@/services/api";
 import axios from 'axios';
 
 
