@@ -2,7 +2,7 @@ import React from "react";
 import { FormControl, FormLabel, Input, FormHelperText, FormErrorMessage, Textarea } from "@chakra-ui/react";
 //helper component to streamline form input fields
 type InputFieldProps = {
-    label: string;
+    label?: string;
     name: string;
     type?: string;
     value: string;
@@ -15,7 +15,7 @@ const InputField = ({ label, name, type = "text", value, onChange, error, helper
 const isTextArea = type === "textarea";    
     return (
         <FormControl isInvalid={!!error}>
-            <FormLabel>{label}</FormLabel>
+            {label && <FormLabel>{label}</FormLabel>}
             {isTextArea ? (
                 <Textarea name={name} value={value} onChange={onChange} />
             ) : (

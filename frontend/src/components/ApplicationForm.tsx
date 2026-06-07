@@ -22,12 +22,13 @@ export default function ApplicationForm({
     const [formData, setFormData] = useState({
         eventId: event.eventId,
         applicantUserName: applicantUserName,
-        startDate: "",
-        endDate: "",
+        startDate: normaliseDate(new Date().toISOString()), // Set default start date to today
+        endDate: normaliseDate(new Date().toISOString()), // Set default end date to today
         status: "",
         guests: "",
         rating: "",
     });
+
     useEffect(() => {
         //ensure formdata is populated correctly as props are loaded
         setFormData({
@@ -87,6 +88,9 @@ export default function ApplicationForm({
                 newErrors.startDate = "Selected dates overlap with unavailable dates.";
                 newErrors.endDate = "Selected dates overlap with unavailable dates.";
             }
+        }
+        if (formData.startDate && formData.startDate < normaliseDate(new Date().toISOString())) {
+            newErrors.startDate = "Start date cannot be in the past.";
         }
         if (!formData.guests) {
             newErrors.guests = "Number of guests is required.";
@@ -215,7 +219,6 @@ export default function ApplicationForm({
         />
         {/* hidden field to allow vendors to set their own rating to 0 */}
         <InputField
-            label = "Rating"
             type = "hidden"
             name = "rating"
             value={""}
