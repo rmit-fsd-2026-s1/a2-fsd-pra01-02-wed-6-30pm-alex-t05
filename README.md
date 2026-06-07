@@ -11,6 +11,16 @@ Lab08 code archive:
     UserController.ts
     User.ts
 
+Render URL:
+frontend: https://a2-fsd-pra01-02-wed-6-30pm-alex-t05-1.onrender.com/
+backend: https://a2-fsd-pra01-02-wed-6-30pm-alex-t05.onrender.com/
+admin-frontend: https://a2-fsd-pra01-02-wed-6-30pm-alex-t05-yn74.onrender.com/
+admin-backend: https://a2-fsd-pra01-02-wed-6-30pm-alex-t05-9tjr.onrender.com/
+
+
+Majority of the backend was taken from Lectorial Week 8-9 for both backend's (node-express, typeorm , graphql)
+
+
 Lectorial Week 8:
     Backend:
         Event.ts (Many to One relationship with User.ts)
