@@ -8,5 +8,6 @@ export type featuredEvent = {
         shortDescription?: string;
         image?: string; // Optional field for event image URL
         isBlocked: boolean; // Optional field for vendors to block the events. FOR CREDIT.
+        user?: string;
     };
 };

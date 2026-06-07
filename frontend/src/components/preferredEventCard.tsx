@@ -24,7 +24,7 @@ export default function PreferredEventCard({ event }: CardProps) {
             setExpanded(null); // Collapse the application form after submission
         };
 
-    if (events.length === 0 || !events) {
+    if (!events || events.length === 0) {
         return <h1>No events available.</h1>;
     } else
         return (

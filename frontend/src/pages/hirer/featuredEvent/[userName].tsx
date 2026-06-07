@@ -5,8 +5,7 @@ import PreferredEventCard from "@/components/preferredEventCard";
 import { userService } from '@/services/api';
 import { useEvent } from "@/context/EventContext";
 import { useRouter } from "next/router";
-
-
+import { Event } from "@/types/event";
 
 export default function PreferredEvent() {
     const { user } = useAuth();
@@ -44,13 +43,7 @@ export default function PreferredEvent() {
                     {featuredEvents.map((featuredEvents) => ( // Map prints the found events
                         <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={featuredEvents.FeaturedId}>
                             <PreferredEventCard
-                                eventId={featuredEvents.event.eventId}
-                                eventName={featuredEvents.event.eventName}
-                                numberOfGuest={featuredEvents.event.numberOfGuest}
-                                address={featuredEvents.event.address || "No address provided"}
-                                image={featuredEvents.event.image}
-                                shortDescription={featuredEvents.event.shortDescription}
-                                isBlocked={featuredEvents.event.isBlocked}
+                                event={featuredEvents?.event as Event} // Pass the entire event object to the card
                             />
                             <div className="flex justify-end gap-2 mt-2">
                             </div>
