@@ -23,7 +23,7 @@ export default function Profile() {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [validation, setValidation] = useState('')
     const [color, setColor] = useState('')
-    
+
     //toggle for application history display
     const [history, setHistory] = useState(false);
     //gets application history from custom hook
@@ -36,16 +36,16 @@ export default function Profile() {
     //TODO refactor this to a hook
     useEffect(() => {
         if (!router.isReady) return; //wait for router
-        try{
-        async function fetchUser() {
-            //fetches user details based on url
-            const user = await userService.getOneUser(profileUserName);
-            setProfileUser(user); //set the profileUser state to the fetched user details
+        try {
+            async function fetchUser() {
+                //fetches user details based on url
+                const user = await userService.getOneUser(profileUserName);
+                setProfileUser(user); //set the profileUser state to the fetched user details
+            }
+            fetchUser();
+        } catch (error) {
+            console.error("Error fetching user details:", error);
         }
-        fetchUser();
-    } catch (error) {
-        console.error("Error fetching user details:", error);
-    }
     }, [profileUserName, currentUser, router.isReady]); //refetches if profile username query parameter or current user changes
 
     useEffect(() => {
@@ -111,7 +111,7 @@ export default function Profile() {
             console.error("Error fetching updated user details after upload:", error);
         }
     }
-        
+
     if (!profileUser) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -217,7 +217,7 @@ export default function Profile() {
                             <Box>
                                 {applicationHistory.map((app) => (
                                     <Box key={app.applicationId} p={2} borderWidth="1px" borderRadius="md" mb={2}>
-                                        <ApplicationHistory application={app}/>
+                                        <ApplicationHistory application={app} />
                                     </Box>
                                 ))}
                             </Box>

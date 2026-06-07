@@ -1,14 +1,16 @@
 import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
 import { Event } from '../types/event';
-import { eventService, userService } from '@/services/api';
+import { eventService, featuredEventService, userService } from '@/services/api';
 import { useRouter } from 'next/router';
 import { useAuth } from './AuthContext';
 import { preferredEvent } from '@/types/preferredEvents';
+import { featuredEvent } from '@/types/featuredEvents';
 
 type EventContextType = {
     events: Event[];
     eventsForVendor: Event[];
     eventsForHirer: preferredEvent[];
+    featuredEvents: featuredEvent[];
     setEvents: (events: Event[]) => void;
     fetchEvents: () => void;
     fetchEventsForVendor: () => void;
@@ -22,6 +24,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
     const [events, setEvents] = useState<Event[]>([]);
     const [eventsForVendor, setEventsForVendor] = useState<Event[]>([]);
     const [eventsForHirer, setEventsForHirer] = useState<preferredEvent[]>([]);
+    const [featuredEvents, setFeaturedEvents] = useState<featuredEvent[]>([]);
     const { user } = useAuth();
 
     //const [selectedEventID, setSelectedEventID] = useState<number | null>(null);
@@ -32,6 +35,7 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         if (user?.userName) {
             fetchEventsForVendor();
             fetchPreferredForHirer();
+            fetchFeaturedEvents();
         }
     }, [user?.userName]);
 
@@ -66,8 +70,19 @@ export const EventProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
+    const fetchFeaturedEvents = async () => {
+        if (user?.role === "hirer") {
+            try {
+                const data = await featuredEventService.getAllFeaturedEvents();
+                setFeaturedEvents(data);
+            } catch (error) {
+                console.error("Error fetching featured events:", error);
+            }
+        }
+    };
+
     return (
-        <EventContext.Provider value={{ events, setEvents, eventsForVendor, eventsForHirer, fetchEvents, fetchEventsForVendor, fetchPreferredForHirer }}>
+        <EventContext.Provider value={{ events, setEvents, eventsForVendor, eventsForHirer, fetchEvents, fetchEventsForVendor, fetchPreferredForHirer, featuredEvents }}>
             {children}
         </EventContext.Provider>
     );
