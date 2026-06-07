@@ -54,13 +54,21 @@ for order: { ranking: "ASC }
 
 for one-to-one relations
     One-to-one relations | TypeORM 2026, Typeorm.io, viewed 6 June 2026, <https://typeorm.io/docs/relations/one-to-one-relations/>.
+
+Search functions in hirer dashboard:
+MDN Web Docs. (2019). Array.prototype.filter(). [online] Available at: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter.
 ‌
 Chakra v2 forms, used in componts EventModal, ApplicationModal
 Adebayo, S. (n.d.). Form Control. [online] Chakra UI: Simple, Modular and Accessible UI Components for your React Applications. Available at: https://v2.chakra-ui.com/docs/components/form-control [Accessed 7 Jun. 2026].
 
+Paramaterised queries in Application Controler
+Pleerock (2017) Re: parameterized queries in TypeORM with MSSQL. GitHub issue comment, 17 November. Available at: https://github.com/typeorm/typeorm/issues/881 (Accessed: 7 June 2026).
 
 Use of Generative AI:
-Generative AI tools including Claude, Chatgpt and Copilot were used in this project primarily for bug diagonisisand, inline completion for repetitive areas and for conceptual exploration. Generated code snippets were critically analysed and care was taken to suitibly modify and adapt any outputs before implementation.
+Generative AI tools including Claude, Chatgpt and Copilot were used in this project primarily for bug diagonisisand, inline completion for repetitive areas and for conceptual exploration. Generated code snippets were critically analysed and care was taken to suitibly modify and adapt any outputs before implementation. Specific areas of use were: several sql queries in applicationController
+
+FileReader component
+developer.mozilla.org. (n.d.). FileReader - Web APIs | MDN. [online] Available at: https://developer.mozilla.org/en-US/docs/Web/API/FileReader.
 
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
