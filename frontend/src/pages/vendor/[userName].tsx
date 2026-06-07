@@ -14,6 +14,16 @@ export default function Vendor() {
     const { eventsForVendor, fetchEventsForVendor } = useEvent();
     const [visualisationsVisible, setVisualisationsVisible] = useState(false);
     const [eventForm, setEventForm] = useState<{ mode: "createEvent" } | null>(null);
+    const [tags, setTags] = useState<{ eventId: number; tag: string }[]>([]);
+    
+    async function fetchAllEventTags() {
+        const eventTags = await eventService.getAllEventTags();
+        setTags(eventTags);
+        console.log("Fetched event tags in Vendor profile:", eventTags);
+    }
+    useEffect(() => {   
+        fetchAllEventTags();
+    }, [eventsForVendor]);
 
     const router = useRouter();
     const userName = router.query.userName as string;
@@ -27,6 +37,7 @@ export default function Vendor() {
         const createdEvent = await eventService.createEvent(updatedEvent);
         await eventService.setTagsForEvent(createdEvent.eventId, event.tags);
         setEventForm(null); // Close the event form modal after submission
+        fetchAllEventTags(); // Refetch tags to ensure the new event's tags are included
         await fetchEventsForVendor(); // Fetchs all vendor events again to update the list
     };
     useEffect(() => {
@@ -72,6 +83,7 @@ export default function Vendor() {
                     <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={vendorEvent.eventId}>
                         <Card
                             event={vendorEvent}
+                            tags={tags.filter(t => t.eventId === vendorEvent.eventId).map(t => t.tag)}
                         />
                     </div>
                 ))}
