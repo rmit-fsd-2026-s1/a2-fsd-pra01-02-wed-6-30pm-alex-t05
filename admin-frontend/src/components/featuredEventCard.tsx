@@ -19,12 +19,12 @@ export default function FeaturedEventCard({ featuredEventId, eventName, numberOf
     const { admin } = useAuth();
     const router = useRouter();
     const { userName } = router.query;
-    const { featuredEvents, fetchFeaturedEvents } = useEvent();
+    const { featuredEvents, fetchFeaturedEvents, fetchEvents } = useEvent();
 
     const HandleRemove = async (featuredEventId: string) => {
         try {
             await AdminService.deleteFeaturedEvent(featuredEventId);
-            fetchFeaturedEvents(); // Refresh the featured events list after removing
+            fetchFeaturedEvents();
         } catch (error) {
             console.error("Error removing event from featured:", error);
         }

@@ -36,7 +36,7 @@ export default function PreferredEvent() {
                             <div>
                                 <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md">
                                     <FeaturedEventCard
-                                        featuredEventId={featuredEvents.event.eventId}
+                                        featuredEventId={featuredEvents.FeaturedId}
                                         eventName={featuredEvents.event.eventName}
                                         numberOfGuest={featuredEvents.event.numberOfGuest}
                                         address={featuredEvents.event.address || "No address provided"}

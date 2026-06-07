@@ -13,7 +13,7 @@ interface CardProps {
 }
 
 export default function Card({ event, vendorUserNames }: CardProps) {
-    const { events, fetchEvents } = useEvent();
+    const { events, fetchFeaturedEvents, fetchEvents } = useEvent();
     const [expanded, setExpanded] = useState<"createApplication" | "viewApplications" | "blockDates" | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const [eventForm, setEventForm] = useState<{ mode: "editEvent" | "createEvent", event: Event } | null>(null);
@@ -41,7 +41,7 @@ export default function Card({ event, vendorUserNames }: CardProps) {
                 image: updatedEvent.image,
             });
             setEventForm(null);
-            fetchEvents(); // Refresh the event list after updating
+            fetchFeaturedEvents(); // Refresh the featured events list after updating
         } catch (error) {
             console.error("Error updating event:", error);
             setError("Failed to update event. Please try again.");
@@ -51,23 +51,12 @@ export default function Card({ event, vendorUserNames }: CardProps) {
     const handleAddToFeatured = async (eventId: string) => {
         try {
             await AdminService.addFeaturedEvent(eventId);
-            fetchEvents(); // Refresh the event list after adding to featured
+            fetchFeaturedEvents(); // Refresh the featured events list after adding
         } catch (error) {
             console.error("Error adding event to featured:", error);
             setError("Failed to add event to featured. Please try again.");
         }
-    }
-    /* re use this for setting featured events
-        const addPreferredEvents = async (eventID: number) => {
-            try {
-                await userService.createPreferredEventForUser(user!.userName, eventID);
-                fetchPreferredForHirer(); // Refresh the preferred events list after adding a new preferred event
-            } catch (error) {
-                console.error("Error adding preferred event:", error);
-                setError("Failed to add preferred event. Please try again.");
-            }
-        }
-    */
+    };
     if (events.length === 0 || !events) {
         return <h1>No events available.</h1>;
     } else

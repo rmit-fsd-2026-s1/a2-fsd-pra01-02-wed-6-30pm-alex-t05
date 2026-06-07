@@ -165,8 +165,8 @@ const UPDATE_EVENT = gql`
 
 
 const DELETE_EVENT = gql`
-  mutation DeleteEvent($eventId: ID!) {
-    deleteEvent(eventId: $eventId)
+  mutation DeleteEvent($featuredId: ID!) {
+    deleteEvent(featuredId: $featuredId)
   }
 `
 
@@ -298,7 +298,7 @@ export const AdminService = {
   deleteFeaturedEvent: async (featuredId: string): Promise<boolean> => {
     const { data } = await client.mutate({
       mutation: DELETE_FEATURED_EVENT,
-      variables: { id: featuredId },
+      variables: { featuredId },
     });
     return data.deleteFeaturedEvent;
   },
