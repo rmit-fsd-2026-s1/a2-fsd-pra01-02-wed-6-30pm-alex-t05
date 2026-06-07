@@ -57,11 +57,11 @@ export default function Signin() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-100 h-130">
-                {error ? (
+                {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                         {error}
                     </div>
-                ) : null}
+                )}
                 <form>
                     <h1 className="!text-4xl">Sign in</h1>
                     <FormControl>

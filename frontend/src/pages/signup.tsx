@@ -81,9 +81,9 @@ export default function Signup() {
     return (
         <main>
             {errors && (
-                <Box mb={4} p={3} bg="red.100" borderRadius="md" color="red.700">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                     {errors}
-                </Box>
+                </div>
             )}
             <div className="h-200 flex items-center justify-center bg-gray-100">
                 <div className="w-250">
