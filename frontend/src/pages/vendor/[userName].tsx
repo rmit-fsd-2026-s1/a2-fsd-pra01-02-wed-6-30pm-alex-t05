@@ -24,7 +24,8 @@ export default function Vendor() {
             user: userName
         };
         console.log("Submitting event:", updatedEvent);
-        await eventService.createEvent(updatedEvent);
+        const createdEvent = await eventService.createEvent(updatedEvent);
+        await eventService.setTagsForEvent(createdEvent.eventId, event.tags);
         setEventForm(null); // Close the event form modal after submission
         await fetchEventsForVendor(); // Fetchs all vendor events again to update the list
     };

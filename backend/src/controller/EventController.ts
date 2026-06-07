@@ -3,12 +3,17 @@ import { AppDataSource } from "../data-source";
 import { Event } from "../entity/Event";
 import { User } from "../entity/User";
 import { Application } from "../entity/Application";
+import { EventTags } from "../entity/EventTags";
+import { Tag } from "../entity/Tag";
+import { In } from "typeorm";
 
 
 export class EventController {
   private eventRepository = AppDataSource.getRepository(Event);
   private userRepository = AppDataSource.getRepository(User);
   private applicationRepository = AppDataSource.getRepository(Application);
+  private eventTagsRepository = AppDataSource.getRepository(EventTags);
+  private tagRepository = AppDataSource.getRepository(Tag);
 
   /**
    * Retrieves all events from the database
@@ -158,5 +163,43 @@ try {
       relations: ["user"],
     });
     return response.json(events);
+  }
+
+  async getAllTags(request: Request, response: Response) {
+    const tags = await this.tagRepository.find();
+    return response.json(tags);
+  }
+  async getTagsForEvent(request: Request, response: Response) {
+    const eventId = parseInt(request.params.eventId);
+    const eventTags = await this.eventTagsRepository.find({
+      where: { event: { eventId } },
+      relations: ["tagEntity"],
+    });
+    const tags = eventTags.map((eventTag) => eventTag.tagEntity);
+    return response.json(tags);
+  }
+
+  async setTagsForEvent(request: Request, response: Response) {
+    const eventId = parseInt(request.params.eventId);
+    const tags: string[] = request.body;
+    const newTags = await this.tagRepository.findBy({ tag: In(tags) });
+
+    const event = await this.eventRepository.findOneBy({ eventId });
+    if (!event) {
+      return response.status(404).json({ message: "Event not found" });
+    }
+
+    await this.eventTagsRepository.delete({ event: { eventId } });
+
+    if (newTags.length === 0) {
+      return response.json({ message: "Tags updated successfully" });
+    }
+    
+    const eventTags = newTags.map(tag => ({
+      eventId,
+      tag: tag.tag
+    }));
+    await this.eventTagsRepository.save(eventTags);
+    return response.json({ message: "Tags updated successfully" });
   }
 }

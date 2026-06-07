@@ -3,6 +3,7 @@ import { Event } from "@/types/event";
 import InputField from "@/components/InputField";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import TagCheckBox from "@/components/TagsCheckbox";
 export default function EventFormModal({
     mode,
     selectedEvent,
@@ -25,6 +26,7 @@ export default function EventFormModal({
                 shortDescription: selectedEvent.shortDescription || "",
                 address: selectedEvent.address || "",
                 user: selectedEvent.user,
+                tags: [],
             });
         }
     }, [owner]);
@@ -37,6 +39,7 @@ export default function EventFormModal({
         image: mode === "editEvent" && selectedEvent ? selectedEvent.image || "" : "",
         address: mode === "editEvent" && selectedEvent ? selectedEvent.address || "" : "",
         user: owner,
+        tags: [] as string[],
     });
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -94,6 +97,13 @@ export default function EventFormModal({
                     )}
                     {/*TODO implement form*/}
                     <FormControl>
+                        <TagCheckBox 
+                            eventId={mode === "editEvent" && selectedEvent ? selectedEvent.eventId : undefined}
+                            value={formData.tags}
+                            onChange={(tags) => {
+                                setFormData({ ...formData, tags });
+                            }}
+                        />
                         <InputField
                             label="Event Name"
                             name="eventName"

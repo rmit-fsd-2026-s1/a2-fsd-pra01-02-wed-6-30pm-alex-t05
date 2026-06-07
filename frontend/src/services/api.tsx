@@ -24,8 +24,9 @@ export const eventService = {
         return data;
     },
 
-    createEvent: async (event: Event): Promise<void> => {
-        await axios.post(`${API_BASE_URL}/events`, event);
+    createEvent: async (event: Event): Promise<Event> => {
+        const { data } = await axios.post(`${API_BASE_URL}/events`, event);
+        return data;
     },
 
     updateEvent: async (eventId: number, event: Event): Promise<Event> => {
@@ -35,6 +36,20 @@ export const eventService = {
 
     deleteEvent: async (event: Event): Promise<void> => {
         await axios.delete(`${API_BASE_URL}/events/${event.eventId}`);
+    },
+    getAllTags: async (): Promise<string[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/tags`);
+        console.log("Fetched all tags:", data);
+        return data.map((t: { tag: string }) => t.tag);
+    },
+    getTagsForEvent: async (eventId: number): Promise<string[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/tags`);
+        console.log(`Fetched tags for event ${eventId}:`, data);
+        return data.map((t: { tag: string }) => t.tag);
+    },
+    setTagsForEvent: async (eventId: number, tags: string[]): Promise<void> => {
+        console.log(`Setting tags for event ${eventId}:`, tags);
+        await axios.post(`${API_BASE_URL}/events/${eventId}/tags`, tags);
     },
 };
 

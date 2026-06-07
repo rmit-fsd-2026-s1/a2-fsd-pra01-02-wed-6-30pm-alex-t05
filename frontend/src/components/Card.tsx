@@ -34,12 +34,14 @@ export default function Card({ event }: CardProps) {
 
     const handleEventSubmit = async (updatedEventData: any) => {
         //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
-        console.log("Updated event data:", updatedEventData);
+        const { tags, ...eventDataWithoutTags } = updatedEventData;
         const updatedEvent: Event = {
-            ...updatedEventData,
-            numberOfGuest: parseInt(updatedEventData.numberOfGuest),
+            ...eventDataWithoutTags,
+            numberOfGuest: parseInt(eventDataWithoutTags.numberOfGuest),
+            user: user!.userName
         };
         await eventService.updateEvent(event.eventId, updatedEvent);
+        await eventService.setTagsForEvent(event.eventId, tags);
         setEventForm(null); // Close the event form modal after submission
         fetchEventsForVendor(); // Fetchs all vendor events again to update the list
     }

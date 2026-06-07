@@ -13,7 +13,7 @@ export class UpdateEventDTO {
     @IsNotEmpty()
     address: string;
 
-    @IsString()
+    @IsBoolean()
     @IsOptional()
     isArchived?: boolean = false;
 

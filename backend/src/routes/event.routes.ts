@@ -31,5 +31,17 @@ router.delete("/events/:id", async (req, res) => {
   await eventController.remove(req, res);
 });
 
+router.get("/tags", async (req, res) => {
+  await eventController.getAllTags(req, res);
+});
+
+router.get("/events/:eventId/tags", async (req, res) => {
+  await eventController.getTagsForEvent(req, res);
+});
+
+router.post("/events/:eventId/tags", async (req, res) => {
+  await eventController.setTagsForEvent(req, res);
+});
+
 
 export default router;
