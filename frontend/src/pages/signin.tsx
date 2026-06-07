@@ -29,7 +29,7 @@ export default function Signin() {
             if (axios.isAxiosError(error) && error.response) {
                 if (error.response.status === 401) { // Check if the error status is 401 (Unauthorized) or 400 (Bad Request)
                     setError("Invalid email or password"); // Set error message if login fails due to invalid credentials
-                } 
+                }
             } else {
                 setError("An error occurred during login. Please try again."); // Set generic error message for other errors
             }
@@ -62,6 +62,7 @@ export default function Signin() {
                         {error}
                     </div>
                 ) : null}
+                <form>
                     <h1 className="!text-4xl">Sign in</h1>
                     <FormControl>
                         <FormLabel>Email address</FormLabel>
@@ -76,12 +77,13 @@ export default function Signin() {
                             placeholder='Password'
                             onChange={(e) => setPassword(e.target.value)} // Sets a new state for 'password'
                         />
-                    
 
-                    <Button mt={4} colorScheme='teal' onClick={handleSubmit} type='submit'>
-                        Sign In
-                    </Button>
-                </FormControl>
+
+                        <Button mt={4} colorScheme='teal' onClick={handleSubmit} type='submit'>
+                            Sign In
+                        </Button>
+                    </FormControl>
+                </form>
             </div>
             <div className="bg-blue-200 p-8 rounded-lg shadow-md w-75 h-130">
                 <div>
