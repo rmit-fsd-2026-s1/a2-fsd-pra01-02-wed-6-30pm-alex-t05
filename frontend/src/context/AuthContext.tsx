@@ -1,0 +1,77 @@
+import { createContext, useState, ReactNode, useEffect, useContext } from 'react';
+import { userService } from "@/services/api";
+import { User } from '@/types/user';
+import { authService } from '@/services/loginapi';
+
+//bespoke type to restrict user data displayed in context
+type AuthUser = {
+    userName: string;
+    email: string;
+    role: string;
+}
+
+type login = {
+    userName: string;
+    password: string;
+}
+
+type AuthContextType = {
+    user: AuthUser | null;
+    fetchUsers: () => Promise<User[]>;
+    login: (userName: string, password: string) => Promise<void>;
+    logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [user, setUser] = useState<AuthUser | null>(null);
+    //retrieves current user to persist login
+    useEffect(() => {
+        const StoredUser = localStorage.getItem('currentUser'); // Checks if there is a logged in user
+        if (StoredUser) setUser(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
+    }, []);
+
+    const login = async (email: string, password: string) => {
+        const data = await authService.loginUser(email, password);
+        console.log("Login successful, user data:", data); // Debug log to check login response
+        const userData: AuthUser = {
+            userName: data.userName,
+            email: data.email,
+            role: data.role
+        }
+        console.log("User data after login:", userData); // Debug log to check user data
+        setUser(userData);
+        localStorage.setItem('currentUser', JSON.stringify(userData));
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const data = await userService.getAllUsers();
+            return data;
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            return [];
+        }
+    };
+
+    const logout = () => {
+        setUser(null);
+        localStorage.removeItem('currentUser');
+    };
+
+    return (
+        <AuthContext.Provider value={{ user, fetchUsers, login, logout }}>
+            {children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuth = () => {
+    //provider
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
+}
