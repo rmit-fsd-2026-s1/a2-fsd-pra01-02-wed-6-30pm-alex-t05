@@ -5,7 +5,7 @@ import { Application } from "@/types/application";
 import { preferredEvent } from "@/types/preferredEvents";
 import { featuredEvent } from "@/types/featuredEvents";
 
-const API_BASE_URL = "http://localhost:3001/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 // Will need to add validations in the future.
 

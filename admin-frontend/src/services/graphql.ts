@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 
 const httpLink = createHttpLink({
-  uri: "http://localhost:3101/graphql",
+  uri: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3101/graphql",
 });
 
 export const client = new ApolloClient({

@@ -3,10 +3,10 @@ import { DataSource } from "typeorm";
 
 export const AppDataSource = new DataSource({
   type: "mssql",
-  host: "dipto-database.cn2ems8y2mfe.ap-southeast-2.rds.amazonaws.com",
-  username: "s3731804",
-  password: "Rmit1234#1",
-  database: "s3731804",
+  host: process.env.DB_HOST,
+  username: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   options: {
     encrypt: false, // Use this for Azure SQL Database
     //trustedConnection: false // Use this for Windows Authentication (if applicable)
