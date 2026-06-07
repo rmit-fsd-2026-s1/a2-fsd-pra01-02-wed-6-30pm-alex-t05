@@ -15,9 +15,10 @@ import { eventService, applicationService } from "@/services/api";
 
 interface CardProps {
     event: Event;
+    tags?: string[];
 }
 
-export default function Card({ event }: CardProps) {
+export default function Card({ event, tags }: CardProps) {
     const { events, fetchPreferredForHirer, fetchEventsForVendor } = useEvent();
     const { user } = useAuth();
     const [expanded, setExpanded] = useState<"createApplication" | "viewApplications" | "blockDates" | null>(null);
@@ -31,6 +32,7 @@ export default function Card({ event }: CardProps) {
         applicationService.submitApplication(application);
         setExpanded(null); // Collapse the application form after submission
     };
+
 
     const handleEventSubmit = async (updatedEventData: any) => {
         //TODO implement event update logic, which will likely involve calling an API endpoint to update the event in the backend, then updating the event in the frontend state to reflect the changes
@@ -66,6 +68,7 @@ export default function Card({ event }: CardProps) {
                 <div className="grid grid-cols-2">
                     <p className="text-gray-600">Occupancy: {event.numberOfGuest}</p>
                     <p className="text-gray-600">Address: {event.address || "No address provided"}</p>
+                    <p className="text-gray-600">Tags: {tags && tags.length > 0 ? tags.join(", ") : "No tags"}</p>
                 </div>
                 <p className="text-gray-600 mt-2">Description: {event.shortDescription}</p>
                 {error && <p className="text-red-500">{error}</p>}

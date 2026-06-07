@@ -43,5 +43,9 @@ router.post("/events/:eventId/tags", async (req, res) => {
   await eventController.setTagsForEvent(req, res);
 });
 
+router.get("/event-tags", async (req, res) => {
+  await eventController.getAllEventTags(req, res);
+});
+
 
 export default router;

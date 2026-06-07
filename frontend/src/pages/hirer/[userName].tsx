@@ -1,10 +1,13 @@
-import { useState } from 'react';
-import { Button, Input, Icon } from "@chakra-ui/react";
+import { useEffect, useState } from 'react';
+import { Button, Input, Icon, Box } from "@chakra-ui/react";
 import { useAuth } from "../../context/AuthContext";
 import { MdSearch } from "react-icons/md";
 import Card from "../../components/Card";
 import { useEvent } from '../../context/EventContext';
 import { useRouter } from "next/router";
+import TagsCheckBox from "@/components/TagsCheckbox";
+import { eventService } from '@/services/api';
+import { Event } from '@/types/event';
 
 export default function Hirer() {
     const router = useRouter();
@@ -12,6 +15,21 @@ export default function Hirer() {
     const { user } = useAuth()
     const { events } = useEvent();
     const [userSearch, setUserSearch] = useState('')
+    const [tags, setTags] = useState<{ eventId: number; tag: string}[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+    useEffect(() => {
+        async function fetchAllEventTags() {
+            const eventTags = await eventService.getAllEventTags();
+            setTags(eventTags);
+            console.log("Fetched event tags in Hirer profile:", eventTags);
+        }
+        fetchAllEventTags();
+    }, []);
+
+    useEffect(() => {
+        console.log("Selected tags in Hirer profile:", selectedTags);
+    }, [selectedTags]);
 
     if (!user) {
         return <div>Loading...</div>;
@@ -30,6 +48,9 @@ export default function Hirer() {
                 <Button colorScheme='teal' type='button' className="w-30 items-center">
                     Search
                 </Button>
+                <Box padding={4}>
+                    <TagsCheckBox value={selectedTags} onChange={setSelectedTags} />
+                </Box>
             </form>
             {(events.length === 0 || events === null) ? (
                 <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -41,16 +62,22 @@ export default function Hirer() {
                 /* include will get userSearch(useState) with the events and see what matches.
                 filter will get the found events and return them */
                 <div className="grid grid-cols-2 gap-4">
-                    {events.filter(e =>
+                    {events.filter(e => 
+                    (
                         e.eventName.toLowerCase().includes(userSearch.toLowerCase()) ||
                         e.numberOfGuest.toString().includes(userSearch.toLowerCase()) ||
                         e.address?.toLowerCase().includes(userSearch.toLowerCase()) ||
-                        e.shortDescription?.toLowerCase().includes(userSearch.toLowerCase()
-                        )).map((event) => (
+                        e.shortDescription?.toLowerCase().includes(userSearch.toLowerCase())
+                     ) &&
+                     (  selectedTags.length === 0 ||
+                        tags.filter(t => t.eventId === e.eventId).some(t => selectedTags.includes(t.tag))
+                     )
+                        ).map((event) => (
                             <div className="bg-white p-6 ml-3 mr-3 mt-3 rounded-lg shadow-md" key={event.eventId}>
                                 <Card
                                     event={event}
-                                />
+                                    tags={tags.filter(t => t.eventId === event.eventId).map(t => t.tag)}
+                                    />
                             </div>
                         ))}
                 </div>

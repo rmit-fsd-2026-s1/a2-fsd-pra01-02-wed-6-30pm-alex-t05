@@ -60,7 +60,17 @@ export class EventController {
 
     response.status(201).json(event);
   }
+  async getAllEventTags(req: Request, res: Response) {
+    const rows = await this.eventTagsRepository.find({
+        relations: ["tagEntity"],
+    });
 
+    const result = rows.map(r => ({
+        eventId: r.eventId,
+        tag: r.tagEntity.tag,
+    }));
+    return res.json(result);
+}
   /**
  * Updates an existing event's information
  * @param request - Express request object containing event ID in params and updated details in body

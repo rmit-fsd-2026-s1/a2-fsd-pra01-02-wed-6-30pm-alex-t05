@@ -48,6 +48,11 @@ export const eventService = {
         console.log(`Fetched tags for event ${eventId}:`, data);
         return data.map((t: { tag: string }) => t.tag);
     },
+    getAllEventTags: async (): Promise<{ eventId: number; tag: string}[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/event-tags`);
+        console.log("Fetched all event tags:", data);
+        return data;
+    },
     setTagsForEvent: async (eventId: number, tags: string[]): Promise<void> => {
         console.log(`Setting tags for event ${eventId}:`, tags);
         await axios.post(`${API_BASE_URL}/events/${eventId}/tags`, tags);
