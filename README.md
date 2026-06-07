@@ -84,13 +84,13 @@ Cascade in PreferredEvents, FeaturedEvents, and Event Tags (tricky bug)
 GeeksforGeeks (2023). Cascade in SQL. [online] GeeksforGeeks. Available at: 
 https://www.geeksforgeeks.org/sql/cascade-in-sql/.
 
-‌
 
-NEED TO DO:
-finish of validations to applicaiton and vendorcomments
-apply them to the routes
-Updpate event for vendor (CRUD)
-removepreferredEvents works but every slowly. need to fix to make it quicker somehow
+‌Note for Render Deployment:
+This api call works:
+https://a2-fsd-pra01-02-wed-6-30pm-alex-t05.onrender.com/api/users
+But we had trouble with deployment as it was reporting memory issues and full deployment was not successful.
+
+
 
 User Logins (plaintext):
 userName: harryp
