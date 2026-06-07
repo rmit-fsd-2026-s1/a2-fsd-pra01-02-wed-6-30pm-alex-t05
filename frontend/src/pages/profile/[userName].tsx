@@ -172,14 +172,18 @@ export default function Profile() {
                         variant="flushed"
                     />
                 </Box>
-                <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
-                    <p>Rating</p>
-                    {<p>{rating ? rating : 'Not rated'}</p>}
-                </Box>
-                <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
-                    <p>Credibility Score</p>
-                    <p>{credibilityScore ? credibilityScore * 25 + "%" : 'Not rated'}</p>
-                </Box>
+                {profileUser.role === "hirer" && (
+                    <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
+                        <p>Rating</p>
+                        {<p>{rating ? Math.round(rating*100)/100 + " / 5" : 'Not rated'}</p>}
+                    </Box>
+                )}
+                {profileUser.role === "hirer" && (
+                    <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
+                        <p>Credibility Score</p>
+                        <p>{credibilityScore ? credibilityScore * 25 + "%" : 'Not rated'}</p>
+                    </Box>
+                )}
                 <Box display="grid" gridTemplateColumns="140px 1fr" p={2} gap={4}>
                     <p>Account Created At</p>
                     <p>{profileUser.createdAt ? new Date(profileUser.createdAt).toLocaleDateString() : 'Not available'}</p>
