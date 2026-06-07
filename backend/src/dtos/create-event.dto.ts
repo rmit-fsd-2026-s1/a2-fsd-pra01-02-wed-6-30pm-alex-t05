@@ -21,7 +21,8 @@ export class CreateEventDTO {
     shortDescription?: string;
 
     @IsString()
-    image?: string;
+    @IsNotEmpty()
+    image: string;
 
     @IsBoolean()
     isArchived?: boolean = false;

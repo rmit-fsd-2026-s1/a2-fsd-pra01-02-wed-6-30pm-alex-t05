@@ -3,6 +3,7 @@ import express, { application } from "express";
 import { AppDataSource } from "./data-source";
 import userRoutes from "./routes/user.routes";
 import eventRoutes from "./routes/event.routes";
+import featuredEventRoutes from "./routes/featuredEvents.routes";
 import cors from "cors";
 import applicationRoutes from "./routes/application.routes";
 const app = express();
@@ -13,6 +14,8 @@ app.use(express.json());
 app.use("/api", userRoutes);
 app.use("/api", eventRoutes);
 app.use("/api", applicationRoutes);
+app.use("/api", featuredEventRoutes);
+
 
 AppDataSource.initialize()
   .then(() => {

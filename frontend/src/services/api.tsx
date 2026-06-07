@@ -3,6 +3,7 @@ import { Event } from "../types/event";
 import { User } from "../types/user";
 import { Application } from "@/types/application";
 import { preferredEvent } from "@/types/preferredEvents";
+import { featuredEvent } from "@/types/featuredEvents";
 
 const API_BASE_URL = "http://localhost:3001/api";
 
@@ -188,7 +189,7 @@ export const applicationService = {
             return [];
         }
     },
-    getUnavailableDatesForEvent: async (eventId: number): Promise<{ startDate: string; endDate: string; applicantUserName : string; applicationId: number }[]> => {
+    getUnavailableDatesForEvent: async (eventId: number): Promise<{ startDate: string; endDate: string; applicantUserName: string; applicationId: number }[]> => {
         const { data } = await axios.get(`${API_BASE_URL}/events/${eventId}/unavailable-dates`);
         return data;
     },
@@ -247,6 +248,17 @@ export const applicationService = {
         }
 
     },
-
-
 }
+
+export const featuredEventService = {
+    getAllFeaturedEvents: async (): Promise<featuredEvent[]> => {
+        const { data } = await axios.get(`${API_BASE_URL}/featuredevents`);
+        return data;
+    },
+
+    getFeaturedEvent: async (id: string): Promise<featuredEvent> => {
+        const { data } = await axios.get(`${API_BASE_URL}/featuredevents/${id}`);
+        return data;
+    }
+};
+

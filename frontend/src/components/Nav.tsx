@@ -12,6 +12,13 @@ const Nav = () => {
             <ul className="flex space-x-4">
                 {user ? (
                     <>
+                        {user.role === "hirer" && ( // Only show preferred events link if the user is a hirer
+                            <li>
+                                <Link href={`/hirer/featuredEvent/${user.userName}`}>
+                                    Featured Events
+                                </Link>
+                            </li>
+                        )}
                         <li>
                             <Link href={user.role === "hirer" ? `/hirer/${user.userName}` : `/vendor/${user.userName}`}>
                                 {user.role.charAt(0).toUpperCase() + user.role.slice(1)} Dashboard

@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     //retrieves current user to persist login
     useEffect(() => {
         fetchAdmins();
-        const StoredUser = localStorage.getItem('currentUser'); // Checks if there is a logged in user
+        const StoredUser = localStorage.getItem('currentAdmin'); // Checks if there is a logged in user
         if (StoredUser) setAdmin(JSON.parse(StoredUser)); // If there is a logged in user, set the user state to that user
     }, []);
 

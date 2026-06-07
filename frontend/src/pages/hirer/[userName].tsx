@@ -13,6 +13,10 @@ export default function Hirer() {
     const { events } = useEvent();
     const [userSearch, setUserSearch] = useState('')
 
+    if (!user) {
+        return <div>Loading...</div>;
+    }
+
     return (user && user.role === "hirer" && user.userName === userName) ? (
         <div className="min-h-screen items-center justify-center bg-gray-100">
             <h1 className="!text-2xl flex items-center justify-center">Venue List</h1>
