@@ -70,6 +70,12 @@ Generative AI tools including Claude, Chatgpt and Copilot were used in this proj
 FileReader component
 developer.mozilla.org. (n.d.). FileReader - Web APIs | MDN. [online] Available at: https://developer.mozilla.org/en-US/docs/Web/API/FileReader.
 
+Cascade in PreferredEvents, FeaturedEvents, and Event Tags (tricky bug)
+GeeksforGeeks (2023). Cascade in SQL. [online] GeeksforGeeks. Available at: 
+https://www.geeksforgeeks.org/sql/cascade-in-sql/.
+
+‌
+
 NEED TO DO:
 finish of validations to applicaiton and vendorcomments
 apply them to the routes
