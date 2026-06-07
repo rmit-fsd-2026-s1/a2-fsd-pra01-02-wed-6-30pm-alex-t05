@@ -184,7 +184,7 @@ export default function ApplicationForm({
                     .map((dateRange, index) => (
                         <p key={index}>
                             {dateRange.startDate} to {dateRange.endDate}
-                            {dateRange.applicantUserName == user?.userName && <Button onClick={() => cancelBlock(dateRange)} variant="link" color="blue"> Cancel Block </Button>}
+                            {dateRange.applicantUserName == (user?.userName && user.role === "vendor") && <Button onClick={() => cancelBlock(dateRange)} variant="link" color="blue"> Cancel Block </Button>}
                         </p>
                     ))
                 )}
