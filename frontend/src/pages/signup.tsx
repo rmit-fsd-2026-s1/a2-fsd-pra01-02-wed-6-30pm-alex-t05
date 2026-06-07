@@ -5,9 +5,6 @@ import { FormControl, FormLabel, Button, RadioGroup, Radio, Stack, FormErrorMess
 import { useAuth } from "@/context/AuthContext";
 import { userService } from "@/services/api";
 
-// Sign up works but needs to be cleaned heavily
-// Needs to be encryted
-
 export default function Signup() {
     const [userData, setUserData] = useState({
         userName: '',
@@ -18,16 +15,20 @@ export default function Signup() {
         role: '',
     });
     const [confirmPassword, setConfirmPassword] = useState("");
-    //const [errors, setErrors] = useState<Partial<FormData>>({});
     const [errors, setErrors] = useState("");
     const router = useRouter();
-    const { user } = useAuth();
+    const { user, fetchUsers } = useAuth();
 
-    // Fetch profiles on component mount
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const users = await fetchUsers();
         if (!userData.userName) {
             setErrors("Username is required");
+            return;
+        }
+        // filter puts all in an array that matches the user username from the database and then checks the length of the array if its more than 0.
+        if (users.filter((u) => u.userName === userData.userName).length > 0) {
+            setErrors("Username already exists");
             return;
         }
         if (!userData.firstName.trim()) {
@@ -46,7 +47,8 @@ export default function Signup() {
             setErrors("Email must be valid e.g. example@email.com");
             return;
         }
-        if (user?.email === userData.email && !userData.email) {
+        // filter puts all in an array that matches the user email from the database and then checks the length of the array if it is more than 0.
+        if (users.filter((u) => u.email === userData.email).length > 0) {
             setErrors("Email already exists");
             return;
         }
@@ -76,96 +78,74 @@ export default function Signup() {
         }
     };
 
-
-    //this dynamically displays password strength in helper text
-    /*const getPasswordStrength = (password: string): "weak" | "strong" | "" => {
-        if (password.length >= 6) return "strong";
-        if (password.length > 0) return "weak";
-        return "";
-    };
-    
-    //this is just for reactive password strength indicator and error tracking
-    */
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
-        const { name, value } = e.target;
-        setUserData((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
-        //if (name === "password") {
-        //    getPasswordStrength(value)
-        //}
-    };
-
     return (
         <main>
             {errors && (
-                <Box mb={4} p={3} bg="red.100" borderRadius="md" color="red.700">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
                     {errors}
-                </Box>
+                </div>
             )}
             <div className="h-200 flex items-center justify-center bg-gray-100">
-                <form onSubmit={handleSubmit} className="w-250">
+                <div className="w-250">
+                    <form onSubmit={handleSubmit}>
+                        <FormControl isRequired>
+                            <FormLabel>Username</FormLabel>
+                            <Input type='userName'
+                                value={userData.userName}
+                                onChange={(e) => setUserData({ ...userData, userName: e.target.value })} />
+                        </FormControl>
 
-                    <FormControl isRequired>
-                        <FormLabel>Username</FormLabel>
-                        <Input type='userName'
-                            value={userData.userName}
-                            onChange={(e) => setUserData({ ...userData, userName: e.target.value })} />
-                    </FormControl>
+                        <FormControl isRequired>
+                            <FormLabel>First Name</FormLabel>
+                            <Input type='firstName'
+                                value={userData.firstName}
+                                onChange={(e) => setUserData({ ...userData, firstName: e.target.value })} />
+                        </FormControl>
+                        <FormControl isRequired>
+                            <FormLabel>Last Name</FormLabel>
+                            <Input
+                                value={userData.lastName}
+                                onChange={(e) => setUserData({ ...userData, lastName: e.target.value })} />
+                        </FormControl>
 
-                    <FormControl isRequired>
-                        <FormLabel>First Name</FormLabel>
-                        <Input type='firstName'
-                            value={userData.firstName}
-                            onChange={(e) => setUserData({ ...userData, firstName: e.target.value })} />
-                    </FormControl>
-                    <FormControl isRequired>
-                        <FormLabel>Last Name</FormLabel>
-                        <Input
-                            value={userData.lastName}
-                            onChange={(e) => setUserData({ ...userData, lastName: e.target.value })} />
-                    </FormControl>
+                        <FormControl isRequired>
+                            <FormLabel>Email</FormLabel>
+                            <Input
+                                type="email"
+                                value={userData.email}
+                                onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
+                        </FormControl>
 
-                    <FormControl isRequired>
-                        <FormLabel>Email</FormLabel>
-                        <Input
-                            type="email"
-                            value={userData.email}
-                            onChange={(e) => setUserData({ ...userData, email: e.target.value })} />
-                    </FormControl>
-
-                    <FormControl isRequired>
-                        <FormLabel>Password</FormLabel>
-                        <Input
-                            type="password"
-                            value={userData.password}
-                            onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
-                    </FormControl>
-                    <FormControl isRequired>
-                        <FormLabel>Confirm Password</FormLabel>
-                        <Input
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)} />
-                    </FormControl>
-                    <FormControl>
-                        <FormLabel>Account Type</FormLabel>
-                        <RadioGroup
-                            onChange={(value) => setUserData(prev => ({ ...prev, role: value }))}
-                            value={userData.role}>
-                            <Stack direction='row'>
-                                <Radio value='hirer'>Hirer</Radio>
-                                <Radio value='vendor'>Vendor</Radio>
-                            </Stack>
-                        </RadioGroup>
-                    </FormControl>
-                    <Button mt={4} colorScheme='teal' type='submit'>
-                        Sign Up
-                    </Button>
-                </form>
+                        <FormControl isRequired>
+                            <FormLabel>Password</FormLabel>
+                            <Input
+                                type="password"
+                                value={userData.password}
+                                onChange={(e) => setUserData({ ...userData, password: e.target.value })} />
+                        </FormControl>
+                        <FormControl isRequired>
+                            <FormLabel>Confirm Password</FormLabel>
+                            <Input
+                                type="password"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)} />
+                        </FormControl>
+                        <FormControl>
+                            <FormLabel>Account Type</FormLabel>
+                            <RadioGroup
+                                onChange={(value) => setUserData(prev => ({ ...prev, role: value }))}
+                                value={userData.role}>
+                                <Stack direction='row'>
+                                    <Radio value='hirer'>Hirer</Radio>
+                                    <Radio value='vendor'>Vendor</Radio>
+                                </Stack>
+                            </RadioGroup>
+                        </FormControl>
+                        <Button mt={4} colorScheme='teal' type='submit'>
+                            Sign Up
+                        </Button>
+                    </form>
+                </div>
             </div>
         </main>
     );
